@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,300..800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; font-family: "Work Sans", system-ui, sans-serif; background: oklch(0.975 0 0); color: oklch(0.22 0 0); -webkit-font-smoothing: antialiased; }
+  a { color: oklch(0.55 0.13 200); text-decoration: none; }
+  a:hover { color: oklch(0.45 0.13 200); text-decoration: underline; }
+  textarea, button { font-family: inherit; font-size: inherit; color: inherit; }
+  textarea:focus { outline: 2px solid oklch(0.55 0.13 200 / 0.35); outline-offset: 1px; }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 20px 80px;">
+  <div style="width: 100%; max-width: 1000px;">
+
+    <header style="padding: 40px 0 26px;">
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.13 200); margin-bottom: 8px;">Stockage local · {{ cle }}</div>
+      <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">Base de données</h1>
+      <p style="margin: 10px 0 0; font-size: 15.5px; color: oklch(0.45 0 0); line-height: 1.6; max-width: 68ch; text-wrap: pretty;">Ce que l'outil a réellement enregistré sur ce poste. Cette page tient le rôle de la future base distante : mêmes champs, mêmes clés. <a href="index.html">Retour à l'outil</a></p>
+    </header>
+
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px;">
+      <button onClick="{{ rafraichir }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Rafraîchir</button>
+      <button onClick="{{ exporter }}" style="border: 0; cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: oklch(0.55 0.13 200); color: white;" style-hover="background: oklch(0.47 0.13 200);">Exporter en JSON</button>
+      <button onClick="{{ enregistrer }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Enregistrer le JSON modifié</button>
+      <span style="flex: 1;"></span>
+      <button onClick="{{ rechargerDemo }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Recharger les demandes de démonstration</button>
+      <button onClick="{{ reinitialiser }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0); color: oklch(0.5 0.14 25);" style-hover="background: oklch(0.97 0.02 25);">Vider la base</button>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;">
+      <span style="font-size: 14px; color: oklch(0.45 0 0);">{{ resume }}</span>
+      <span style="font-size: 13.5px; color: oklch(0.5 0.12 155);">{{ message }}</span>
+    </div>
+
+    <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; overflow: hidden; margin-bottom: 28px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; padding: 12px 16px; background: oklch(0.97 0 0); border-bottom: 1px solid oklch(0.91 0 0); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.5 0 0);">
+        <span>ref</span>
+        <span>demandeur</span>
+        <span>titre</span>
+        <span>statut</span>
+        <span>lien</span>
+      </div>
+      <sc-for list="{{ lignes }}" as="l" hint-placeholder-count="5">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; padding: 13px 16px; border-bottom: 1px solid oklch(0.95 0 0); font-size: 13.5px; align-items: start;">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: oklch(0.45 0 0);">{{ l.ref }}</span>
+          <span style="overflow-wrap: anywhere;">{{ l.demandeur }}</span>
+          <span style="line-height: 1.4;">{{ l.titre }}</span>
+          <span style="color: {{ l.fg }}; font-weight: 500;">{{ l.statut }}</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: oklch(0.55 0 0); overflow-wrap: anywhere;">{{ l.lien }}</span>
+        </div>
+      </sc-for>
+      <sc-if value="{{ vide }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 40px; text-align: center; font-size: 15px; color: oklch(0.55 0 0);">La base est vide. Déposez une demande depuis l'outil.</div>
+      </sc-if>
+    </div>
+
+    <div style="margin-bottom: 34px;">
+      <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 10px;">Contenu brut</div>
+      <textarea value="{{ json }}" onChange="{{ majJson }}" rows="16" spellcheck="false" style="width: 100%; padding: 16px; border: 1px solid oklch(0.89 0 0); border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6; resize: vertical; background: white;"></textarea>
+    </div>
+
+    <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 26px;">
+      <h2 style="margin: 0 0 6px; font-size: 18px; font-weight: 600; letter-spacing: -0.01em;">Passage à une base distante</h2>
+      <p style="margin: 0 0 20px; font-size: 14.5px; color: oklch(0.45 0 0); line-height: 1.6; max-width: 68ch; text-wrap: pretty;">Une seule table suffit. Les noms de colonnes ci-dessous sont exactement les clés utilisées par l'outil : la reprise se fait sans conversion.</p>
+      <div style="display: flex; flex-direction: column; gap: 1px; background: oklch(0.94 0 0); border-radius: 8px; overflow: hidden;">
+        <sc-for list="{{ schema }}" as="s" hint-placeholder-count="6">
+          <div style="display: flex; gap: 16px; flex-wrap: wrap; padding: 11px 14px; background: white; font-size: 13.5px;">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; min-width: 130px; color: oklch(0.4 0.1 200);">{{ s.col }}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; min-width: 90px; color: oklch(0.55 0 0);">{{ s.type }}</span>
+            <span style="flex: 1 1 240px; color: oklch(0.42 0 0); line-height: 1.45;">{{ s.note }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CLE = "synthesia_demandes_v1";
+const COULEUR = {
+  nouvelle: "oklch(0.42 0.01 250)", production: "oklch(0.42 0.11 200)",
+  validation: "oklch(0.44 0.11 70)", modif: "oklch(0.47 0.14 25)", validee: "oklch(0.4 0.1 155)"
+};
+const LABEL = {
+  nouvelle: "nouvelle", production: "production", validation: "validation", modif: "modif", validee: "validee"
+};
+const SCHEMA = [
+  { col: "id", type: "text", note: "Clé primaire. Généré au dépôt." },
+  { col: "ref", type: "text", note: "Référence lisible affichée partout : VID-2026-041." },
+  { col: "token", type: "text", note: "Jeton du lien de suivi envoyé par courriel. Remplace le compte demandeur." },
+  { col: "demandeur", type: "text", note: "Nom saisi dans le formulaire." },
+  { col: "email", type: "text", note: "Adresse de notification." },
+  { col: "titre", type: "text", note: "Titre de la vidéo." },
+  { col: "publicVise", type: "text", note: "Public visé." },
+  { col: "duree", type: "text", note: "De 30 s à 5 min, par pas de 30 s." },
+  { col: "urgence", type: "text", note: "Urgent · Normal · Faible." },
+  { col: "nbAvatars", type: "int", note: "1 à 5." },
+  { col: "avatars", type: "json", note: "Tableau des avatars nommés, dans l'ordre des champs n°1 à n°5." },
+  { col: "script", type: "text long", note: "Script audio." },
+  { col: "storyboard", type: "json", note: "Tableau d'objets { plan, schema, presence }." },
+  { col: "precisions", type: "text long", note: "Précisions supplémentaires." },
+  { col: "pieces", type: "json", note: "Noms des visuels déposés. Les fichiers eux-mêmes vont dans un dossier par ticket." },
+  { col: "statut", type: "text", note: "nouvelle · production · validation · modif · validee." },
+  { col: "lien", type: "text", note: "Lien de partage Synthesia de la version courante." },
+  { col: "depose", type: "datetime", note: "Horodatage ISO du dépôt." },
+  { col: "historique", type: "json", note: "Journal { qui, quand, texte }. Une ligne par action, jamais réécrite." }
+];
+
+function lire() {
+  try {
+    const brut = localStorage.getItem(CLE);
+    if (brut) {
+      const d = JSON.parse(brut);
+      if (Array.isArray(d)) return d;
+    }
+  } catch (e) {}
+  return [];
+}
+
+class Component extends DCLogic {
+  state = { tickets: lire(), json: JSON.stringify(lire(), null, 2), message: "" };
+
+  flash(m) {
+    clearTimeout(this._t);
+    this.setState({ message: m });
+    this._t = setTimeout(() => this.setState({ message: "" }), 4000);
+  }
+
+  recharger(msg) {
+    const t = lire();
+    this.setState({ tickets: t, json: JSON.stringify(t, null, 2) });
+    if (msg) this.flash(msg);
+  }
+
+  renderVals() {
+    const st = this.state;
+    return {
+      cle: CLE,
+      resume: st.tickets.length === 0 ? "0 enregistrement"
+        : st.tickets.length + (st.tickets.length === 1 ? " enregistrement" : " enregistrements") + " · " + new Blob([st.json]).size + " octets",
+      message: st.message,
+      vide: st.tickets.length === 0,
+      schema: SCHEMA,
+      lignes: st.tickets.map(t => ({
+        ref: t.ref, demandeur: t.demandeur, titre: t.titre,
+        statut: LABEL[t.statut] || t.statut, fg: COULEUR[t.statut] || "oklch(0.4 0 0)",
+        lien: t.lien || "—"
+      })),
+      json: st.json,
+      majJson: e => this.setState({ json: e.target.value }),
+      rafraichir: () => this.recharger("Relu depuis le stockage."),
+      enregistrer: () => {
+        try {
+          const d = JSON.parse(st.json);
+          if (!Array.isArray(d)) throw new Error("tableau attendu");
+          localStorage.setItem(CLE, JSON.stringify(d));
+          this.setState({ tickets: d });
+          this.flash("Enregistré.");
+        } catch (err) {
+          this.flash("JSON invalide : " + err.message);
+        }
+      },
+      exporter: () => {
+        const blob = new Blob([JSON.stringify(st.tickets, null, 2)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "demandes-video-" + new Date().toISOString().slice(0, 10) + ".json";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      },
+      rechargerDemo: () => {
+        localStorage.removeItem(CLE);
+        this.setState({ tickets: [], json: "[]" });
+        this.flash("Stockage remis à zéro : l'outil recréera les cinq demandes de démonstration à son prochain chargement.");
+      },
+      reinitialiser: () => {
+        localStorage.setItem(CLE, "[]");
+        this.setState({ tickets: [], json: "[]" });
+        this.flash("Base vidée. L'outil n'affichera plus aucune demande.");
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>
