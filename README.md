@@ -1,51 +1,52 @@
 # Gestion des demandes vidéo Synthesia
 
-Outil de gestion des demandes de création de vidéos Synthesia pour l'académie de Reims : dépôt des demandes par les formateurs, suivi de production, validation signée et journal des courriels.
+Outil de gestion des demandes de création de vidéos Synthesia pour l'académie de Reims : dépôt par les formateurs, suivi de production, validation signée, journal des courriels.
 
-## Contenu du dépôt
+## Contenu
 
 | Fichier | Rôle |
 | --- | --- |
-| `index.html` | L'outil complet : formulaire de demande, formulaires de modification et de validation, espace administrateur |
-| `base.html` | Vue technique des données enregistrées, export JSON, schéma de la table |
-| `stockage.js` | Couche de persistance : mode local ou API externe |
+| `index.html` | L'outil : formulaires public, de modification et de validation, espace administrateur |
+| `base.html` | Vue technique des données, export JSON |
+| `stockage.js` | Couche de persistance — **contient l'adresse de l'API à renseigner** |
 | `support.js` | Bibliothèque de rendu, requise par les deux pages |
-| `MISE-EN-LIGNE.md` | Procédure de déploiement pas à pas |
-| `INTEGRATION.md` | Forme des données, schémas SQL, variantes d'hébergement |
+| `logo-greta.jpg` | Bandeau institutionnel affiché en haut de chaque page |
+| `fonts/` | Marianne (Light, Regular, Italic, Medium, Bold, ExtraBold) |
+| `apps-script.gs` | Le code à coller dans Google Apps Script (ne pas téléverser, il ne sert pas au site) |
+| `MISE-EN-LIGNE.md` | Procédure complète |
 
-Les six fichiers vont **à la racine du dépôt**. Ne les rangez pas dans un sous-dossier : `index.html` charge `support.js` et `stockage.js` par chemin relatif.
+Les quatre premiers fichiers vont **à la racine du dépôt**, pas dans un sous-dossier. Le dossier `fonts/` conserve son nom et sa place à la racine.
 
-## Mise en ligne
+## Avant de publier
 
-1. Créez un dépôt public sur GitHub.
-2. Téléversez les six fichiers à la racine.
-3. **Settings → Pages → Source : Deploy from a branch**, branche `main`, dossier `/ (root)`.
-4. Deux minutes plus tard, le site répond sur `https://<compte>.github.io/<depot>/`.
+Dans `stockage.js`, renseignez l'adresse de votre déploiement Apps Script :
 
-La procédure complète — création de la base Google Sheets, déploiement de l'API, raccordement, recette — est dans `MISE-EN-LIGNE.md`.
+```javascript
+  var API = "https://script.google.com/macros/s/…/exec";
+```
+
+Laissée vide, l'application fonctionne en mode local : chaque visiteur écrit dans son propre navigateur et vous ne voyez rien. C'est le mode de démonstration.
+
+## Trois niveaux d'accès
+
+| Qui | Peut | S'authentifie par |
+| --- | --- | --- |
+| N'importe qui | Déposer une demande | Rien — le script n'accepte qu'une création |
+| Le demandeur | Voir, valider, modifier **sa** demande | Le jeton de son lien de suivi |
+| L'administrateur | Tout le reste | Le jeton saisi dans Configuration, jamais publié |
 
 ## Premier accès
 
-Espace administrateur : identifiant `admin`, mot de passe `reims2026`.
+Espace administrateur : `admin` / `reims2026`. **À changer immédiatement** dans Configuration → Accès administrateur.
 
-**Changez-les immédiatement** dans Configuration → Accès administrateur.
+Le jeton d'administration se saisit dans Configuration → Base de données. Sans lui, aucune demande ne s'affiche.
 
-## Les trois adresses publiques
+## Adresses publiques
 
 | Page | Adresse |
 | --- | --- |
 | Déposer une demande | `/` |
-| Demander une modification | `/?modifier=VID-2026-042` |
-| Valider une vidéo | `/?valider=VID-2026-042` |
+| Valider une vidéo | `/?valider=<jeton>` |
+| Demander une modification | `/?modifier=<jeton>` |
 
-Les deux dernières sont insérées automatiquement dans les courriels envoyés aux formateurs.
-
-## Avertissement de sécurité
-
-La connexion administrateur de cette version est vérifiée par le navigateur : elle empêche un accès distrait, pas un accès déterminé. Sur un dépôt public, toute personne connaissant l'adresse atteint l'écran de connexion.
-
-Avant l'ouverture aux formateurs, choisissez l'une de ces deux options :
-- héberger l'interface sur un espace déjà authentifié de l'académie ;
-- faire contrôler le mot de passe par le script Apps Script, qui ne renvoie les données qu'après vérification.
-
-Les jetons de suivi (`token`) donnent accès à la validation d'une vidéo : ne les publiez nulle part.
+Les deux dernières sont insérées automatiquement dans les courriels. Les jetons de suivi donnent accès à la validation d'une vidéo : ne les publiez nulle part.

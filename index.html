@@ -11,15 +11,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
-<link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,300..800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <script src="stockage.js"></script>
 <style>
+  @font-face { font-family: "Marianne"; src: url("fonts/Marianne-Light.woff2") format("woff2"); font-weight: 300; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Marianne"; src: url("fonts/Marianne-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Marianne"; src: url("fonts/Marianne-RegularItalic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+  @font-face { font-family: "Marianne"; src: url("fonts/Marianne-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Marianne"; src: url("fonts/Marianne-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Marianne"; src: url("fonts/Marianne-ExtraBold.woff2") format("woff2"); font-weight: 800; font-style: normal; font-display: swap; }
   *, *::before, *::after { box-sizing: border-box; }
-  body { margin: 0; font-family: "Work Sans", system-ui, sans-serif; background: oklch(0.975 0 0); color: oklch(0.22 0 0); -webkit-font-smoothing: antialiased; }
-  a { color: oklch(0.55 0.13 200); text-decoration: none; }
-  a:hover { color: oklch(0.45 0.13 200); text-decoration: underline; }
+  body { margin: 0; font-family: "Marianne", system-ui, sans-serif; background: #f4f6fa; color: #1c2433; -webkit-font-smoothing: antialiased; }
+  a { color: #154194; text-decoration: none; }
+  a:hover { color: #f39200; text-decoration: underline; }
   input, textarea, select, button { font-family: inherit; font-size: inherit; color: inherit; }
-  input:focus, textarea:focus, select:focus { outline: 2px solid oklch(0.55 0.13 200 / 0.35); outline-offset: 1px; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid rgba(21, 65, 148, 0.4); outline-offset: 1px; }
   @keyframes slideup { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
 </style>
@@ -28,7 +34,7 @@
 <div style="min-height: 100vh; display: flex; flex-direction: column;">
 
   <sc-if value="{{ montrerBarre }}" hint-placeholder-val="{{ true }}">
-  <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 9px 20px; background: oklch(0.22 0.01 250); color: oklch(0.97 0 0); font-size: 13px;">
+  <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 9px 20px; background: #0d2452; color: oklch(0.97 0 0); font-size: 13px;">
     <span style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.55;">Prototype · navigation de démonstration</span>
     <div style="display: flex; gap: 3px; padding: 3px; background: oklch(1 0 0 / 0.1); border-radius: 7px; flex-wrap: wrap;">
       <sc-for list="{{ navigation }}" as="n" hint-placeholder-count="3">
@@ -37,54 +43,68 @@
     </div>
     <div style="display: flex; align-items: center; justify-content: flex-end; gap: 14px; flex-wrap: wrap; margin-left: auto;">
       <sc-if value="{{ montrerBase }}" hint-placeholder-val="{{ false }}">
-        <a href="base.html" style="color: oklch(0.85 0.03 200); font-size: 12.5px;">Voir la base de données</a>
+        <a href="base.html" style="color: #b9cbef; font-size: 12.5px;">Voir la base de données</a>
       </sc-if>
       <button onClick="{{ navAdmin }}" style="border: 0; cursor: pointer; padding: 5px 12px; border-radius: 5px; font-size: 12.5px; font-weight: 500; background: {{ navAdminBg }}; color: {{ navAdminFg }};">Espace administrateur</button>
     </div>
   </div>
   </sc-if>
 
+  <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding: 14px 20px; background: #ffffff; border-bottom: 3px solid #f39200;">
+    <img src="logo-greta.jpg" alt="République française · GIP FCIP académie de Reims · Réseau GRETA académie de Reims Grand Est" style="height: 62px; width: auto; max-width: 100%; display: block;" />
+    <span style="flex: 1;"></span>
+    <span style="font-size: 12.5px; font-weight: 500; color: #154194; letter-spacing: 0.02em;">Vidéos Synthesia</span>
+  </div>
+
   <sc-if value="{{ montrerBaseErreur }}" hint-placeholder-val="{{ false }}">
     <div style="padding: 11px 20px; background: oklch(0.96 0.03 25); border-bottom: 1px solid oklch(0.9 0.05 25); color: oklch(0.42 0.14 25); font-size: 13px; line-height: 1.5; text-wrap: pretty;">{{ baseErreur }}</div>
   </sc-if>
 
-  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; padding: 0 20px 80px;">
+  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; padding: {{ rembourrage }};">
   <div style="width: 100%; max-width: 1060px;">
 
   <sc-if value="{{ routePublic }}" hint-placeholder-val="{{ true }}">
     <div style="animation: fadein 0.2s ease-out;">
-      <header style="padding: 40px 0 26px; max-width: 760px;">
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.13 200); margin-bottom: 8px;">Académie de Reims · Vidéos Synthesia</div>
-        <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">Demander une vidéo</h1>
-        <p style="margin: 10px 0 0; font-size: 15.5px; color: oklch(0.45 0 0); line-height: 1.6; text-wrap: pretty;">Aucun compte n'est nécessaire. Renseignez votre demande, vous recevrez par courriel le lien de suivi puis la vidéo à valider.</p>
-      </header>
+      <sc-if value="{{ integre }}" hint-placeholder-val="{{ false }}">
+        <header style="margin: 0 0 22px; padding: 24px 26px; max-width: 760px; background: linear-gradient(135deg, #154194 0%, #1d54b8 100%); border-radius: 12px; color: white;">
+          <h1 style="margin: 0; font-size: 25px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15;">Demander une vidéo</h1>
+          <p style="margin: 9px 0 0; font-size: 15px; color: #dce6fa; line-height: 1.6; max-width: 56ch; text-wrap: pretty;">Renseignez votre demande : vous recevrez par courriel le lien de suivi, puis la vidéo à valider.</p>
+        </header>
+      </sc-if>
+      <sc-if value="{{ pageEntiere }}" hint-placeholder-val="{{ true }}">
+        <header style="margin: 32px 0 26px; padding: 34px 36px; max-width: 760px; background: linear-gradient(135deg, #154194 0%, #1d54b8 100%); border-radius: 14px; color: white;">
+          <div style="display: inline-block; padding: 5px 12px; border-radius: 999px; background: #f39200; color: #241300; font-size: 11.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 16px;">Réseau GRETA · Académie de Reims</div>
+          <h1 style="margin: 0; font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1;">Demander une vidéo</h1>
+          <p style="margin: 12px 0 0; font-size: 16px; color: #dce6fa; line-height: 1.6; max-width: 56ch; text-wrap: pretty;">Aucun compte n'est nécessaire. Renseignez votre demande : vous recevrez par courriel le lien de suivi, puis la vidéo à valider.</p>
+        </header>
+      </sc-if>
 
-      <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 30px; max-width: 760px;">
+      <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 30px; max-width: 760px;">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
 
           <label style="display: block;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Nom du demandeur</span>
-            <input value="{{ f.demandeur }}" onChange="{{ ch_demandeur }}" placeholder="Prénom et nom" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+            <input value="{{ f.demandeur }}" onChange="{{ ch_demandeur }}" placeholder="Prénom et nom" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
           </label>
 
           <label style="display: block;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Mail de contact</span>
-            <input value="{{ f.email }}" onChange="{{ ch_email }}" placeholder="prenom.nom@ac-reims.fr" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+            <input value="{{ f.email }}" onChange="{{ ch_email }}" placeholder="prenom.nom@ac-reims.fr" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
           </label>
 
           <label style="grid-column: 1 / -1; display: block;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Titre de la vidéo</span>
-            <input value="{{ f.titre }}" onChange="{{ ch_titre }}" placeholder="Ex. : Prise en main de l'espace d'évaluation" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+            <input value="{{ f.titre }}" onChange="{{ ch_titre }}" placeholder="Ex. : Prise en main de l'espace d'évaluation" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
           </label>
 
           <label style="display: block;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Public visé</span>
-            <input value="{{ f.publicVise }}" onChange="{{ ch_publicVise }}" placeholder="Ex. : professeurs de cycle 3" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+            <input value="{{ f.publicVise }}" onChange="{{ ch_publicVise }}" placeholder="Ex. : professeurs de cycle 3" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
           </label>
 
           <label style="display: block;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Durée souhaitée</span>
-            <select value="{{ f.duree }}" onChange="{{ ch_duree }}" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; background: white;">
+            <select value="{{ f.duree }}" onChange="{{ ch_duree }}" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; background: white;">
               <option>30 s</option>
               <option>1 min</option>
               <option>1 min 30</option>
@@ -100,7 +120,7 @@
 
           <label style="display: block;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Niveau d'urgence</span>
-            <select value="{{ f.urgence }}" onChange="{{ ch_urgence }}" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; background: white;">
+            <select value="{{ f.urgence }}" onChange="{{ ch_urgence }}" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; background: white;">
               <option>Urgent</option>
               <option>Normal</option>
               <option>Faible</option>
@@ -109,7 +129,7 @@
 
           <label style="display: block;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Nombre d'avatars</span>
-            <select value="{{ f.nbAvatars }}" onChange="{{ ch_nbAvatars }}" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; background: white;">
+            <select value="{{ f.nbAvatars }}" onChange="{{ ch_nbAvatars }}" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; background: white;">
               <option>1</option>
               <option>2</option>
               <option>3</option>
@@ -125,7 +145,7 @@
               <sc-for list="{{ avatarRows }}" as="a" hint-placeholder-count="1">
                 <label style="display: block;">
                   <span style="display: block; font-size: 12.5px; color: oklch(0.45 0 0); margin-bottom: 6px;">{{ a.label }}</span>
-                  <input value="{{ a.valeur }}" onChange="{{ a.onChange }}" placeholder="Nom de l'avatar Synthesia" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+                  <input value="{{ a.valeur }}" onChange="{{ a.onChange }}" placeholder="Nom de l'avatar Synthesia" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
                 </label>
               </sc-for>
             </div>
@@ -134,21 +154,21 @@
           <label style="grid-column: 1 / -1; display: block;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px;">Script audio</span>
             <span style="display: block; font-size: 12.5px; color: oklch(0.53 0 0); margin-bottom: 7px; line-height: 1.45;">Préciser quel avatar parle si plusieurs avatars sont utilisés.</span>
-            <textarea value="{{ f.script }}" onChange="{{ ch_script }}" rows="8" placeholder="Collez ici le texte exact à faire dire à l'avatar." style="width: 100%; padding: 12px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
+            <textarea value="{{ f.script }}" onChange="{{ ch_script }}" rows="8" placeholder="Collez ici le texte exact à faire dire à l'avatar." style="width: 100%; padding: 12px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
           </label>
 
           <div style="grid-column: 1 / -1;">
             <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px;">
               <span style="font-size: 13px; font-weight: 500;">Storyboard</span>
               <span style="flex: 1;"></span>
-              <button onClick="{{ basculerColler }}" style="border: 0; background: none; cursor: pointer; padding: 0; font-size: 13px; color: oklch(0.55 0.13 200);" style-hover="text-decoration: underline;">{{ labelColler }}</button>
+              <button onClick="{{ basculerColler }}" style="border: 0; background: none; cursor: pointer; padding: 0; font-size: 13px; color: #154194;" style-hover="text-decoration: underline;">{{ labelColler }}</button>
             </div>
             <span style="display: block; font-size: 12.5px; color: oklch(0.53 0 0); margin-bottom: 10px; line-height: 1.45;">Un plan par ligne. Vous pouvez aussi coller directement un tableau depuis un tableur ou un document.</span>
 
             <sc-if value="{{ collerOuvert }}" hint-placeholder-val="{{ false }}">
               <div style="margin-bottom: 14px;">
-                <textarea value="{{ collerText }}" onChange="{{ majColler }}" rows="5" placeholder="Collez ici vos lignes (une par plan). Les colonnes peuvent être séparées par une tabulation, un point-virgule ou une barre verticale." style="width: 100%; padding: 12px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14px; font-family: 'JetBrains Mono', monospace; line-height: 1.6; resize: vertical;"></textarea>
-                <button onClick="{{ importerColler }}" style="margin-top: 10px; cursor: pointer; padding: 9px 16px; border-radius: 7px; font-size: 13.5px; font-weight: 500; background: oklch(0.97 0 0); border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.94 0 0);">Importer dans le tableau</button>
+                <textarea value="{{ collerText }}" onChange="{{ majColler }}" rows="5" placeholder="Collez ici vos lignes (une par plan). Les colonnes peuvent être séparées par une tabulation, un point-virgule ou une barre verticale." style="width: 100%; padding: 12px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14px; font-family: 'JetBrains Mono', monospace; line-height: 1.6; resize: vertical;"></textarea>
+                <button onClick="{{ importerColler }}" style="margin-top: 10px; cursor: pointer; padding: 9px 16px; border-radius: 7px; font-size: 13.5px; font-weight: 500; background: oklch(0.97 0 0); border: 1px solid #cfd8e8;" style-hover="background: oklch(0.94 0 0);">Importer dans le tableau</button>
               </div>
             </sc-if>
 
@@ -178,7 +198,7 @@
                 </div>
               </sc-for>
               <div style="padding: 10px;">
-                <button onClick="{{ ajouterLigne }}" style="border: 0; background: none; cursor: pointer; padding: 4px 0; font-size: 13.5px; font-weight: 500; color: oklch(0.55 0.13 200);" style-hover="text-decoration: underline;">+ Ajouter un plan</button>
+                <button onClick="{{ ajouterLigne }}" style="border: 0; background: none; cursor: pointer; padding: 4px 0; font-size: 13.5px; font-weight: 500; color: #154194;" style-hover="text-decoration: underline;">+ Ajouter un plan</button>
               </div>
             </div>
           </div>
@@ -195,12 +215,12 @@
           <label style="grid-column: 1 / -1; display: block;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px;">Précisions supplémentaires</span>
             <span style="display: block; font-size: 12.5px; color: oklch(0.53 0 0); margin-bottom: 7px; line-height: 1.45;">Positionnement des visuels, ou toute information qu'il vous semble importante.</span>
-            <textarea value="{{ f.precisions }}" onChange="{{ ch_precisions }}" rows="4" style="width: 100%; padding: 12px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
+            <textarea value="{{ f.precisions }}" onChange="{{ ch_precisions }}" rows="4" style="width: 100%; padding: 12px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
           </label>
         </div>
 
         <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 28px; padding-top: 24px; border-top: 1px solid oklch(0.93 0 0);">
-          <button onClick="{{ soumettre }}" style="border: 0; cursor: pointer; padding: 13px 24px; border-radius: 8px; font-size: 15px; font-weight: 500; background: oklch(0.55 0.13 200); color: white;" style-hover="background: oklch(0.47 0.13 200);">Déposer la demande</button>
+          <button onClick="{{ soumettre }}" style="border: 0; cursor: pointer; padding: 13px 24px; border-radius: 8px; font-size: 15px; font-weight: 500; background: #154194; color: white;" style-hover="background: #0f3070;">Déposer la demande</button>
           <span style="font-size: 13px; color: oklch(0.5 0.14 25);">{{ messageFormulaire }}</span>
         </div>
       </div>
@@ -209,15 +229,15 @@
 
   <sc-if value="{{ routeEnvoye }}" hint-placeholder-val="{{ false }}">
     <div style="max-width: 620px; margin: 80px 0; animation: fadein 0.2s ease-out;">
-      <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 34px;">
+      <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 34px;">
         <div style="width: 34px; height: 34px; border-radius: 999px; background: oklch(0.94 0.04 155); display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
           <span style="width: 12px; height: 7px; border-left: 2px solid oklch(0.4 0.1 155); border-bottom: 2px solid oklch(0.4 0.1 155); transform: rotate(-45deg) translate(1px, -2px);"></span>
         </div>
         <h1 style="margin: 0 0 12px; font-size: 24px; font-weight: 600; letter-spacing: -0.015em;">Demande enregistrée</h1>
         <p style="margin: 0 0 18px; font-size: 15.5px; line-height: 1.6; color: oklch(0.4 0 0); text-wrap: pretty;">Votre demande porte la référence <strong style="font-family: 'JetBrains Mono', monospace; font-weight: 500;">{{ derniereRef }}</strong>. Un courriel de confirmation vient de partir à {{ derniereAdresse }}, avec le lien qui vous permettra de suivre puis de valider la vidéo.</p>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button onClick="{{ allerPublic }}" style="border: 0; cursor: pointer; padding: 11px 18px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: oklch(0.55 0.13 200); color: white;" style-hover="background: oklch(0.47 0.13 200);">Déposer une autre demande</button>
-          <button onClick="{{ ouvrirDerniereValidation }}" style="cursor: pointer; padding: 11px 18px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: oklch(0.97 0 0); border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.94 0 0);">Ouvrir mon lien de suivi</button>
+          <button onClick="{{ allerPublic }}" style="border: 0; cursor: pointer; padding: 11px 18px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: #154194; color: white;" style-hover="background: #0f3070;">Déposer une autre demande</button>
+          <button onClick="{{ ouvrirDerniereValidation }}" style="cursor: pointer; padding: 11px 18px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: oklch(0.97 0 0); border: 1px solid #cfd8e8;" style-hover="background: oklch(0.94 0 0);">Ouvrir mon lien de suivi</button>
         </div>
       </div>
     </div>
@@ -225,20 +245,20 @@
 
   <sc-if value="{{ routeLogin }}" hint-placeholder-val="{{ false }}">
     <div style="max-width: 420px; margin: 80px 0; animation: fadein 0.2s ease-out;">
-      <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 32px;">
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.13 200); margin-bottom: 10px;">Espace administrateur</div>
+      <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 32px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #154194; margin-bottom: 10px;">Espace administrateur</div>
         <h1 style="margin: 0 0 22px; font-size: 22px; font-weight: 600; letter-spacing: -0.015em;">Connexion</h1>
         <label style="display: block; margin-bottom: 14px;">
           <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Identifiant</span>
-          <input value="{{ loginId }}" onChange="{{ majLoginId }}" placeholder="admin" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+          <input value="{{ loginId }}" onChange="{{ majLoginId }}" placeholder="admin" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
         </label>
         <label style="display: block; margin-bottom: 18px;">
           <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Mot de passe</span>
-          <input type="password" value="{{ loginMdp }}" onChange="{{ majLoginMdp }}" onKeyDown="{{ loginTouche }}" placeholder="••••••••" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+          <input type="password" value="{{ loginMdp }}" onChange="{{ majLoginMdp }}" onKeyDown="{{ loginTouche }}" placeholder="••••••••" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
         </label>
-        <button onClick="{{ seConnecter }}" style="width: 100%; border: 0; cursor: pointer; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 500; background: oklch(0.55 0.13 200); color: white;" style-hover="background: oklch(0.47 0.13 200);">Se connecter</button>
+        <button onClick="{{ seConnecter }}" style="width: 100%; border: 0; cursor: pointer; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 500; background: #154194; color: white;" style-hover="background: #0f3070;">Se connecter</button>
         <div style="font-size: 13px; color: oklch(0.5 0.14 25); margin-top: 12px; min-height: 18px;">{{ loginErreur }}</div>
-        <div style="margin-top: 6px; padding-top: 16px; border-top: 1px solid oklch(0.94 0 0); font-size: 12.5px; color: oklch(0.55 0 0); line-height: 1.55;">Identifiant <span style="font-family: 'JetBrains Mono', monospace;">{{ indiceId }}</span>, mot de passe <span style="font-family: 'JetBrains Mono', monospace;">{{ indiceMdp }}</span>. Modifiables dans Configuration.</div>
+        <div style="margin-top: 6px; padding-top: 16px; border-top: 1px solid oklch(0.94 0 0); font-size: 12.5px; color: oklch(0.55 0 0); line-height: 1.55;">Espace réservé au service de création vidéo. Les demandes et les validations ne passent pas par cet écran.</div>
       </div>
     </div>
   </sc-if>
@@ -247,11 +267,11 @@
     <div>
       <header style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; padding: 36px 0 24px;">
         <div style="flex: 1; min-width: 240px;">
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.13 200); margin-bottom: 8px;">Espace administrateur</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #f39200; margin-bottom: 8px;">Espace administrateur</div>
           <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">Toutes les demandes</h1>
           <p style="margin: 8px 0 0; font-size: 15px; color: oklch(0.5 0 0); max-width: 56ch; text-wrap: pretty;">Chaque demande arrive ici avec son script, son storyboard et ses visuels. Les données sont conservées sur ce poste.</p>
         </div>
-        <button onClick="{{ seDeconnecter }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Se déconnecter</button>
+        <button onClick="{{ seDeconnecter }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Se déconnecter</button>
       </header>
 
       <div style="display: flex; gap: 4px; flex-wrap: wrap; padding: 4px; background: oklch(0.945 0 0); border-radius: 9px; margin-bottom: 24px; width: fit-content;">
@@ -262,7 +282,7 @@
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 28px;">
         <sc-for list="{{ compteurs }}" as="c" hint-placeholder-count="4">
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 10px; padding: 16px 18px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 10px; padding: 16px 18px;">
             <div style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1;">{{ c.n }}</div>
             <div style="font-size: 13px; color: oklch(0.5 0 0); margin-top: 6px;">{{ c.label }}</div>
           </div>
@@ -277,7 +297,7 @@
 
       <div style="display: flex; flex-direction: column; gap: 8px;">
         <sc-for list="{{ liste }}" as="t" hint-placeholder-count="5">
-          <div onClick="{{ t.onClick }}" style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap; background: white; border: 1px solid oklch(0.91 0 0); border-left: 3px solid {{ t.fg }}; border-radius: 10px; padding: 16px 18px; cursor: pointer; transition: box-shadow 0.15s, transform 0.15s;" style-hover="box-shadow: 0 4px 16px oklch(0 0 0 / 0.07); transform: translateY(-1px);">
+          <div onClick="{{ t.onClick }}" style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap; background: white; border: 1px solid #dfe5f0; border-left: 3px solid {{ t.fg }}; border-radius: 10px; padding: 16px 18px; cursor: pointer; transition: box-shadow 0.15s, transform 0.15s;" style-hover="box-shadow: 0 4px 16px oklch(0 0 0 / 0.07); transform: translateY(-1px);">
             <div style="min-width: 108px;">
               <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: oklch(0.55 0 0);">{{ t.ref }}</div>
               <div style="font-size: 12px; color: oklch(0.62 0 0); margin-top: 3px;">{{ t.depose }}</div>
@@ -306,11 +326,11 @@
     <div>
       <header style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; padding: 36px 0 24px;">
         <div style="flex: 1; min-width: 240px;">
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.13 200); margin-bottom: 8px;">Espace administrateur</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #f39200; margin-bottom: 8px;">Espace administrateur</div>
           <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">Configuration</h1>
           <p style="margin: 8px 0 0; font-size: 15px; color: oklch(0.5 0 0); max-width: 62ch; text-wrap: pretty;">Réglages de l'outil. Chaque modification est enregistrée immédiatement et s'applique aux envois suivants.</p>
         </div>
-        <button onClick="{{ seDeconnecter }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Se déconnecter</button>
+        <button onClick="{{ seDeconnecter }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Se déconnecter</button>
       </header>
 
       <div style="display: flex; gap: 4px; flex-wrap: wrap; padding: 4px; background: oklch(0.945 0 0); border-radius: 9px; margin-bottom: 24px; width: fit-content;">
@@ -321,51 +341,27 @@
 
       <div style="display: flex; flex-direction: column; gap: 16px; max-width: 820px;">
 
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
           <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
             <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Base de données</h2>
             <span style="padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; background: {{ baseSourceBg }}; color: {{ baseSourceFg }};">{{ baseSource }}</span>
           </div>
-          <p style="margin: 0 0 20px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">En mode « API externe », les demandes, les courriels et les modèles sont lus et écrits sur votre service, avec copie locale de sécurité. Le contrat attendu (trois collections, GET et PUT) est décrit dans le fichier INTEGRATION.md.</p>
+          <p style="margin: 0 0 20px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">L'adresse du service est inscrite dans le fichier <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px;">stockage.js</span> du site : elle doit être connue de tous les visiteurs, y compris des formateurs qui déposent depuis leur propre ordinateur. Le jeton d'administration, lui, reste sur ce poste et n'apparaît jamais dans les pages publiques.</p>
 
-          <label style="display: block; margin-bottom: 16px;">
-            <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Mode de stockage</span>
-            <select value="{{ cfg.baseMode }}" onChange="{{ cfgBaseMode }}" style="width: 100%; max-width: 380px; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; background: white;">
-              <sc-for list="{{ cfgModes }}" as="md" hint-placeholder-count="2">
-                <option>{{ md }}</option>
-              </sc-for>
-            </select>
-          </label>
-
-          <label style="display: block; margin-bottom: 16px;">
-            <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Adresse de l'API</span>
-            <input value="{{ cfg.baseUrl }}" onChange="{{ cfgBaseUrl }}" placeholder="https://script.google.com/macros/s/…/exec" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14px; font-family: 'JetBrains Mono', monospace;" />
-          </label>
-
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
-            <label style="display: block;">
-              <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Clé ou jeton</span>
-              <input value="{{ cfg.baseCle }}" onChange="{{ cfgBaseCle }}" placeholder="laisser vide si le service est ouvert" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14px; font-family: 'JetBrains Mono', monospace;" />
-            </label>
-            <label style="display: block;">
-              <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">En-tête d'authentification</span>
-              <input value="{{ cfg.baseEntete }}" onChange="{{ cfgBaseEntete }}" placeholder="Authorization" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14px; font-family: 'JetBrains Mono', monospace;" />
-            </label>
+          <div style="margin-bottom: 18px; padding: 12px 14px; background: oklch(0.97 0 0); border-radius: 8px;">
+            <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.55 0 0); margin-bottom: 5px;">Adresse du service</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: oklch(0.35 0 0); overflow-wrap: anywhere; line-height: 1.5;">{{ adresseApi }}</div>
           </div>
 
-          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-top: 16px;">
-            <input type="checkbox" checked="{{ cfg.basePost }}" onChange="{{ cfgBasePost }}" style="width: 17px; height: 17px; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
-            <span style="font-size: 14px;">Envoyer les écritures en POST (services qui n'acceptent pas PUT, dont Google Apps Script)</span>
-          </label>
-
-          <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; margin-top: 12px;">
-            <input type="checkbox" checked="{{ cfg.envoiReel }}" onChange="{{ cfgEnvoiReel }}" style="width: 17px; height: 17px; margin-top: 2px; flex-shrink: 0; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
-            <span style="font-size: 14px; line-height: 1.5;">Expédier réellement les courriels par ce service. Décoché, les messages sont seulement journalisés dans l'onglet « Courriels envoyés » sans quitter le navigateur.</span>
+          <label style="display: block;">
+            <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px;">Jeton d'administration</span>
+            <span style="display: block; font-size: 12.5px; color: oklch(0.53 0 0); margin-bottom: 7px; line-height: 1.45;">La constante <span style="font-family: 'JetBrains Mono', monospace;">JETON</span> du script Apps Script. Sans lui, vous ne voyez aucune demande.</span>
+            <input value="{{ cfg.baseCle }}" onChange="{{ cfgBaseCle }}" placeholder="collez ici le jeton du script" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14px; font-family: 'JetBrains Mono', monospace;" />
           </label>
 
           <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 20px; padding-top: 18px; border-top: 1px solid oklch(0.94 0 0);">
-            <button onClick="{{ testerBase }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Tester la connexion</button>
-            <button onClick="{{ rechargerBase }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Relire les données</button>
+            <button onClick="{{ testerBase }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Tester la connexion</button>
+            <button onClick="{{ rechargerBase }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Relire les données</button>
             <span style="font-size: 13.5px; color: oklch(0.45 0 0); line-height: 1.5;">{{ testBase }}</span>
           </div>
 
@@ -374,36 +370,36 @@
           </sc-if>
         </div>
 
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
-          <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Notifications des demandes</h2>
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
+          <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Notifications des demandes <span style="font-weight: 500; font-size: 13px; color: #f39200;">— enregistré dans la base</span></h2>
           <p style="margin: 0 0 20px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">Adresse qui reçoit les alertes lorsqu'un formateur dépose un formulaire, valide une vidéo ou demande une modification.</p>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
             <label style="display: block;">
               <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Adresse de notification</span>
-              <input value="{{ cfg.adresseNotif }}" onChange="{{ cfgAdresseNotif }}" placeholder="videos@ac-reims.fr" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+              <input value="{{ cfg.adresseNotif }}" onChange="{{ cfgAdresseNotif }}" placeholder="videos@ac-reims.fr" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
             </label>
             <label style="display: block;">
               <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Copie à <span style="font-weight: 400; color: oklch(0.6 0 0);">— facultatif</span></span>
-              <input value="{{ cfg.copieNotif }}" onChange="{{ cfgCopieNotif }}" placeholder="collegue@ac-reims.fr" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+              <input value="{{ cfg.copieNotif }}" onChange="{{ cfgCopieNotif }}" placeholder="collegue@ac-reims.fr" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
             </label>
           </div>
           <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px; padding-top: 18px; border-top: 1px solid oklch(0.94 0 0);">
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-              <input type="checkbox" checked="{{ cfg.notifDepot }}" onChange="{{ cfgNotifDepot }}" style="width: 17px; height: 17px; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
+              <input type="checkbox" checked="{{ cfg.notifDepot }}" onChange="{{ cfgNotifDepot }}" style="width: 17px; height: 17px; accent-color: #154194; cursor: pointer;" />
               <span style="font-size: 14px;">Me prévenir à chaque nouvelle demande déposée</span>
             </label>
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-              <input type="checkbox" checked="{{ cfg.notifValidation }}" onChange="{{ cfgNotifValidation }}" style="width: 17px; height: 17px; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
+              <input type="checkbox" checked="{{ cfg.notifValidation }}" onChange="{{ cfgNotifValidation }}" style="width: 17px; height: 17px; accent-color: #154194; cursor: pointer;" />
               <span style="font-size: 14px;">Me prévenir à chaque vidéo validée et signée</span>
             </label>
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-              <input type="checkbox" checked="{{ cfg.notifModification }}" onChange="{{ cfgNotifModification }}" style="width: 17px; height: 17px; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
+              <input type="checkbox" checked="{{ cfg.notifModification }}" onChange="{{ cfgNotifModification }}" style="width: 17px; height: 17px; accent-color: #154194; cursor: pointer;" />
               <span style="font-size: 14px;">Me prévenir à chaque demande de modification</span>
             </label>
           </div>
           <label style="display: block; margin-top: 20px; padding-top: 18px; border-top: 1px solid oklch(0.94 0 0);">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Canal des notifications</span>
-            <select value="{{ cfg.canal }}" onChange="{{ cfgCanal }}" style="width: 100%; max-width: 380px; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; background: white;">
+            <select value="{{ cfg.canal }}" onChange="{{ cfgCanal }}" style="width: 100%; max-width: 380px; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; background: white;">
               <sc-for list="{{ cfgCanaux }}" as="c" hint-placeholder-count="3">
                 <option>{{ c }}</option>
               </sc-for>
@@ -411,47 +407,69 @@
           </label>
         </div>
 
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
-          <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Expéditeur et signature</h2>
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
+          <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Expéditeur et signature <span style="font-weight: 500; font-size: 13px; color: #f39200;">— enregistré dans la base</span></h2>
           <p style="margin: 0 0 20px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">Identité sous laquelle partent les courriels. La signature est disponible dans les modèles sous la variable <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px;">{{ exempleSignature }}</span>.</p>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
             <label style="display: block;">
               <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Nom de l'expéditeur</span>
-              <input value="{{ cfg.nomExpediteur }}" onChange="{{ cfgNomExpediteur }}" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+              <input value="{{ cfg.nomExpediteur }}" onChange="{{ cfgNomExpediteur }}" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
             </label>
             <label style="display: block;">
               <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Adresse d'expédition</span>
-              <input value="{{ cfg.adresseExpediteur }}" onChange="{{ cfgAdresseExpediteur }}" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+              <input value="{{ cfg.adresseExpediteur }}" onChange="{{ cfgAdresseExpediteur }}" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
             </label>
           </div>
           <label style="display: block; margin-top: 16px;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Signature des courriels</span>
-            <textarea value="{{ cfg.signature }}" onChange="{{ cfgSignature }}" rows="4" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
+            <textarea value="{{ cfg.signature }}" onChange="{{ cfgSignature }}" rows="4" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
           </label>
         </div>
 
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
-          <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Accès administrateur</h2>
-          <p style="margin: 0 0 20px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">Identifiants de connexion à cet espace. Ils sont conservés sur ce poste : lors de la mise en ligne, cette authentification devra être portée par le service qui héberge les données.</p>
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
+          <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Accès administrateur <span style="font-weight: 500; font-size: 13px; color: oklch(0.5 0 0);">— propre à ce poste</span></h2>
+          <p style="margin: 0 0 20px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">Contrairement aux réglages ci-dessus, ces trois valeurs ne quittent jamais ce navigateur : les inscrire dans la base reviendrait à les exposer. Un autre poste devra donc les ressaisir.</p>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
             <label style="display: block;">
               <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Identifiant</span>
-              <input value="{{ cfg.adminId }}" onChange="{{ cfgAdminId }}" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+              <input value="{{ cfg.adminId }}" onChange="{{ cfgAdminId }}" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
             </label>
             <label style="display: block;">
               <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Mot de passe</span>
-              <input value="{{ cfg.adminMdp }}" onChange="{{ cfgAdminMdp }}" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; font-family: 'JetBrains Mono', monospace;" />
+              <input value="{{ cfg.adminMdp }}" onChange="{{ cfgAdminMdp }}" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; font-family: 'JetBrains Mono', monospace;" />
             </label>
           </div>
         </div>
 
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
-          <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Références des demandes</h2>
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
+          <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
+            <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Déclarations du formulaire de validation</h2>
+            <span style="flex: 1;"></span>
+            <sc-if value="{{ declarationsModifiees }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ reinitDeclarations }}" style="border: 0; background: none; cursor: pointer; padding: 0; font-size: 13px; color: #154194;" style-hover="text-decoration: underline;">Rétablir les déclarations d'origine</button>
+            </sc-if>
+          </div>
+          <p style="margin: 0 0 20px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">Les cases que le demandeur doit cocher pour signer. Toutes sont obligatoires. Les modifications s'appliquent aux validations suivantes ; les signatures déjà recueillies conservent le texte en vigueur au moment de leur signature.</p>
+
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <sc-for list="{{ declarationsRows }}" as="dc" hint-placeholder-count="5">
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <span style="flex-shrink: 0; width: 108px; padding-top: 11px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.5 0 0);">{{ dc.numero }}</span>
+                <textarea value="{{ dc.texte }}" onChange="{{ dc.onTexte }}" rows="3" style="flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #cfd8e8; border-radius: 7px; font-size: 13.5px; line-height: 1.55; resize: vertical;"></textarea>
+                <button onClick="{{ dc.onSupprimer }}" title="Supprimer cette déclaration" style="flex-shrink: 0; border: 0; background: none; cursor: pointer; padding: 9px 4px; font-size: 17px; color: oklch(0.65 0 0); line-height: 1;" style-hover="color: oklch(0.47 0.14 25);">×</button>
+              </div>
+            </sc-for>
+          </div>
+          <button onClick="{{ ajouterDeclaration }}" style="margin-top: 14px; border: 0; background: none; cursor: pointer; padding: 0; font-size: 13.5px; font-weight: 500; color: #154194;" style-hover="text-decoration: underline;">+ Ajouter une déclaration</button>
+        </div>
+
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
+          <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Références des demandes <span style="font-weight: 500; font-size: 13px; color: #f39200;">— enregistré dans la base</span></h2>
           <p style="margin: 0 0 20px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55;">Préfixe appliqué aux nouvelles demandes. La numérotation continue à partir du plus grand numéro existant.</p>
           <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end;">
             <label style="display: block; flex: 0 1 240px;">
               <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Préfixe</span>
-              <input value="{{ cfg.prefixeRef }}" onChange="{{ cfgPrefixeRef }}" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; font-family: 'JetBrains Mono', monospace;" />
+              <input value="{{ cfg.prefixeRef }}" onChange="{{ cfgPrefixeRef }}" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; font-family: 'JetBrains Mono', monospace;" />
             </label>
             <div style="font-size: 13.5px; color: oklch(0.5 0 0); padding-bottom: 12px;">Prochaine référence : <span style="font-family: 'JetBrains Mono', monospace; color: oklch(0.28 0 0);">{{ cfgProchaineRef }}</span></div>
           </div>
@@ -466,11 +484,11 @@
     <div>
       <header style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; padding: 36px 0 24px;">
         <div style="flex: 1; min-width: 240px;">
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.13 200); margin-bottom: 8px;">Espace administrateur</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #f39200; margin-bottom: 8px;">Espace administrateur</div>
           <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">Modèles de courriels</h1>
           <p style="margin: 8px 0 0; font-size: 15px; color: oklch(0.5 0 0); max-width: 62ch; text-wrap: pretty;">Les huit messages que l'outil envoie automatiquement. Les modifications sont enregistrées au fil de la saisie et s'appliquent aux envois suivants.</p>
         </div>
-        <button onClick="{{ seDeconnecter }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Se déconnecter</button>
+        <button onClick="{{ seDeconnecter }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Se déconnecter</button>
       </header>
 
       <div style="display: flex; gap: 4px; flex-wrap: wrap; padding: 4px; background: oklch(0.945 0 0); border-radius: 9px; margin-bottom: 20px; width: fit-content;">
@@ -479,7 +497,7 @@
         </sc-for>
       </div>
 
-      <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 10px; padding: 16px 18px; margin-bottom: 20px;">
+      <div style="background: white; border: 1px solid #dfe5f0; border-radius: 10px; padding: 16px 18px; margin-bottom: 20px;">
         <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 10px;">Variables disponibles</div>
         <div style="display: flex; gap: 7px; flex-wrap: wrap;">
           <sc-for list="{{ variables }}" as="v2" hint-placeholder-count="8">
@@ -491,25 +509,25 @@
 
       <div style="display: flex; flex-direction: column; gap: 14px;">
         <sc-for list="{{ modelesRows }}" as="m" hint-placeholder-count="8">
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 22px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 22px;">
             <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px;">
               <span style="font-size: 16px; font-weight: 600;">{{ m.nom }}</span>
               <span style="font-size: 12.5px; color: oklch(0.55 0 0);">à : {{ m.dest }}</span>
               <span style="flex: 1;"></span>
               <sc-if value="{{ m.modifie }}" hint-placeholder-val="{{ false }}">
-                <button onClick="{{ m.onReset }}" style="border: 0; background: none; cursor: pointer; padding: 0; font-size: 13px; color: oklch(0.55 0.13 200);" style-hover="text-decoration: underline;">Rétablir le modèle d'origine</button>
+                <button onClick="{{ m.onReset }}" style="border: 0; background: none; cursor: pointer; padding: 0; font-size: 13px; color: #154194;" style-hover="text-decoration: underline;">Rétablir le modèle d'origine</button>
               </sc-if>
             </div>
             <div style="font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.5; margin-bottom: 16px;">{{ m.quand }}</div>
 
             <label style="display: block; margin-bottom: 14px;">
               <span style="display: block; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.5 0 0); margin-bottom: 6px;">Objet</span>
-              <input value="{{ m.objet }}" onChange="{{ m.onObjet }}" style="width: 100%; padding: 10px 12px; border: 1px solid oklch(0.89 0 0); border-radius: 7px; font-size: 14px;" />
+              <input value="{{ m.objet }}" onChange="{{ m.onObjet }}" style="width: 100%; padding: 10px 12px; border: 1px solid #cfd8e8; border-radius: 7px; font-size: 14px;" />
             </label>
 
             <label style="display: block;">
               <span style="display: block; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.5 0 0); margin-bottom: 6px;">Corps du message</span>
-              <textarea value="{{ m.corps }}" onChange="{{ m.onCorps }}" rows="7" style="width: 100%; padding: 11px 12px; border: 1px solid oklch(0.89 0 0); border-radius: 7px; font-size: 14px; line-height: 1.6; resize: vertical;"></textarea>
+              <textarea value="{{ m.corps }}" onChange="{{ m.onCorps }}" rows="7" style="width: 100%; padding: 11px 12px; border: 1px solid #cfd8e8; border-radius: 7px; font-size: 14px; line-height: 1.6; resize: vertical;"></textarea>
             </label>
 
             <div style="font-size: 12px; color: oklch(0.6 0 0); margin-top: 10px;">{{ m.etat }}</div>
@@ -523,11 +541,11 @@
     <div>
       <header style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; padding: 36px 0 24px;">
         <div style="flex: 1; min-width: 240px;">
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.13 200); margin-bottom: 8px;">Espace administrateur</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #f39200; margin-bottom: 8px;">Espace administrateur</div>
           <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">Courriels envoyés</h1>
           <p style="margin: 8px 0 0; font-size: 15px; color: oklch(0.5 0 0); max-width: 60ch; text-wrap: pretty;">Chaque notification partie depuis l'outil, la plus récente en haut. Ce journal sert de preuve d'envoi.</p>
         </div>
-        <button onClick="{{ seDeconnecter }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Se déconnecter</button>
+        <button onClick="{{ seDeconnecter }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Se déconnecter</button>
       </header>
 
       <div style="display: flex; gap: 4px; flex-wrap: wrap; padding: 4px; background: oklch(0.945 0 0); border-radius: 9px; margin-bottom: 24px; width: fit-content;">
@@ -538,7 +556,7 @@
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <sc-for list="{{ mails }}" as="m" hint-placeholder-count="4">
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 10px; padding: 18px 20px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 10px; padding: 18px 20px;">
             <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
               <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.5 0.12 155);">{{ m.canal }}</span>
               <span style="font-size: 12.5px; color: oklch(0.55 0 0);">{{ m.quand }}</span>
@@ -573,7 +591,7 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; align-items: start;">
 
         <div style="display: flex; flex-direction: column; gap: 20px;">
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
             <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;">
               <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: oklch(0.55 0 0); white-space: nowrap;">{{ d.ref }}</span>
               <span style="padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; background: {{ d.bg }}; color: {{ d.fg }};">{{ d.statut }}</span>
@@ -589,14 +607,14 @@
             </div>
           </div>
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
             <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 12px;">Script audio</div>
             <div style="font-size: 14.5px; line-height: 1.65; color: oklch(0.3 0 0); white-space: pre-wrap; text-wrap: pretty;">{{ d.script }}</div>
             <sc-if value="{{ d.montrerPieces }}" hint-placeholder-val="{{ false }}">
               <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; padding-top: 18px; border-top: 1px solid oklch(0.93 0 0);">
                 <sc-for list="{{ d.pieces }}" as="p" hint-placeholder-count="2">
                   <div style="display: flex; align-items: center; gap: 9px; padding: 8px 13px; background: oklch(0.97 0 0); border: 1px solid oklch(0.92 0 0); border-radius: 7px; font-size: 13px;">
-                    <span style="width: 7px; height: 7px; border-radius: 2px; background: oklch(0.55 0.13 200);"></span>
+                    <span style="width: 7px; height: 7px; border-radius: 2px; background: #154194;"></span>
                     <span>{{ p }}</span>
                   </div>
                 </sc-for>
@@ -605,12 +623,12 @@
           </div>
 
           <sc-if value="{{ d.montrerStoryboard }}" hint-placeholder-val="{{ false }}">
-            <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+            <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
               <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 14px;">Storyboard</div>
               <div style="display: flex; flex-direction: column; gap: 14px;">
                 <sc-for list="{{ d.storyboard }}" as="p" hint-placeholder-count="3">
                   <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; align-items: start; padding-bottom: 14px; border-bottom: 1px solid oklch(0.95 0 0);">
-                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: oklch(0.55 0.13 200); padding-top: 2px;">{{ p.plan }}</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #154194; padding-top: 2px;">{{ p.plan }}</div>
                     <div>
                       <div style="font-size: 14.5px; line-height: 1.55; color: oklch(0.3 0 0); text-wrap: pretty;">{{ p.schema }}</div>
                       <div style="display: inline-block; margin-top: 8px; padding: 4px 10px; border-radius: 999px; font-size: 12px; background: oklch(0.96 0 0); color: oklch(0.42 0 0);">{{ p.presence }}</div>
@@ -622,14 +640,14 @@
           </sc-if>
 
           <sc-if value="{{ d.montrerPrecisions }}" hint-placeholder-val="{{ false }}">
-            <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+            <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
               <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 12px;">Précisions du demandeur</div>
               <div style="font-size: 14.5px; line-height: 1.6; color: oklch(0.3 0 0); white-space: pre-wrap; text-wrap: pretty;">{{ d.precisions }}</div>
             </div>
           </sc-if>
 
           <sc-if value="{{ d.montrerVideo }}" hint-placeholder-val="{{ false }}">
-            <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+            <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
               <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 12px;">Vidéo générée</div>
               <sc-if value="{{ d.lecteurIntegre }}" hint-placeholder-val="{{ true }}">
                 <div style="position: relative; overflow: hidden; aspect-ratio: 16 / 9; border-radius: 8px; background: oklch(0.16 0 0);">
@@ -651,7 +669,7 @@
           </sc-if>
 
           <sc-if value="{{ d.montrerSignature }}" hint-placeholder-val="{{ false }}">
-            <div style="background: white; border: 1px solid oklch(0.91 0 0); border-left: 3px solid oklch(0.5 0.12 155); border-radius: 12px; padding: 24px;">
+            <div style="background: white; border: 1px solid #dfe5f0; border-left: 3px solid oklch(0.5 0.12 155); border-radius: 12px; padding: 24px;">
               <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 14px;">Validation signée</div>
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px 20px;">
                 <div>
@@ -671,7 +689,7 @@
             </div>
           </sc-if>
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
             <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 18px;">Historique</div>
             <div style="display: flex; flex-direction: column; gap: 18px;">
               <sc-for list="{{ d.historique }}" as="h" hint-placeholder-count="3">
@@ -692,32 +710,37 @@
 
         <div style="display: flex; flex-direction: column; gap: 20px;">
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 22px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 22px;">
             <div style="font-size: 15px; font-weight: 600; margin-bottom: 6px;">{{ d.actionTitre }}</div>
             <p style="margin: 0 0 16px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.5; text-wrap: pretty;">{{ d.actionTexte }}</p>
 
             <sc-if value="{{ d.besoinLien }}" hint-placeholder-val="{{ false }}">
-              <input value="{{ lienInput }}" onChange="{{ majLien }}" placeholder="https://share.synthesia.io/..." style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14px; margin-bottom: 12px;" />
+              <input value="{{ lienInput }}" onChange="{{ majLien }}" placeholder="https://share.synthesia.io/..." style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14px; margin-bottom: 12px;" />
             </sc-if>
 
             <sc-if value="{{ d.actionPossible }}" hint-placeholder-val="{{ true }}">
-              <button onClick="{{ actionPrincipale }}" style="width: 100%; border: 0; cursor: pointer; padding: 12px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: oklch(0.55 0.13 200); color: white;" style-hover="background: oklch(0.47 0.13 200);">{{ d.actionLabel }}</button>
+              <button onClick="{{ actionPrincipale }}" style="width: 100%; border: 0; cursor: pointer; padding: 12px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: #154194; color: white;" style-hover="background: #0f3070;">{{ d.actionLabel }}</button>
             </sc-if>
 
+            <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; margin-top: 14px; padding-top: 14px; border-top: 1px solid oklch(0.94 0 0);">
+              <input type="checkbox" checked="{{ silencieux }}" onChange="{{ basculerSilencieux }}" style="width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; accent-color: #154194; cursor: pointer;" />
+              <span style="font-size: 13.5px; line-height: 1.5; color: oklch(0.4 0 0);">Ne prévenir personne. Fait avancer la demande sans envoyer de courriel — pour reprendre une vidéo déjà engagée dans le circuit.</span>
+            </label>
+
             <sc-if value="{{ d.montrerSecondaire }}" hint-placeholder-val="{{ false }}">
-              <button onClick="{{ actionSecondaire }}" style="width: 100%; margin-top: 8px; cursor: pointer; padding: 11px; border-radius: 8px; font-size: 14px; font-weight: 500; background: oklch(0.97 0 0); color: oklch(0.35 0 0); border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.94 0 0);">{{ d.secondaireLabel }}</button>
+              <button onClick="{{ actionSecondaire }}" style="width: 100%; margin-top: 8px; cursor: pointer; padding: 11px; border-radius: 8px; font-size: 14px; font-weight: 500; background: oklch(0.97 0 0); color: oklch(0.35 0 0); border: 1px solid #cfd8e8;" style-hover="background: oklch(0.94 0 0);">{{ d.secondaireLabel }}</button>
             </sc-if>
 
             <sc-if value="{{ d.montrerLienValidation }}" hint-placeholder-val="{{ false }}">
               <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid oklch(0.94 0 0);">
                 <div style="font-size: 12px; color: oklch(0.55 0 0); margin-bottom: 6px;">Lien de validation envoyé au demandeur</div>
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: oklch(0.42 0 0); overflow-wrap: anywhere; line-height: 1.5;">{{ d.lienValidation }}</div>
-                <button onClick="{{ ouvrirValidation }}" style="margin-top: 10px; border: 0; background: none; cursor: pointer; padding: 0; font-size: 13px; color: oklch(0.55 0.13 200);" style-hover="text-decoration: underline;">Ouvrir la page vue par le demandeur</button>
+                <button onClick="{{ ouvrirValidation }}" style="margin-top: 10px; border: 0; background: none; cursor: pointer; padding: 0; font-size: 13px; color: #154194;" style-hover="text-decoration: underline;">Ouvrir la page vue par le demandeur</button>
               </div>
             </sc-if>
           </div>
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 22px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 22px;">
             <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 16px;">Avancement</div>
             <div style="display: flex; flex-direction: column; gap: 2px;">
               <sc-for list="{{ d.etapes }}" as="e" hint-placeholder-count="4">
@@ -732,7 +755,7 @@
             </div>
           </div>
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 22px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 22px;">
             <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 14px;">Demandeur</div>
             <div style="font-size: 15px; font-weight: 500;">{{ d.demandeur }}</div>
             <a href="#" style="display: inline-block; margin-top: 8px; font-size: 13.5px; overflow-wrap: anywhere;">{{ d.email }}</a>
@@ -745,12 +768,12 @@
 
   <sc-if value="{{ routeValider }}" hint-placeholder-val="{{ false }}">
     <div style="max-width: 720px; padding-top: 40px; animation: fadein 0.2s ease-out;">
-      <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.13 200); margin-bottom: 8px;">Suivi de votre demande · {{ v.ref }}</div>
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #154194; margin-bottom: 8px;">Suivi de votre demande · {{ v.ref }}</div>
       <h1 style="margin: 0 0 6px; font-size: 27px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2;">{{ v.titre }}</h1>
       <div style="display: inline-block; margin-bottom: 26px; padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 500; background: {{ v.bg }}; color: {{ v.fg }};">{{ v.statut }}</div>
 
       <sc-if value="{{ v.montrerVideo }}" hint-placeholder-val="{{ false }}">
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px; margin-bottom: 20px;">
           <sc-if value="{{ v.lecteurIntegre }}" hint-placeholder-val="{{ true }}">
             <div style="position: relative; overflow: hidden; aspect-ratio: 16 / 9; border-radius: 8px; background: oklch(0.16 0 0);">
               <iframe src="{{ v.integration }}" title="{{ v.titreLecteur }}" loading="lazy" allowFullScreen="{{ true }}" allow="encrypted-media; fullscreen" style="position: absolute; inset: 0; width: 100%; height: 100%; border: none;"></iframe>
@@ -771,22 +794,22 @@
       </sc-if>
 
       <sc-if value="{{ v.peutValider }}" hint-placeholder-val="{{ false }}">
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px; margin-bottom: 20px;">
           <div style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">Votre retour</div>
           <p style="margin: 0 0 18px; font-size: 14px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">Visionnez la vidéo, puis validez-la en signant le formulaire de validation. Si elle doit évoluer, la demande de modification reste possible : elle est facultative.</p>
           <button onClick="{{ allerSignature }}" style="width: 100%; border: 0; cursor: pointer; padding: 13px; border-radius: 8px; font-size: 15px; font-weight: 500; background: oklch(0.5 0.12 155); color: white;" style-hover="background: oklch(0.43 0.12 155);">Valider la vidéo</button>
           <div style="margin-top: 18px; padding-top: 18px; border-top: 1px solid oklch(0.93 0 0);">
             <p style="margin: 0 0 12px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">Si la vidéo doit encore évoluer, le formulaire de modification s'ouvre prérempli avec votre script et votre storyboard.</p>
-            <button onClick="{{ allerModification }}" style="width: 100%; cursor: pointer; padding: 12px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: oklch(0.97 0 0); color: oklch(0.35 0 0); border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.94 0 0);">Demander une modification</button>
+            <button onClick="{{ allerModification }}" style="width: 100%; cursor: pointer; padding: 12px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: oklch(0.97 0 0); color: oklch(0.35 0 0); border: 1px solid #cfd8e8;" style-hover="background: oklch(0.94 0 0);">Demander une modification</button>
           </div>
         </div>
       </sc-if>
 
       <sc-if value="{{ v.attente }}" hint-placeholder-val="{{ false }}">
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px; margin-bottom: 20px; font-size: 15px; color: oklch(0.4 0 0); line-height: 1.6; text-wrap: pretty;">{{ v.messageAttente }}</div>
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px; margin-bottom: 20px; font-size: 15px; color: oklch(0.4 0 0); line-height: 1.6; text-wrap: pretty;">{{ v.messageAttente }}</div>
       </sc-if>
 
-      <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+      <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
         <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 18px;">Suivi</div>
         <div style="display: flex; flex-direction: column; gap: 18px;">
           <sc-for list="{{ v.historique }}" as="h" hint-placeholder-count="2">
@@ -809,25 +832,25 @@
   <sc-if value="{{ routeSignature }}" hint-placeholder-val="{{ false }}">
     <div style="max-width: 760px; animation: fadein 0.2s ease-out;">
       <header style="padding: 40px 0 26px;">
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.13 200); margin-bottom: 8px;">Académie de Reims · Réseau des GRETA</div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #154194; margin-bottom: 8px;">Académie de Reims · Réseau des GRETA</div>
         <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">Validation d'une vidéo Synthesia</h1>
         <p style="margin: 10px 0 0; font-size: 15.5px; color: oklch(0.45 0 0); line-height: 1.6; text-wrap: pretty;">Ce formulaire recueille votre accord écrit sur la vidéo produite à votre demande, ainsi que sur son usage au sein du réseau des GRETA de l'académie de Reims. Il ne s'active que si la vidéo vous a été soumise pour validation.</p>
       </header>
 
       <sc-if value="{{ valSaisie }}" hint-placeholder-val="{{ true }}">
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 30px;">
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 30px;">
           <label style="display: block; margin-bottom: 16px;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Référence de la vidéo</span>
-            <input value="{{ valRefSaisie }}" onChange="{{ majValRef }}" onKeyDown="{{ toucheValRef }}" placeholder="VID-2026-038" style="width: 100%; padding: 12px 14px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 15px; font-family: 'JetBrains Mono', monospace;" />
+            <input value="{{ valRefSaisie }}" onChange="{{ majValRef }}" onKeyDown="{{ toucheValRef }}" placeholder="VID-2026-038" style="width: 100%; padding: 12px 14px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 15px; font-family: 'JetBrains Mono', monospace;" />
           </label>
-          <button onClick="{{ chargerVal }}" style="border: 0; cursor: pointer; padding: 12px 22px; border-radius: 8px; font-size: 15px; font-weight: 500; background: oklch(0.55 0.13 200); color: white;" style-hover="background: oklch(0.47 0.13 200);">Accéder au formulaire</button>
+          <button onClick="{{ chargerVal }}" style="border: 0; cursor: pointer; padding: 12px 22px; border-radius: 8px; font-size: 15px; font-weight: 500; background: #154194; color: white;" style-hover="background: #0f3070;">Accéder au formulaire</button>
           <div style="font-size: 13.5px; color: oklch(0.5 0.14 25); margin-top: 14px; line-height: 1.55; text-wrap: pretty;">{{ valErreur }}</div>
           <div style="margin-top: 18px; padding-top: 18px; border-top: 1px solid oklch(0.94 0 0); font-size: 13px; color: oklch(0.55 0 0); line-height: 1.55;">La référence figure dans l'objet du courriel qui vous a été adressé. Le lien contenu dans ce courriel remplit ce champ automatiquement.</div>
         </div>
       </sc-if>
 
       <sc-if value="{{ montrerValConfirme }}" hint-placeholder-val="{{ false }}">
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 30px;">
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 30px;">
           <h2 style="margin: 0 0 12px; font-size: 21px; font-weight: 600; letter-spacing: -0.015em;">Validation enregistrée</h2>
           <p style="margin: 0; font-size: 15px; line-height: 1.6; color: oklch(0.4 0 0); text-wrap: pretty;">Votre accord sur la vidéo {{ valConfirme }} a été enregistré avec vos nom, prénom, la date et l'heure de signature. La vidéo peut désormais être diffusée et mutualisée au sein du réseau des GRETA de l'académie de Reims. Un exemplaire de cette validation est conservé dans le dossier de la demande.</p>
         </div>
@@ -836,7 +859,7 @@
       <sc-if value="{{ valActif }}" hint-placeholder-val="{{ false }}">
         <div style="display: flex; flex-direction: column; gap: 20px;">
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: oklch(0.55 0 0); margin-bottom: 10px;">{{ g.ref }}</div>
             <h2 style="margin: 0 0 18px; font-size: 21px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.25;">{{ g.titre }}</h2>
             <sc-if value="{{ g.lecteurIntegre }}" hint-placeholder-val="{{ true }}">
@@ -867,49 +890,31 @@
             </div>
           </div>
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 26px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 26px;">
             <h3 style="margin: 0 0 6px; font-size: 17px; font-weight: 600;">Déclarations du demandeur</h3>
-            <p style="margin: 0 0 20px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">Les cinq déclarations ci-dessous sont nécessaires à la validation. Cochez chacune d'elles après en avoir pris connaissance.</p>
+            <p style="margin: 0 0 20px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">Les déclarations ci-dessous sont toutes nécessaires à la validation. Cochez chacune d'elles après en avoir pris connaissance.</p>
 
             <div style="display: flex; flex-direction: column; gap: 16px;">
-              <label style="display: flex; gap: 12px; align-items: flex-start; cursor: pointer;">
-                <input type="checkbox" checked="{{ g.c1 }}" onChange="{{ basculerC1 }}" style="width: 17px; height: 17px; margin-top: 3px; flex-shrink: 0; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
-                <span style="font-size: 14.5px; line-height: 1.6; color: oklch(0.28 0 0); text-wrap: pretty;">En cochant cette case, je confirme avoir visionné dans son intégralité la vidéo référencée ci-dessus, produite avec l'outil Synthesia à ma demande.</span>
-              </label>
-
-              <label style="display: flex; gap: 12px; align-items: flex-start; cursor: pointer;">
-                <input type="checkbox" checked="{{ g.c2 }}" onChange="{{ basculerC2 }}" style="width: 17px; height: 17px; margin-top: 3px; flex-shrink: 0; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
-                <span style="font-size: 14.5px; line-height: 1.6; color: oklch(0.28 0 0); text-wrap: pretty;">Je certifie l'exactitude des informations pédagogiques, réglementaires et factuelles qu'elle contient, dont je demeure l'auteur et le responsable, et j'atteste qu'elle ne comporte aucun propos contraire aux valeurs du service public d'éducation.</span>
-              </label>
-
-              <label style="display: flex; gap: 12px; align-items: flex-start; cursor: pointer;">
-                <input type="checkbox" checked="{{ g.c3 }}" onChange="{{ basculerC3 }}" style="width: 17px; height: 17px; margin-top: 3px; flex-shrink: 0; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
-                <span style="font-size: 14.5px; line-height: 1.6; color: oklch(0.28 0 0); text-wrap: pretty;">Je garantis détenir les droits d'usage sur l'ensemble des éléments que j'ai transmis (textes, visuels, captures, documents) et que leur intégration dans la vidéo ne porte atteinte à aucun droit de tiers, notamment aux droits d'auteur et au droit à l'image.</span>
-              </label>
-
-              <label style="display: flex; gap: 12px; align-items: flex-start; cursor: pointer;">
-                <input type="checkbox" checked="{{ g.c4 }}" onChange="{{ basculerC4 }}" style="width: 17px; height: 17px; margin-top: 3px; flex-shrink: 0; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
-                <span style="font-size: 14.5px; line-height: 1.6; color: oklch(0.28 0 0); text-wrap: pretty;">J'ai été informé que la voix et le personnage présents à l'image sont générés artificiellement par l'outil Synthesia, qu'aucune personne réelle n'y est filmée, et que cette nature synthétique doit être portée à la connaissance du public destinataire.</span>
-              </label>
-
-              <label style="display: flex; gap: 12px; align-items: flex-start; cursor: pointer;">
-                <input type="checkbox" checked="{{ g.c5 }}" onChange="{{ basculerC5 }}" style="width: 17px; height: 17px; margin-top: 3px; flex-shrink: 0; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
-                <span style="font-size: 14.5px; line-height: 1.6; color: oklch(0.28 0 0); text-wrap: pretty;">Je valide l'utilisation de cette vidéo et j'autorise sa mutualisation, sa diffusion et sa réutilisation à des fins de formation, sans limitation de durée, au sein du réseau des GRETA de l'académie de Reims et des services académiques, à l'exclusion de tout usage commercial.</span>
-              </label>
+              <sc-for list="{{ g.cases }}" as="c" hint-placeholder-count="5">
+                <label style="display: flex; gap: 12px; align-items: flex-start; cursor: pointer;">
+                  <input type="checkbox" checked="{{ c.coche }}" onChange="{{ c.onChange }}" style="width: 17px; height: 17px; margin-top: 3px; flex-shrink: 0; accent-color: #154194; cursor: pointer;" />
+                  <span style="font-size: 14.5px; line-height: 1.6; color: oklch(0.28 0 0); text-wrap: pretty;">{{ c.texte }}</span>
+                </label>
+              </sc-for>
             </div>
           </div>
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 26px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 26px;">
             <h3 style="margin: 0 0 6px; font-size: 17px; font-weight: 600;">Signature</h3>
             <p style="margin: 0 0 20px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">La saisie de vos nom et prénom vaut signature de la présente validation. La date, l'heure et la référence de la vidéo y sont associées et conservées dans le dossier de la demande.</p>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px;">
               <label style="display: block;">
                 <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Nom et prénom</span>
-                <input value="{{ g.nom }}" onChange="{{ majValNom }}" placeholder="Prénom NOM" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+                <input value="{{ g.nom }}" onChange="{{ majValNom }}" placeholder="Prénom NOM" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
               </label>
               <label style="display: block;">
                 <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Fonction et structure <span style="font-weight: 400; color: oklch(0.6 0 0);">— facultatif</span></span>
-                <input value="{{ g.fonction }}" onChange="{{ majValFonction }}" placeholder="Ex. : formatrice, GRETA Marne" style="width: 100%; padding: 11px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px;" />
+                <input value="{{ g.fonction }}" onChange="{{ majValFonction }}" placeholder="Ex. : formatrice, GRETA Marne" style="width: 100%; padding: 11px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px;" />
               </label>
             </div>
             <div style="font-size: 13.5px; color: oklch(0.45 0 0); margin-top: 16px; line-height: 1.6; text-wrap: pretty;">Fait le {{ g.dateJour }}. En appuyant sur « Valider et signer », je confirme donner mon accord sur l'ensemble des déclarations ci-dessus.</div>
@@ -922,7 +927,7 @@
 
           <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
             <button onClick="{{ signerValidation }}" style="border: 0; cursor: pointer; padding: 13px 24px; border-radius: 8px; font-size: 15px; font-weight: 500; background: oklch(0.5 0.12 155); color: white;" style-hover="background: oklch(0.43 0.12 155);">Valider et signer</button>
-            <button onClick="{{ annulerVal }}" style="cursor: pointer; padding: 12px 20px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Annuler</button>
+            <button onClick="{{ annulerVal }}" style="cursor: pointer; padding: 12px 20px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Annuler</button>
             <span style="font-size: 13.5px; color: oklch(0.5 0.14 25); line-height: 1.5;">{{ valErreur }}</span>
           </div>
         </div>
@@ -933,25 +938,25 @@
   <sc-if value="{{ routeModification }}" hint-placeholder-val="{{ false }}">
     <div style="max-width: 760px; animation: fadein 0.2s ease-out;">
       <header style="padding: 40px 0 26px;">
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.13 200); margin-bottom: 8px;">Académie de Reims · Vidéos Synthesia</div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #154194; margin-bottom: 8px;">Académie de Reims · Vidéos Synthesia</div>
         <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">Demander une modification</h1>
         <p style="margin: 10px 0 0; font-size: 15.5px; color: oklch(0.45 0 0); line-height: 1.6; text-wrap: pretty;">Renseignez la référence de votre vidéo pour charger votre demande. Le formulaire ne s'active que si la vidéo vous a été soumise pour validation.</p>
       </header>
 
       <sc-if value="{{ modifSaisie }}" hint-placeholder-val="{{ true }}">
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 30px;">
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 30px;">
           <label style="display: block; margin-bottom: 16px;">
             <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Référence de la vidéo</span>
-            <input value="{{ modifRefSaisie }}" onChange="{{ majModifRef }}" onKeyDown="{{ toucheModifRef }}" placeholder="VID-2026-038" style="width: 100%; padding: 12px 14px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 15px; font-family: 'JetBrains Mono', monospace;" />
+            <input value="{{ modifRefSaisie }}" onChange="{{ majModifRef }}" onKeyDown="{{ toucheModifRef }}" placeholder="VID-2026-038" style="width: 100%; padding: 12px 14px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 15px; font-family: 'JetBrains Mono', monospace;" />
           </label>
-          <button onClick="{{ chargerModif }}" style="border: 0; cursor: pointer; padding: 12px 22px; border-radius: 8px; font-size: 15px; font-weight: 500; background: oklch(0.55 0.13 200); color: white;" style-hover="background: oklch(0.47 0.13 200);">Charger ma demande</button>
+          <button onClick="{{ chargerModif }}" style="border: 0; cursor: pointer; padding: 12px 22px; border-radius: 8px; font-size: 15px; font-weight: 500; background: #154194; color: white;" style-hover="background: #0f3070;">Charger ma demande</button>
           <div style="font-size: 13.5px; color: oklch(0.5 0.14 25); margin-top: 14px; line-height: 1.55; text-wrap: pretty;">{{ modifErreur }}</div>
           <div style="margin-top: 18px; padding-top: 18px; border-top: 1px solid oklch(0.94 0 0); font-size: 13px; color: oklch(0.55 0 0); line-height: 1.55;">La référence figure dans l'objet du courriel qui vous a été adressé. Le lien contenu dans ce courriel remplit ce champ automatiquement.</div>
         </div>
       </sc-if>
 
       <sc-if value="{{ montrerConfirme }}" hint-placeholder-val="{{ false }}">
-        <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 30px;">
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 30px;">
           <h2 style="margin: 0 0 12px; font-size: 21px; font-weight: 600; letter-spacing: -0.015em;">Demande de modification transmise</h2>
           <p style="margin: 0; font-size: 15px; line-height: 1.6; color: oklch(0.4 0 0); text-wrap: pretty;">Vos remarques sur la demande {{ modifConfirme }} ont été enregistrées et transmises au service de création vidéo. Vous recevrez un courriel dès que la nouvelle version sera disponible.</p>
         </div>
@@ -960,7 +965,7 @@
       <sc-if value="{{ modifActif }}" hint-placeholder-val="{{ false }}">
         <div style="display: flex; flex-direction: column; gap: 20px;">
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
             <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;">
               <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: oklch(0.55 0 0); white-space: nowrap;">{{ m.ref }}</span>
               <span style="padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; background: {{ m.bg }}; color: {{ m.fg }};">{{ m.statut }}</span>
@@ -976,30 +981,30 @@
             </sc-if>
           </div>
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
             <label style="display: block;">
               <span style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px;">Modification demandée</span>
               <span style="display: block; font-size: 12.5px; color: oklch(0.53 0 0); margin-bottom: 8px; line-height: 1.45;">Décrivez précisément ce qui doit changer, avec le minutage si possible. Ce texte guidera la nouvelle version.</span>
-              <textarea value="{{ m.commentaire }}" onChange="{{ majModifCommentaire }}" rows="5" placeholder="Ex. : à 0'42, remplacer « compétences » par « attendus ». Ajouter le logo académique sur le dernier plan." style="width: 100%; padding: 12px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
+              <textarea value="{{ m.commentaire }}" onChange="{{ majModifCommentaire }}" rows="5" placeholder="Ex. : à 0'42, remplacer « compétences » par « attendus ». Ajouter le logo académique sur le dernier plan." style="width: 100%; padding: 12px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
             </label>
           </div>
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-              <input type="checkbox" checked="{{ m.majScript }}" onChange="{{ basculerScript }}" style="width: 17px; height: 17px; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
+              <input type="checkbox" checked="{{ m.majScript }}" onChange="{{ basculerScript }}" style="width: 17px; height: 17px; accent-color: #154194; cursor: pointer;" />
               <span style="font-size: 14.5px; font-weight: 500;">Modifier le script audio</span>
             </label>
             <sc-if value="{{ m.majScript }}" hint-placeholder-val="{{ false }}">
               <label style="display: block; margin-top: 16px;">
                 <span style="display: block; font-size: 12.5px; color: oklch(0.53 0 0); margin-bottom: 8px; line-height: 1.45;">Prérempli avec le script de votre demande. Corrigez directement le texte à faire dire à l'avatar.</span>
-                <textarea value="{{ m.script }}" onChange="{{ majModifScript }}" rows="9" style="width: 100%; padding: 12px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
+                <textarea value="{{ m.script }}" onChange="{{ majModifScript }}" rows="9" style="width: 100%; padding: 12px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
               </label>
             </sc-if>
           </div>
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-              <input type="checkbox" checked="{{ m.majStoryboard }}" onChange="{{ basculerStoryboard }}" style="width: 17px; height: 17px; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
+              <input type="checkbox" checked="{{ m.majStoryboard }}" onChange="{{ basculerStoryboard }}" style="width: 17px; height: 17px; accent-color: #154194; cursor: pointer;" />
               <span style="font-size: 14.5px; font-weight: 500;">Modifier le storyboard</span>
             </label>
             <sc-if value="{{ m.majStoryboard }}" hint-placeholder-val="{{ false }}">
@@ -1033,28 +1038,28 @@
                 <div style="padding: 20px; font-size: 13.5px; color: oklch(0.55 0 0);">Aucun plan n'avait été transmis pour cette vidéo.</div>
               </sc-if>
               <div style="padding: 10px;">
-                <button onClick="{{ ajouterModifLigne }}" style="border: 0; background: none; cursor: pointer; padding: 4px 0; font-size: 13.5px; font-weight: 500; color: oklch(0.55 0.13 200);" style-hover="text-decoration: underline;">+ Ajouter un plan</button>
+                <button onClick="{{ ajouterModifLigne }}" style="border: 0; background: none; cursor: pointer; padding: 4px 0; font-size: 13.5px; font-weight: 500; color: #154194;" style-hover="text-decoration: underline;">+ Ajouter un plan</button>
               </div>
             </div>
             </sc-if>
           </div>
 
-          <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 24px;">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-              <input type="checkbox" checked="{{ m.majPrecisions }}" onChange="{{ basculerPrecisions }}" style="width: 17px; height: 17px; accent-color: oklch(0.55 0.13 200); cursor: pointer;" />
+              <input type="checkbox" checked="{{ m.majPrecisions }}" onChange="{{ basculerPrecisions }}" style="width: 17px; height: 17px; accent-color: #154194; cursor: pointer;" />
               <span style="font-size: 14.5px; font-weight: 500;">Modifier les précisions supplémentaires</span>
             </label>
             <sc-if value="{{ m.majPrecisions }}" hint-placeholder-val="{{ false }}">
               <label style="display: block; margin-top: 16px;">
                 <span style="display: block; font-size: 12.5px; color: oklch(0.53 0 0); margin-bottom: 8px; line-height: 1.45;">Prérempli avec les précisions de votre demande : positionnement des visuels, ou toute information qu'il vous semble importante.</span>
-                <textarea value="{{ m.precisions }}" onChange="{{ majModifPrecisions }}" rows="4" style="width: 100%; padding: 12px 13px; border: 1px solid oklch(0.87 0 0); border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
+                <textarea value="{{ m.precisions }}" onChange="{{ majModifPrecisions }}" rows="4" style="width: 100%; padding: 12px 13px; border: 1px solid #c8d2e4; border-radius: 8px; font-size: 14.5px; line-height: 1.6; resize: vertical;"></textarea>
               </label>
             </sc-if>
           </div>
 
           <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-            <button onClick="{{ envoyerModif }}" style="border: 0; cursor: pointer; padding: 13px 24px; border-radius: 8px; font-size: 15px; font-weight: 500; background: oklch(0.55 0.13 200); color: white;" style-hover="background: oklch(0.47 0.13 200);">Envoyer ma demande de modification</button>
-            <button onClick="{{ annulerModif }}" style="cursor: pointer; padding: 12px 20px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Annuler</button>
+            <button onClick="{{ envoyerModif }}" style="border: 0; cursor: pointer; padding: 13px 24px; border-radius: 8px; font-size: 15px; font-weight: 500; background: #154194; color: white;" style-hover="background: #0f3070;">Envoyer ma demande de modification</button>
+            <button onClick="{{ annulerModif }}" style="cursor: pointer; padding: 12px 20px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Annuler</button>
             <span style="font-size: 13.5px; color: oklch(0.5 0.14 25); line-height: 1.5;">{{ modifErreur }}</span>
           </div>
         </div>
@@ -1063,9 +1068,9 @@
   </sc-if>
 
   <sc-if value="{{ routeVide }}" hint-placeholder-val="{{ false }}">
-    <div style="max-width: 560px; margin: 90px 0; background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 30px; font-size: 15px; color: oklch(0.4 0 0); line-height: 1.6;">
+    <div style="max-width: 560px; margin: 90px 0; background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 30px; font-size: 15px; color: oklch(0.4 0 0); line-height: 1.6;">
       Ce lien de suivi ne correspond à aucune demande. Le ticket a peut-être été supprimé.
-      <button onClick="{{ allerPublic }}" style="display: block; margin-top: 18px; border: 0; cursor: pointer; padding: 11px 18px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: oklch(0.55 0.13 200); color: white;" style-hover="background: oklch(0.47 0.13 200);">Déposer une demande</button>
+      <button onClick="{{ allerPublic }}" style="display: block; margin-top: 18px; border: 0; cursor: pointer; padding: 11px 18px; border-radius: 8px; font-size: 14.5px; font-weight: 500; background: #154194; color: white;" style-hover="background: #0f3070;">Déposer une demande</button>
     </div>
   </sc-if>
 
@@ -1093,14 +1098,14 @@ const MDP = "reims2026";
 
 const S = {
   nouvelle:   { label: "Nouvelle demande", bg: "oklch(0.95 0.005 250)", fg: "oklch(0.42 0.01 250)" },
-  production: { label: "En production",    bg: "oklch(0.94 0.035 200)", fg: "oklch(0.42 0.11 200)" },
+  production: { label: "En production",    bg: "#e4ecfb", fg: "#154194" },
   validation: { label: "À valider",        bg: "oklch(0.95 0.055 80)",  fg: "oklch(0.44 0.11 70)" },
   modif:      { label: "Modification demandée", bg: "oklch(0.95 0.04 25)", fg: "oklch(0.47 0.14 25)" },
   validee:    { label: "Validée",          bg: "oklch(0.94 0.04 155)",  fg: "oklch(0.4 0.1 155)" }
 };
 const ORDRE = ["nouvelle", "production", "validation", "modif", "validee"];
 const PRIORITE = { Urgent: "priorité urgente", Normal: "priorité normale", Faible: "priorité faible" };
-const PT = { nouvelle: "oklch(0.42 0.01 250)", production: "oklch(0.42 0.11 200)", validation: "oklch(0.44 0.11 70)", modif: "oklch(0.47 0.14 25)", validee: "oklch(0.4 0.1 155)" };
+const PT = { nouvelle: "oklch(0.42 0.01 250)", production: "#154194", validation: "oklch(0.44 0.11 70)", modif: "oklch(0.47 0.14 25)", validee: "oklch(0.4 0.1 155)" };
 
 const ACTIONS = {
   nouvelle: {
@@ -1220,10 +1225,7 @@ function charger() {
   } catch (e) {}
   return SEED;
 }
-function sauver(tickets) {
-  if (window.Stockage) window.Stockage.pousser("demandes", tickets);
-  else { try { localStorage.setItem(CLE, JSON.stringify(tickets)); } catch (e) {} }
-}
+
 
 const CLE_CONFIG = "synthesia_config_v1";
 const CONFIG_DEFAUT = {
@@ -1239,12 +1241,7 @@ const CONFIG_DEFAUT = {
   notifValidation: true,
   notifModification: true,
   prefixeRef: "VID-2026-",
-  baseMode: "Locale (ce navigateur)",
-  baseUrl: "",
-  baseCle: "",
-  baseEntete: "Authorization",
-  basePost: false,
-  envoiReel: false
+  baseCle: ""
 };
 function chargerConfig() {
   try {
@@ -1312,6 +1309,26 @@ const MODELES = [
     corps: "Bonjour,\n\n{{demandeur}} a visionné la vidéo « {{titre}} » ({{ref}}) et souhaite une modification avant validation.\n\nRemarques transmises :\n{{commentaire}}\n\nLa demande est repassée au statut « Modification demandée » dans l'espace administrateur, où figure l'historique complet.\n\nBonne journée."
   }
 ];
+/* Déclarations du formulaire de validation. Modifiables dans Configuration et
+ * rangées dans la collection partagée « modeles » (clé réservée), afin que le
+ * navigateur du formateur puisse les lire sans jeton d'administration. */
+const CLE_DECLARATIONS = "__declarations";
+
+/* Réglages partagés : ils vivent dans la base, car le navigateur du formateur
+ * les utilise au moment du dépôt (signature du courriel, préfixe de référence).
+ * Ne restent locaux que l'identifiant, le mot de passe et le jeton. */
+const CLE_REGLAGES = "__reglages";
+const REGLAGES_PARTAGES = ["nomExpediteur", "adresseExpediteur", "signature",
+  "adresseNotif", "copieNotif", "canal", "notifDepot", "notifValidation",
+  "notifModification", "prefixeRef"];
+const DECLARATIONS_DEFAUT = [
+  "En cochant cette case, je confirme avoir visionné dans son intégralité la vidéo référencée ci-dessus, produite avec l'outil Synthesia à ma demande.",
+  "Je certifie l'exactitude des informations pédagogiques, réglementaires et factuelles qu'elle contient, dont je demeure l'auteur et le responsable, et j'atteste qu'elle ne comporte aucun propos contraire aux valeurs du service public d'éducation.",
+  "Je garantis détenir les droits d'usage sur l'ensemble des éléments que j'ai transmis (textes, visuels, captures, documents) et que leur intégration dans la vidéo ne porte atteinte à aucun droit de tiers, notamment aux droits d'auteur et au droit à l'image.",
+  "J'ai été informé que la voix et le personnage présents à l'image sont générés artificiellement par l'outil Synthesia, qu'aucune personne réelle n'y est filmée, et que cette nature synthétique doit être portée à la connaissance du public destinataire.",
+  "Je valide l'utilisation de cette vidéo et j'autorise sa mutualisation, sa diffusion et sa réutilisation à des fins de formation, sans limitation de durée, au sein du réseau des GRETA de l'académie de Reims et des services académiques, à l'exclusion de tout usage commercial."
+];
+
 const VARIABLES = ["ref", "titre", "demandeur", "email", "duree", "urgence", "public", "plans", "lienVideo", "lienSuivi", "lienValidation", "lienModification", "commentaire", "signature"];
 
 function chargerModeles() {
@@ -1363,7 +1380,8 @@ class Component extends DCLogic {
     messageFormulaire: "", derniereRef: "", derniereAdresse: "", dernierToken: null,
     modifRef: "", modifId: null, modifForm: null, modifErreur: "", modifConfirme: "",
     valRef: "", valId: null, valForm: null, valErreur: "", valConfirme: "",
-    base: { source: "local", erreur: "" }, testBase: ""
+    valSuivi: null, valCible: null, modifSuivi: null, modifCible: null,
+    base: { source: "local", erreur: "" }, testBase: "", silencieux: false
   };
 
   componentDidMount() {
@@ -1385,6 +1403,13 @@ class Component extends DCLogic {
     try {
       const q = new URLSearchParams(location.search);
       const h = location.hash || "";
+      /* ?formulaire — mode intégration (iframe Moodle) : uniquement le dépôt,
+       * sans barre de démonstration ni accès administrateur. */
+      if (q.has("formulaire") || /formulaire/.test(h)) {
+        this._integre = true;
+        this.setState({ route: "public" });
+        this.suivreHauteur();
+      }
       const hv = h.match(/valider=([\w-]+)/);
       const hm = h.match(/modifier=([\w-]+)/);
       const aValider = q.get("valider") || (hv && hv[1]);
@@ -1394,17 +1419,41 @@ class Component extends DCLogic {
     } catch (e) {}
   }
 
+  /* Fait remonter la hauteur réelle à la page hôte, qui redimensionne l'iframe.
+   * Sans cela, un formulaire long défile dans un cadre de hauteur fixe. */
+  suivreHauteur() {
+    const envoyer = () => {
+      const h = Math.ceil(document.documentElement.scrollHeight);
+      if (h !== this._hauteur) {
+        this._hauteur = h;
+        try { parent.postMessage({ type: "synthesia-hauteur", hauteur: h }, "*"); } catch (e) {}
+      }
+    };
+    envoyer();
+    this._minuteurHauteur = setInterval(envoyer, 400);
+    try {
+      this._observateur = new ResizeObserver(envoyer);
+      this._observateur.observe(document.documentElement);
+    } catch (e) {}
+  }
+
   componentWillUnmount() {
     this._demonte = true;
+    clearInterval(this._minuteurHauteur);
+    if (this._observateur) this._observateur.disconnect();
     if (this._surErreur) window.removeEventListener("stockage-erreur", this._surErreur);
   }
 
   brancherStockage() {
     window.Stockage.onErreur = msg => this.setState(s => ({ base: { ...s.base, erreur: msg } }));
-    window.Stockage.charger({ demandes: SEED }).then(d => {
+    /* Les demandes de démonstration ne servent qu'au mode local sans API.
+     * Dès qu'un service est branché, une base vide reste vide : y réinjecter
+     * SEED ferait réapparaître des demandes fictives dans le vrai service. */
+    const demo = !window.Stockage.apiConfiguree();
+    window.Stockage.charger(demo ? { demandes: SEED } : { demandes: [] }).then(d => {
       if (this._demonte) return;
       this.setState({
-        tickets: d.demandes && d.demandes.length ? d.demandes : SEED,
+        tickets: demo && !(d.demandes && d.demandes.length) ? SEED : (d.demandes || []),
         mails: d.courriels || [],
         modeles: d.modeles || {},
         base: { source: d.source, erreur: d.erreur || "" }
@@ -1412,17 +1461,36 @@ class Component extends DCLogic {
     });
   }
 
+  declarations() {
+    const d = (this.state.modeles || {})[CLE_DECLARATIONS];
+    return Array.isArray(d) && d.length ? d : DECLARATIONS_DEFAUT;
+  }
+
+  majDeclarations(liste) {
+    const modeles = { ...this.state.modeles, [CLE_DECLARATIONS]: liste };
+    sauverModeles(modeles);
+    this.setState({ modeles });
+  }
+
   ouvrirSignature(ref) {
+    /* Le navigateur du formateur n'a pas de jeton : il lit les déclarations
+     * par la voie publique avant d'afficher le formulaire. */
+    if (window.Stockage && window.Stockage.lireModelesPublic) {
+      window.Stockage.lireModelesPublic().then(m => {
+        if (!this._demonte && m) this.setState({ modeles: m });
+      });
+    }
     this.setState({ route: "signature", valRef: ref, valConfirme: "" }, () => this.chargerVal());
   }
 
-  chargerVal() {
-    const v = String(this.state.valRef || "").trim().toLowerCase();
+  async chargerVal() {
+    const v = String(this.state.valRef || "").trim();
     if (!v) {
       this.setState({ valErreur: "Indiquez la référence de votre vidéo, par exemple VID-2026-038." });
       return;
     }
-    const t = this.state.tickets.find(x => String(x.ref).toLowerCase() === v || String(x.token).toLowerCase() === v);
+    this.setState({ valErreur: "Recherche de votre demande…" });
+    const t = window.Stockage ? await window.Stockage.lireSuivi(v) : null;
     if (!t) {
       this.setState({ valId: null, valForm: null, valErreur: "Aucune demande ne correspond à cette référence. Vérifiez le courriel que vous avez reçu." });
       return;
@@ -1437,8 +1505,8 @@ class Component extends DCLogic {
       return;
     }
     this.setState({
-      valId: t.id, valErreur: "", valConfirme: "",
-      valForm: { nom: t.demandeur || "", fonction: "", c1: false, c2: false, c3: false, c4: false, c5: false }
+      valId: t.id || t.token, valSuivi: t.token, valCible: t, valErreur: "", valConfirme: "",
+      valForm: { nom: t.demandeur || "", fonction: "", coches: this.declarations().map(() => false) }
     });
   }
 
@@ -1450,13 +1518,14 @@ class Component extends DCLogic {
     this.setState({ route: "modification", modifRef: ref, modifConfirme: "" }, () => this.chargerModif());
   }
 
-  chargerModif() {
-    const v = String(this.state.modifRef || "").trim().toLowerCase();
+  async chargerModif() {
+    const v = String(this.state.modifRef || "").trim();
     if (!v) {
       this.setState({ modifErreur: "Indiquez la référence de votre vidéo, par exemple VID-2026-038." });
       return;
     }
-    const t = this.state.tickets.find(x => String(x.ref).toLowerCase() === v || String(x.token).toLowerCase() === v);
+    this.setState({ modifErreur: "Recherche de votre demande…" });
+    const t = window.Stockage ? await window.Stockage.lireSuivi(v) : null;
     if (!t) {
       this.setState({ modifId: null, modifForm: null, modifErreur: "Aucune demande ne correspond à cette référence. Vérifiez le courriel que vous avez reçu." });
       return;
@@ -1469,7 +1538,7 @@ class Component extends DCLogic {
       return;
     }
     this.setState({
-      modifId: t.id, modifErreur: "", modifConfirme: "",
+      modifId: t.id || t.token, modifSuivi: t.token, modifCible: t, modifErreur: "", modifConfirme: "",
       modifForm: {
         script: t.script,
         precisions: t.precisions || "",
@@ -1487,18 +1556,21 @@ class Component extends DCLogic {
     this.setState(s => ({ modifForm: { ...s.modifForm, storyboard: s.modifForm.storyboard.map((r, j) => j === i ? { ...r, ...patch } : r) } }));
   }
 
-  ecrire(tickets, extra) {
-    sauver(tickets);
-    this.setState({ tickets, ...(extra || {}) });
-  }
+
 
   journaliser(canal, dest, objet, corps, ref) {
     const mail = {
       id: "m" + Date.now() + Math.random().toString(36).slice(2, 5),
       canal, dest, objet, corps, ref: ref || "", envoye: new Date().toISOString(),
-      expediteur: this.state.config.nomExpediteur + " <" + this.state.config.adresseExpediteur + ">"
+      expediteur: this.reglages().nomExpediteur + " <" + this.reglages().adresseExpediteur + ">"
     };
     if (window.Stockage && canal !== "Notification") window.Stockage.expedier(mail);
+    /* Quand l'API est branchée, c'est elle qui tient le journal : y écrire aussi
+     * depuis le navigateur écraserait les entrées enregistrées entre-temps. */
+    if (window.Stockage && window.Stockage.apiConfiguree()) {
+      this.setState(s => ({ mails: [mail, ...s.mails] }));
+      return;
+    }
     const mails = [mail, ...this.state.mails];
     sauverMails(mails);
     this.setState({ mails });
@@ -1512,19 +1584,40 @@ class Component extends DCLogic {
   }
 
   canalActuel() {
-    const p = this.state.config.canal;
+    const p = this.reglages().canal;
     return p === "Notification dans l'outil seulement" ? "Notification" : "E-mail envoyé";
   }
 
   adresseAdmin() {
-    const c = this.state.config;
+    const c = this.reglages();
     return c.copieNotif.trim() ? c.adresseNotif + ", " + c.copieNotif.trim() : c.adresseNotif;
   }
 
+  /* Vue effective des réglages : la base d'abord, le poste en secours. */
+  reglages() {
+    const partages = (this.state.modeles || {})[CLE_REGLAGES] || {};
+    return { ...this.state.config, ...partages };
+  }
+
   majConfig(patch) {
-    const config = { ...this.state.config, ...patch };
-    sauverConfig(config);
-    this.setState({ config });
+    const cles = Object.keys(patch);
+    const versBase = {};
+    const versPoste = {};
+    cles.forEach(k => {
+      if (REGLAGES_PARTAGES.indexOf(k) >= 0) versBase[k] = patch[k];
+      else versPoste[k] = patch[k];
+    });
+    if (Object.keys(versPoste).length) {
+      const config = { ...this.state.config, ...versPoste };
+      sauverConfig(config);
+      this.setState({ config });
+    }
+    if (Object.keys(versBase).length) {
+      const actuels = (this.state.modeles || {})[CLE_REGLAGES] || {};
+      const modeles = { ...this.state.modeles, [CLE_REGLAGES]: { ...actuels, ...versBase } };
+      sauverModeles(modeles);
+      this.setState({ modeles });
+    }
   }
 
   modele(id) {
@@ -1534,19 +1627,32 @@ class Component extends DCLogic {
   }
 
   variables(t, extra) {
+    var base = "";
+    try { base = location.origin + location.pathname.replace(/\/[^\/]*$/, ""); } catch (e) {}
     return {
       ref: t.ref, titre: t.titre, demandeur: t.demandeur, email: t.email,
       duree: t.duree, urgence: t.urgence, public: t.publicVise,
       plans: (t.storyboard && t.storyboard.length) ? (t.storyboard.length === 1 ? "1 plan" : t.storyboard.length + " plans") : "aucun plan",
-      lienVideo: t.lien, lienSuivi: "https://ac-reims.fr/videos/suivi/" + t.token,
-      lienModification: "https://ac-reims.fr/videos/modifier?id=" + t.ref,
-      lienValidation: "https://ac-reims.fr/videos/valider?id=" + t.ref,
-      signature: this.state.config.signature,
+      lienVideo: t.lien, lienSuivi: base + "/?valider=" + t.token,
+      lienValidation: base + "/?valider=" + t.token,
+      lienModification: base + "/?modifier=" + t.token,
+      signature: this.reglages().signature,
       commentaire: "", ...(extra || {})
     };
   }
 
+  /* Compose un courriel à partir d'un modèle, sans l'envoyer : la charge est
+   * transmise au serveur, qui expédie et journalise. Le destinataire "@admin"
+   * est résolu côté serveur (le poste du formateur ignore votre adresse). */
+  composer(id, dest, vars, ref) {
+    const m = this.modele(id);
+    return { dest, ref: ref || "", objet: remplir(m.objet, vars), corps: remplir(m.corps, vars) };
+  }
+
   envoyer(id, dest, vars, ref, silencieux) {
+    /* Mode silencieux : reprise d'une vidéo déjà engagée dans le circuit,
+     * on fait avancer le statut sans réécrire au formateur. */
+    if (this.state.silencieux) return;
     const m = this.modele(id);
     const objet = remplir(m.objet, vars);
     const corps = remplir(m.corps, vars);
@@ -1567,11 +1673,19 @@ class Component extends DCLogic {
     return "déposée le " + p(d.getDate()) + "/" + p(d.getMonth() + 1);
   }
 
-  majTicket(id, patch, entree) {
+  /* Modification ciblée : l'outil n'envoie que le ticket concerné, jamais la
+   * collection entière — sinon l'instantané en mémoire de l'administrateur
+   * effacerait les demandes déposées depuis l'ouverture de son onglet. */
+  majTicket(id, patch, entree, courriels) {
+    const cible = this.state.tickets.find(t => t.id === id);
+    const ref = cible ? cible.ref : null;
     const tickets = this.state.tickets.map(t => t.id !== id ? t : {
       ...t, ...patch, historique: entree ? [...t.historique, entree] : t.historique
     });
-    this.ecrire(tickets);
+    this.setState({ tickets });
+    if (!window.Stockage) return;
+    window.Stockage.majDemande(id, ref, patch, entree, courriels)
+      .catch(e => this.setState(s => ({ base: { ...s.base, erreur: "Enregistrement impossible (" + e.message + "). Rechargez la page avant de poursuivre : votre modification n'est pas conservée." } })));
   }
 
   majModele(id, patch) {
@@ -1628,8 +1742,8 @@ class Component extends DCLogic {
         onClick: () => this.setState({ selected: t.id, route: "ticket", lienInput: t.lien || "" })
       }));
 
-    const actif = { bg: "oklch(0.22 0.01 250)", fg: "white", bd: "oklch(0.22 0.01 250)" };
-    const repos = { bg: "white", fg: "oklch(0.4 0 0)", bd: "oklch(0.89 0 0)" };
+    const actif = { bg: "#0d2452", fg: "white", bd: "#0d2452" };
+    const repos = { bg: "white", fg: "oklch(0.4 0 0)", bd: "#cfd8e8" };
 
     let d = {};
     if (sel) {
@@ -1676,8 +1790,8 @@ class Component extends DCLogic {
           return {
             label: e.label, facultative: !!e.facultative,
             style: e.facultative ? "dashed" : "solid",
-            bd: fait ? "oklch(0.55 0.13 200)" : "oklch(0.87 0 0)",
-            fill: fait ? "oklch(0.55 0.13 200)" : "transparent",
+            bd: fait ? "#154194" : "#c8d2e4",
+            fill: fait ? "#154194" : "transparent",
             color: courant ? "oklch(0.22 0 0)" : fait ? "oklch(0.4 0 0)" : "oklch(0.65 0 0)",
             weight: courant ? "600" : "400"
           };
@@ -1705,7 +1819,7 @@ class Component extends DCLogic {
       };
     }
 
-    const mt = st.tickets.find(t => t.id === st.modifId) || null;
+    const mt = st.modifCible;
     const mf = st.modifForm;
     let m = {};
     if (mt && mf) {
@@ -1728,7 +1842,7 @@ class Component extends DCLogic {
       };
     }
 
-    const gt = st.tickets.find(t => t.id === st.valId) || null;
+    const gt = st.valCible;
     const gf = st.valForm;
     let g = {};
     if (gt && gf) {
@@ -1739,7 +1853,14 @@ class Component extends DCLogic {
         lecteurAbsent: !!gt.lien && !integration(gt.lien),
         titreLecteur: "Lecteur Synthesia · " + gt.titre,
         nom: gf.nom, fonction: gf.fonction,
-        c1: gf.c1, c2: gf.c2, c3: gf.c3, c4: gf.c4, c5: gf.c5,
+        cases: this.declarations().map((texte, i) => ({
+          texte, coche: !!(gf.coches || [])[i],
+          onChange: e => {
+            const v = e.target.checked;
+            this.majValForm({ coches: this.declarations().map((_, j) => j === i ? v : !!(this.state.valForm.coches || [])[j]) });
+          }
+        })),
+        nbCases: this.declarations().length,
         dateJour: new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })
       };
     }
@@ -1768,46 +1889,48 @@ class Component extends DCLogic {
     };
 
     return {
-      navigation: nav.map(n => ({ label: n.label, onClick: n.onClick, bg: n.actif ? "white" : "transparent", fg: n.actif ? "oklch(0.22 0.01 250)" : "oklch(0.9 0 0)" })),
-      montrerBarre: !this.props.masquerBarreDemo,
+      navigation: nav.map(n => ({ label: n.label, onClick: n.onClick, bg: n.actif ? "white" : "transparent", fg: n.actif ? "#0d2452" : "oklch(0.9 0 0)" })),
+      montrerBarre: !this.props.masquerBarreDemo && !this._integre,
+      integre: !!this._integre,
+      pageEntiere: !this._integre,
+      rembourrage: this._integre ? "16px 16px 24px" : "0 20px 80px",
       montrerBase: st.authed,
       navAdmin: allerAdmin,
       navAdminBg: navAdminActif ? "white" : "oklch(1 0 0 / 0.1)",
-      navAdminFg: navAdminActif ? "oklch(0.22 0.01 250)" : "oklch(0.9 0 0)",
+      navAdminFg: navAdminActif ? "#0d2452" : "oklch(0.9 0 0)",
       routePublic: st.route === "public",
       routeEnvoye: st.route === "envoye",
       routeLogin: st.route === "login",
       routeAdmin: st.route === "admin" && st.authed,
       routeMails: st.route === "mails" && st.authed,
       routeConfig: st.route === "config" && st.authed,
-      baseSource: st.base.source === "api" ? "Base externe connectée" : "Stockage local (ce navigateur)",
-      baseSourceBg: st.base.source === "api" ? "oklch(0.94 0.04 155)" : "oklch(0.95 0.005 250)",
-      baseSourceFg: st.base.source === "api" ? "oklch(0.4 0.1 155)" : "oklch(0.42 0.01 250)",
+      baseSource: st.base.source === "api" ? "Base connectée"
+        : st.base.source === "hors-ligne" ? "Hors ligne" : "Mode local (démonstration)",
+      baseSourceBg: st.base.source === "api" ? "oklch(0.94 0.04 155)"
+        : st.base.source === "hors-ligne" ? "oklch(0.95 0.04 25)" : "oklch(0.95 0.005 250)",
+      baseSourceFg: st.base.source === "api" ? "oklch(0.4 0.1 155)"
+        : st.base.source === "hors-ligne" ? "oklch(0.47 0.14 25)" : "oklch(0.42 0.01 250)",
       baseErreur: st.base.erreur,
       montrerBaseErreur: !!st.base.erreur,
       testBase: st.testBase,
-      cfgModes: ["Locale (ce navigateur)", "API externe"],
-      cfgBaseMode: e => this.majConfig({ baseMode: e.target.value }),
-      cfgBaseUrl: e => this.majConfig({ baseUrl: e.target.value }),
+      adresseApi: (window.Stockage && window.Stockage.adresseApi()) || "Aucune — renseignez la constante API dans stockage.js",
       cfgBaseCle: e => this.majConfig({ baseCle: e.target.value }),
-      cfgBaseEntete: e => this.majConfig({ baseEntete: e.target.value }),
-      cfgBasePost: e => this.majConfig({ basePost: e.target.checked }),
-      cfgEnvoiReel: e => this.majConfig({ envoiReel: e.target.checked }),
       testerBase: () => {
         if (!window.Stockage) return;
         this.setState({ testBase: "Test en cours…" });
-        window.Stockage.tester(this.state.config).then(r => this.setState({ testBase: r.message }));
+        window.Stockage.tester().then(r => this.setState({ testBase: r.message }));
       },
       rechargerBase: () => {
         if (!window.Stockage) return;
-        window.Stockage.charger({ demandes: SEED }).then(d => this.setState({
-          tickets: d.demandes && d.demandes.length ? d.demandes : SEED,
+        const demo2 = !window.Stockage.apiConfiguree();
+        window.Stockage.charger(demo2 ? { demandes: SEED } : { demandes: [] }).then(d => this.setState({
+          tickets: demo2 && !(d.demandes && d.demandes.length) ? SEED : (d.demandes || []),
           mails: d.courriels || [], modeles: d.modeles || {},
           base: { source: d.source, erreur: d.erreur || "" },
-          testBase: d.source === "api" ? "Données relues depuis la base externe." : "Données relues depuis le stockage local."
+          testBase: d.source === "api" ? "Données relues depuis la base." : "Données relues depuis le stockage local."
         }));
       },
-      cfg: st.config,
+      cfg: this.reglages(),
       cfgCanaux: ["E-mail et notification dans l'outil", "E-mail seulement", "Notification dans l'outil seulement"],
       cfgAdminId: e => this.majConfig({ adminId: e.target.value }),
       cfgAdminMdp: e => this.majConfig({ adminMdp: e.target.value }),
@@ -1821,8 +1944,14 @@ class Component extends DCLogic {
       cfgNotifValidation: e => this.majConfig({ notifValidation: e.target.checked }),
       cfgNotifModification: e => this.majConfig({ notifModification: e.target.checked }),
       cfgPrefixeRef: e => this.majConfig({ prefixeRef: e.target.value }),
-      cfgReset: () => { sauverConfig({ ...CONFIG_DEFAUT }); this.setState({ config: { ...CONFIG_DEFAUT } }); },
-      cfgProchaineRef: st.config.prefixeRef + String(st.tickets.reduce((m, t) => {
+      cfgReset: () => {
+        sauverConfig({ ...CONFIG_DEFAUT });
+        const modeles = { ...this.state.modeles };
+        delete modeles[CLE_REGLAGES];
+        sauverModeles(modeles);
+        this.setState({ config: { ...CONFIG_DEFAUT }, modeles });
+      },
+      cfgProchaineRef: this.reglages().prefixeRef + String(st.tickets.reduce((m, t) => {
         const p = parseInt(String(t.ref).split("-").pop(), 10);
         return isNaN(p) ? m : Math.max(m, p);
       }, 0) + 1).padStart(3, "0"),
@@ -1850,7 +1979,7 @@ class Component extends DCLogic {
         label: o.label, onClick: o.onClick,
         bg: o.actif ? "white" : "transparent",
         fg: o.actif ? "oklch(0.22 0 0)" : "oklch(0.5 0 0)",
-        bd: o.actif ? "oklch(0.89 0 0)" : "transparent",
+        bd: o.actif ? "#cfd8e8" : "transparent",
         poids: o.actif ? "600" : "500"
       })),
       mails: st.mails.map(m => {
@@ -1881,11 +2010,21 @@ class Component extends DCLogic {
       g,
       majValNom: e => this.majValForm({ nom: e.target.value }),
       majValFonction: e => this.majValForm({ fonction: e.target.value }),
-      basculerC1: e => this.majValForm({ c1: e.target.checked }),
-      basculerC2: e => this.majValForm({ c2: e.target.checked }),
-      basculerC3: e => this.majValForm({ c3: e.target.checked }),
-      basculerC4: e => this.majValForm({ c4: e.target.checked }),
-      basculerC5: e => this.majValForm({ c5: e.target.checked }),
+      declarationsRows: this.declarations().map((texte, i) => ({
+        numero: "Déclaration " + (i + 1),
+        texte,
+        onTexte: e => {
+          const v = e.target.value;
+          this.majDeclarations(this.declarations().map((t, j) => j === i ? v : t));
+        },
+        onSupprimer: () => {
+          const reste = this.declarations().filter((_, j) => j !== i);
+          this.majDeclarations(reste.length ? reste : DECLARATIONS_DEFAUT);
+        }
+      })),
+      ajouterDeclaration: () => this.majDeclarations([...this.declarations(), ""]),
+      reinitDeclarations: () => this.majDeclarations(DECLARATIONS_DEFAUT),
+      declarationsModifiees: !!(this.state.modeles || {})[CLE_DECLARATIONS],
       annulerVal: () => this.setState({ valId: null, valForm: null, valRef: "", valErreur: "" }),
       signerValidation: () => {
         if (!gt || !gf) return;
@@ -1893,21 +2032,27 @@ class Component extends DCLogic {
           this.setState({ valErreur: "Indiquez vos nom et prénom : ils constituent votre signature." });
           return;
         }
-        if (!(gf.c1 && gf.c2 && gf.c3 && gf.c4 && gf.c5)) {
+        const decl = this.declarations();
+        if (!decl.every((_, i) => (gf.coches || [])[i])) {
           this.setState({ valErreur: "Toutes les cases doivent être cochées pour que la validation soit recevable." });
           return;
         }
-        const quand = this.horodatage();
-        this.majTicket(gt.id, {
-          statut: "validee",
-          validation: {
-            nom: gf.nom.trim(), fonction: gf.fonction.trim(),
-            signeLe: new Date().toISOString(),
-            engagements: ["visionnage intégral", "exactitude du contenu", "droits sur les éléments fournis", "transparence sur l'avatar de synthèse", "mutualisation réseau GRETA"]
-          }
-        }, { qui: gf.nom.trim(), quand, texte: "Validation signée : visionnage intégral, exactitude du contenu, droits sur les éléments fournis, transparence sur l'avatar de synthèse et accord de mutualisation au sein du réseau des GRETA de l'académie de Reims.", point: PT.validee });
-        if (st.config.notifValidation) this.envoyer("validee", this.adresseAdmin(), this.variables(gt, { commentaire: gf.nom.trim() }), gt.ref);
-        this.setState({ valId: null, valForm: null, valRef: "", valErreur: "", valConfirme: gt.ref });
+        const validation = {
+          nom: gf.nom.trim(), fonction: gf.fonction.trim(),
+          signeLe: new Date().toISOString(),
+          engagements: decl
+        };
+        const note = "Validation signée par " + gf.nom.trim() + ", avec acceptation des " + decl.length + " déclarations en vigueur ce jour.";
+        const courriels = this.reglages().notifValidation === false ? []
+          : [this.composer("validee", "@admin", this.variables(gt, { commentaire: gf.nom.trim() }), gt.ref)];
+        this.setState({ valErreur: "Enregistrement de votre signature…" });
+        window.Stockage.retour(st.valSuivi, "validation", { validation, note }, courriels)
+          .then(() => this.setState(s => ({
+            valId: null, valCible: null, valForm: null, valRef: "", valErreur: "", valConfirme: gt.ref,
+            tickets: s.tickets.map(t => t.ref !== gt.ref ? t : { ...t, statut: "validee", validation,
+              historique: [...(t.historique || []), { qui: validation.nom, quand: this.horodatage(), texte: note, point: PT.validee }] })
+          })))
+          .catch(e => this.setState({ valErreur: "Enregistrement impossible (" + e.message + "). Réessayez dans un instant ; votre saisie est conservée." }));
       },
       routeModification: st.route === "modification",
       modifSaisie: !(mt && mf) && !st.modifConfirme,
@@ -1936,15 +2081,22 @@ class Component extends DCLogic {
           this.setState({ modifErreur: "Décrivez la modification attendue : c'est ce texte qui guidera la nouvelle version." });
           return;
         }
-        const patch = { statut: "modif" };
+        const champs = {};
         const mentions = [];
-        if (mf.majScript) { patch.script = mf.script; mentions.push("Modification du script"); }
-        if (mf.majStoryboard) { patch.storyboard = mf.storyboard.filter(r => r.schema.trim()); mentions.push("Modification du storyboard"); }
-        if (mf.majPrecisions) { patch.precisions = mf.precisions; mentions.push("Modification des précisions"); }
+        if (mf.majScript) { champs.script = mf.script; mentions.push("Modification du script"); }
+        if (mf.majStoryboard) { champs.storyboard = mf.storyboard.filter(r => r.schema.trim()); mentions.push("Modification du storyboard"); }
+        if (mf.majPrecisions) { champs.precisions = mf.precisions; mentions.push("Modification des précisions"); }
         const texte = (mentions.length ? mentions.join(" · ") + "\n\n" : "") + mf.commentaire.trim();
-        this.majTicket(mt.id, patch, { qui: mt.demandeur, quand: this.horodatage(), texte, point: PT.modif });
-        if (st.config.notifModification) this.envoyer("modif_demandee", this.adresseAdmin(), this.variables(mt, { commentaire: texte }), mt.ref);
-        this.setState({ modifId: null, modifForm: null, modifRef: "", modifErreur: "", modifConfirme: mt.ref });
+        const courriels = this.reglages().notifModification === false ? []
+          : [this.composer("modif_demandee", "@admin", this.variables(mt, { commentaire: texte }), mt.ref)];
+        this.setState({ modifErreur: "Transmission de votre demande…" });
+        window.Stockage.retour(st.modifSuivi, "modification", { champs, note: texte }, courriels)
+          .then(() => this.setState(s => ({
+            modifId: null, modifCible: null, modifForm: null, modifRef: "", modifErreur: "", modifConfirme: mt.ref,
+            tickets: s.tickets.map(t => t.ref !== mt.ref ? t : { ...t, ...champs, statut: "modif",
+              historique: [...(t.historique || []), { qui: t.demandeur, quand: this.horodatage(), texte, point: PT.modif }] })
+          })))
+          .catch(e => this.setState({ modifErreur: "Transmission impossible (" + e.message + "). Réessayez dans un instant ; votre saisie est conservée." }));
       },
       routeVide: st.route === "valider" && !vt,
       allerPublic,
@@ -1971,6 +2123,8 @@ class Component extends DCLogic {
       retourListe: () => this.setState({ route: "admin", selected: null }),
 
       d, v,
+      silencieux: st.silencieux,
+      basculerSilencieux: e => this.setState({ silencieux: e.target.checked }),
       lienInput: st.lienInput,
       majLien: e => this.setState({ lienInput: e.target.value }),
       modifText: st.modifText,
@@ -1988,7 +2142,9 @@ class Component extends DCLogic {
       ouvrirValidation: () => { if (sel) this.setState({ route: "valider", tokenActif: sel.token }); },
       supprimerTicket: () => {
         if (!sel) return;
-        this.ecrire(st.tickets.filter(t => t.id !== sel.id), { route: "admin", selected: null });
+        this.setState({ tickets: st.tickets.filter(t => t.id !== sel.id), route: "admin", selected: null });
+        if (window.Stockage) window.Stockage.supprimerDemande(sel.id, sel.ref)
+          .catch(e => this.setState(s => ({ base: { ...s.base, erreur: "Suppression non enregistrée (" + e.message + "). Rechargez la page." } })));
       },
 
       validerVideo: () => {
@@ -2059,29 +2215,39 @@ class Component extends DCLogic {
           this.setState({ messageFormulaire: "Le titre et le script audio sont nécessaires pour lancer une production." });
           return;
         }
-        const maxNum = st.tickets.reduce((m, t) => {
-          const p = parseInt(String(t.ref).split("-").pop(), 10);
-          return isNaN(p) ? m : Math.max(m, p);
-        }, 0);
-        const ref = st.config.prefixeRef + String(maxNum + 1).padStart(3, "0");
-        const token = "t-" + Math.random().toString(36).slice(2, 9);
         const nbAv = Number(fo.nbAvatars) || 1;
-        const nouveau = {
-          id: "d" + Date.now(), ref, token,
+        const demande = {
+          prefixe: this.reglages().prefixeRef,
           demandeur: fo.demandeur.trim(), email: fo.email.trim(), titre: fo.titre.trim(),
           publicVise: fo.publicVise.trim() || "Non précisé", duree: fo.duree, urgence: fo.urgence,
           nbAvatars: fo.nbAvatars, avatars: fo.avatars.slice(0, nbAv).map(a => a.trim()).filter(Boolean),
-          statut: "nouvelle", lien: "", depose: new Date().toISOString(),
           script: fo.script.trim(), precisions: fo.precisions.trim(),
-          storyboard: st.storyboard.filter(r => r.schema.trim()), pieces: [],
-          historique: [{ qui: fo.demandeur.trim(), quand: this.horodatage(), texte: "Demande déposée.", point: PT.nouvelle }]
+          storyboard: st.storyboard.filter(r => r.schema.trim())
         };
-        this.ecrire([nouveau, ...st.tickets], {
-          route: "envoye", form: { ...FORM_VIDE }, storyboard: SB_VIDE(), collerText: "", collerOuvert: false,
-          messageFormulaire: "", derniereRef: ref, derniereAdresse: nouveau.email, dernierToken: token
+        /* La référence et le jeton de suivi sont attribués par le serveur : deux
+         * formateurs qui déposent en même temps ne peuvent pas se télescoper.
+         * Les textes sont composés ici, mais {{ref}} et les liens restent en
+         * attente — le serveur les remplace juste avant d'expédier. */
+        const vars = this.variables({ ...demande, ref: "{{ref}}", token: "" }, {
+          ref: "{{ref}}", lienSuivi: "{{lienSuivi}}",
+          lienValidation: "{{lienValidation}}", lienModification: "{{lienModification}}"
         });
-        this.envoyer("depot_confirmation", nouveau.email, this.variables(nouveau), ref, true);
-        if (st.config.notifDepot) this.envoyer("depot_admin", this.adresseAdmin(), this.variables(nouveau), ref);
+        const courriels = [this.composer("depot_confirmation", demande.email, vars)];
+        if (this.reglages().notifDepot !== false) courriels.push(this.composer("depot_admin", "@admin", vars));
+        this.setState({ messageFormulaire: "Envoi de votre demande…" });
+        window.Stockage.deposer(demande, courriels).then(r => {
+          const sansPrefixe = { ...demande };
+          delete sansPrefixe.prefixe;
+          const complet = r.demande || { ...sansPrefixe, id: "d" + Date.now(),
+            ref: r.ref, token: r.token, statut: "nouvelle", lien: "", pieces: [],
+            depose: new Date().toISOString(),
+            historique: [{ qui: demande.demandeur, quand: this.horodatage(), texte: "Demande déposée.", point: PT.nouvelle }] };
+          this.setState(s => ({ tickets: [complet, ...s.tickets] }));
+          this.setState({
+            route: "envoye", form: { ...FORM_VIDE }, storyboard: SB_VIDE(), collerText: "", collerOuvert: false,
+            messageFormulaire: "", derniereRef: r.ref, derniereAdresse: demande.email, dernierToken: r.token
+          });
+        }).catch(e => this.setState({ messageFormulaire: "Envoi impossible (" + e.message + "). Votre saisie est conservée, réessayez dans un instant." }));
       },
 
       toast: st.toast

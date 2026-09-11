@@ -12,12 +12,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
-<link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,300..800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
+  @font-face { font-family: "Marianne"; src: url("fonts/Marianne-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Marianne"; src: url("fonts/Marianne-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Marianne"; src: url("fonts/Marianne-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
   *, *::before, *::after { box-sizing: border-box; }
-  body { margin: 0; font-family: "Work Sans", system-ui, sans-serif; background: oklch(0.975 0 0); color: oklch(0.22 0 0); -webkit-font-smoothing: antialiased; }
-  a { color: oklch(0.55 0.13 200); text-decoration: none; }
-  a:hover { color: oklch(0.45 0.13 200); text-decoration: underline; }
+  body { margin: 0; font-family: "Marianne", system-ui, sans-serif; background: #f4f6fa; color: #1c2433; -webkit-font-smoothing: antialiased; }
+  a { color: #154194; text-decoration: none; }
+  a:hover { color: #f39200; text-decoration: underline; }
   textarea, button { font-family: inherit; font-size: inherit; color: inherit; }
   textarea:focus { outline: 2px solid oklch(0.55 0.13 200 / 0.35); outline-offset: 1px; }
 </style>
@@ -26,19 +29,25 @@
 <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 20px 80px;">
   <div style="width: 100%; max-width: 1000px;">
 
-    <header style="padding: 40px 0 26px;">
-      <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.13 200); margin-bottom: 8px;">{{ sourceLabel }} · {{ cle }}</div>
+    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding: 14px 0; border-bottom: 3px solid #f39200; margin-bottom: 4px;">
+      <img src="logo-greta.jpg" alt="République française · GIP FCIP académie de Reims · Réseau GRETA académie de Reims Grand Est" style="height: 62px; width: auto; max-width: 100%; display: block;" />
+      <span style="flex: 1;"></span>
+      <span style="font-size: 12.5px; font-weight: 500; color: #154194;">Vidéos Synthesia</span>
+    </div>
+
+    <header style="padding: 34px 0 26px;">
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #154194; margin-bottom: 8px;">{{ sourceLabel }} · {{ cle }}</div>
       <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">Base de données</h1>
       <p style="margin: 10px 0 0; font-size: 15.5px; color: oklch(0.45 0 0); line-height: 1.6; max-width: 68ch; text-wrap: pretty;">Ce que l'outil a réellement enregistré sur ce poste. Cette page tient le rôle de la future base distante : mêmes champs, mêmes clés. <a href="index.html">Retour à l'outil</a></p>
     </header>
 
     <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px;">
-      <button onClick="{{ rafraichir }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Rafraîchir</button>
-      <button onClick="{{ exporter }}" style="border: 0; cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: oklch(0.55 0.13 200); color: white;" style-hover="background: oklch(0.47 0.13 200);">Exporter en JSON</button>
-      <button onClick="{{ enregistrer }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Enregistrer le JSON modifié</button>
+      <button onClick="{{ rafraichir }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Rafraîchir</button>
+      <button onClick="{{ exporter }}" style="border: 0; cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: #154194; color: white;" style-hover="background: #0f3070;">Exporter en JSON</button>
+      <button onClick="{{ enregistrer }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Enregistrer le JSON modifié</button>
       <span style="flex: 1;"></span>
-      <button onClick="{{ rechargerDemo }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0);" style-hover="background: oklch(0.96 0 0);">Recharger les demandes de démonstration</button>
-      <button onClick="{{ reinitialiser }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid oklch(0.89 0 0); color: oklch(0.5 0.14 25);" style-hover="background: oklch(0.97 0.02 25);">Vider la base</button>
+      <button onClick="{{ rechargerDemo }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Recharger les demandes de démonstration</button>
+      <button onClick="{{ reinitialiser }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid #cfd8e8; color: oklch(0.5 0.14 25);" style-hover="background: oklch(0.97 0.02 25);">Vider la base</button>
     </div>
 
     <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;">
@@ -46,8 +55,8 @@
       <span style="font-size: 13.5px; color: oklch(0.5 0.12 155);">{{ message }}</span>
     </div>
 
-    <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; overflow: hidden; margin-bottom: 28px;">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; padding: 12px 16px; background: oklch(0.97 0 0); border-bottom: 1px solid oklch(0.91 0 0); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.5 0 0);">
+    <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; overflow: hidden; margin-bottom: 28px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; padding: 12px 16px; background: oklch(0.97 0 0); border-bottom: 1px solid #dfe5f0; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.5 0 0);">
         <span>ref</span>
         <span>demandeur</span>
         <span>titre</span>
@@ -70,16 +79,16 @@
 
     <div style="margin-bottom: 34px;">
       <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 10px;">Contenu brut</div>
-      <textarea value="{{ json }}" onChange="{{ majJson }}" rows="16" spellcheck="false" style="width: 100%; padding: 16px; border: 1px solid oklch(0.89 0 0); border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6; resize: vertical; background: white;"></textarea>
+      <textarea value="{{ json }}" onChange="{{ majJson }}" rows="16" spellcheck="false" style="width: 100%; padding: 16px; border: 1px solid #cfd8e8; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6; resize: vertical; background: white;"></textarea>
     </div>
 
-    <div style="background: white; border: 1px solid oklch(0.91 0 0); border-radius: 12px; padding: 26px;">
+    <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 26px;">
       <h2 style="margin: 0 0 6px; font-size: 18px; font-weight: 600; letter-spacing: -0.01em;">Passage à une base distante</h2>
       <p style="margin: 0 0 20px; font-size: 14.5px; color: oklch(0.45 0 0); line-height: 1.6; max-width: 68ch; text-wrap: pretty;">Une seule table suffit. Les noms de colonnes ci-dessous sont exactement les clés utilisées par l'outil : la reprise se fait sans conversion.</p>
       <div style="display: flex; flex-direction: column; gap: 1px; background: oklch(0.94 0 0); border-radius: 8px; overflow: hidden;">
         <sc-for list="{{ schema }}" as="s" hint-placeholder-count="6">
           <div style="display: flex; gap: 16px; flex-wrap: wrap; padding: 11px 14px; background: white; font-size: 13.5px;">
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; min-width: 130px; color: oklch(0.4 0.1 200);">{{ s.col }}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; min-width: 130px; color: #154194;">{{ s.col }}</span>
             <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; min-width: 90px; color: oklch(0.55 0 0);">{{ s.type }}</span>
             <span style="flex: 1 1 240px; color: oklch(0.42 0 0); line-height: 1.45;">{{ s.note }}</span>
           </div>
@@ -94,7 +103,7 @@
 <script type="text/x-dc" data-dc-script>
 const CLE = "synthesia_demandes_v1";
 const COULEUR = {
-  nouvelle: "oklch(0.42 0.01 250)", production: "oklch(0.42 0.11 200)",
+  nouvelle: "#0d2452", production: "#154194",
   validation: "oklch(0.44 0.11 70)", modif: "oklch(0.47 0.14 25)", validee: "oklch(0.4 0.1 155)"
 };
 const LABEL = {
@@ -123,15 +132,13 @@ const SCHEMA = [
 ];
 
 function distant() {
-  try {
-    const c = JSON.parse(localStorage.getItem("synthesia_config_v1") || "{}");
-    return c.baseMode === "API externe" && !!(c.baseUrl || "").trim();
-  } catch (e) { return false; }
+  return !!(window.Stockage && window.Stockage.apiConfiguree());
 }
 
 function ecrire(tickets) {
-  if (window.Stockage) window.Stockage.pousser("demandes", tickets);
-  else { try { localStorage.setItem(CLE, JSON.stringify(tickets)); } catch (e) {} }
+  if (window.Stockage) return window.Stockage.remplacerDemandes(tickets);
+  try { localStorage.setItem(CLE, JSON.stringify(tickets)); } catch (e) {}
+  return Promise.resolve();
 }
 
 function lire() {
@@ -164,7 +171,7 @@ class Component extends DCLogic {
     const st = this.state;
     return {
       cle: CLE,
-      sourceLabel: distant() ? "Base externe · miroir local" : "Stockage local",
+      sourceLabel: distant() ? "Base connectée · miroir local" : "Stockage local",
       resume: st.tickets.length === 0 ? "0 enregistrement"
         : st.tickets.length + (st.tickets.length === 1 ? " enregistrement" : " enregistrements") + " · " + new Blob([st.json]).size + " octets",
       message: st.message,
@@ -182,9 +189,9 @@ class Component extends DCLogic {
         try {
           const d = JSON.parse(st.json);
           if (!Array.isArray(d)) throw new Error("tableau attendu");
-          ecrire(d);
           this.setState({ tickets: d });
-          this.flash(distant() ? "Enregistré et transmis à la base externe." : "Enregistré.");
+          ecrire(d).then(() => this.flash(distant() ? "Enregistré et transmis à la base." : "Enregistré."))
+            .catch(err2 => this.flash("Envoi refusé : " + err2.message));
         } catch (err) {
           this.flash("JSON invalide : " + err.message);
         }
@@ -203,9 +210,9 @@ class Component extends DCLogic {
         this.flash("Stockage remis à zéro : l'outil recréera les cinq demandes de démonstration à son prochain chargement.");
       },
       reinitialiser: () => {
-        ecrire([]);
         this.setState({ tickets: [], json: "[]" });
-        this.flash(distant() ? "Base vidée, y compris sur le service externe." : "Base vidée. L'outil n'affichera plus aucune demande.");
+        ecrire([]).then(() => this.flash(distant() ? "Base vidée, y compris sur le service." : "Base vidée. L'outil n'affichera plus aucune demande."))
+          .catch(err2 => this.flash("Suppression refusée : " + err2.message));
       }
     };
   }
