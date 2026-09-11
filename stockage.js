@@ -43,6 +43,9 @@
   function ecrireLocal(collection, valeur) {
     try { localStorage.setItem(CLES[collection], JSON.stringify(valeur)); } catch (e) {}
   }
+  /* Écritures distantes différées, une file par collection. */
+  var differes = {};
+  var minuteurs = {};
 
   function config() { return lireLocal("config", {}) || {}; }
   function jetonAdmin() { return (config().baseCle || "").trim(); }
@@ -264,9 +267,15 @@
       if (!enLigne()) return;
       var jeton = jetonAdmin();
       if (!jeton) return;
-      ecrireApi({ jeton: jeton, collection: collection, donnees: valeur }).catch(function (e) {
-        signaler("Enregistrement distant impossible (" + e.message + "). La modification n'existe que sur ce poste.");
-      });
+      differes[collection] = valeur;
+      clearTimeout(minuteurs[collection]);
+      minuteurs[collection] = setTimeout(function () {
+        var charge = differes[collection];
+        delete differes[collection];
+        ecrireApi({ jeton: jeton, collection: collection, donnees: charge }).catch(function (e) {
+          signaler("Enregistrement distant impossible (" + e.message + "). La modification n'existe que sur ce poste.");
+        });
+      }, 1200);
     },
 
     /* ---- Administration : expédier un courriel ---- */
