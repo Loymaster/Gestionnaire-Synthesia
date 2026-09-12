@@ -17,7 +17,7 @@
   /* ═══════════════════════════════════════════════════════════════════
      À RENSEIGNER : adresse du déploiement Apps Script (se termine par /exec)
      ═══════════════════════════════════════════════════════════════════ */
-  var API = "https://script.google.com/macros/s/AKfycbwk6Gk8_RsfpsZWQap-cvmU4ckE63X2Lhcw69J9Oxar8DWOISiBU6Myb7Vh2qtYY0ybZw/exec";
+  var API = "https://script.google.com/macros/s/AKfycbzliBwNkvjJgQXksuRWQRJr1_e4tuReKGHF2gX6kCBkM384OnxMQK4nIkix5NDiRL_bBw/exec";
   /* Exemple :
      var API = "https://script.google.com/macros/s/AKfycb…/exec";
      Laisser vide fait fonctionner l'outil en mode local (démonstration). */
