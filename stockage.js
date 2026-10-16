@@ -152,6 +152,19 @@
         }
       }
     },
+    /* ---- Public : tableau d'avancement, liste allégée ---- */
+    lireTableau: async function () {
+      var alleger = function (l) {
+        return (l || []).filter(function (d) { return !d.archive; }).map(function (d) {
+          return { ref: d.ref, titre: d.titre, demandeur: d.demandeur, publicVise: d.publicVise,
+                   duree: d.duree, statut: d.statut, depose: d.depose, urgence: d.urgence };
+        });
+      };
+      if (!enLigne()) return alleger(lireLocal("demandes", []));
+      var r = await lireApi({ tableau: "1" });
+      if (!Array.isArray(r)) throw new Error((r && r.erreur) || "réponse inattendue");
+      return r;
+    },
     /* ---- Jeton de suivi : lire une seule demande ---- */
     lireSuivi: async function (suivi) {
       if (!enLigne()) {
