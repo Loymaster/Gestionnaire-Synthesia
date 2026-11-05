@@ -638,7 +638,7 @@
                 </div>
                 <label style="display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: oklch(0.45 0 0);">Adresse de la vignette
                   <input value="{{ v.cf.vignette }}" onChange="{{ v.chVignette }}" style="padding: 9px 11px; border: 1px solid #cfd8e8; border-radius: 7px; font-size: 13px; font-family: 'JetBrains Mono', monospace; color: #1c2433;" />
-                  <span style="font-size: 12px; color: oklch(0.5 0 0); line-height: 1.45;">Par défaut, le fichier {{ v.nomVignette }} du dossier vignettes du dépôt GitHub. Image en 16:9, 640 × 360 px suffisent.</span>
+                  <span style="font-size: 12px; color: oklch(0.5 0 0); line-height: 1.45;">Par défaut, le fichier {{ v.nomVignette }} du dossier vignettes du dépôt GitHub. GIF ou image en 16:9, 512 × 288 px suffisent.</span>
                 </label>
                 <img src="{{ v.cf.vignette }}" alt="Aperçu de la vignette" style="display: block; width: 100%; max-width: 320px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; background: #e8eef9; border: 1px solid #dfe5f0;" />
                 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
@@ -2157,7 +2157,7 @@ function carteDefaut(t) {
     theme: c.theme || "",
     duree: c.duree || t.duree || "",
     auteur: c.auteur || nomPropre(t.demandeur),
-    vignette: c.vignette || SITE_PUBLIC + "/vignettes/" + t.ref + ".jpg"
+    vignette: c.vignette || SITE_PUBLIC + "/vignettes/" + t.ref + ".gif"
   };
 }
 
@@ -2170,7 +2170,7 @@ function codeCarte(c, lien) {
   return '<!-- Carte vidéo : ' + e(c.titre) + ' -->\n'
     + '<div style="display: flex; flex-wrap: wrap; max-width: 960px; margin: 0 auto 20px; border: 1px solid #d9e1ee; border-radius: 12px; overflow: hidden; background: #ffffff; ' + POLICE_CARTE + '">\n'
     + '  <a href="' + e(lien) + '" target="_blank" rel="noopener noreferrer" style="flex: 1 1 320px; max-width: 100%; display: block; background: #0b1837;">\n'
-    + '    <img src="' + e(c.vignette) + '" alt="Voir la vidéo : ' + e(c.titre) + '" width="640" height="360" loading="lazy" style="display: block; width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: cover;">\n'
+    + '    <img src="' + e(c.vignette) + '" alt="Voir la vidéo : ' + e(c.titre) + '" width="512" height="288" loading="lazy" style="display: block; width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: cover;">\n'
     + '  </a>\n'
     + '  <div style="flex: 999 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 20px 24px;">\n'
     + (meta ? '    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; line-height: 1.3;">\n      ' + meta + '\n    </div>\n' : "")
@@ -2184,11 +2184,10 @@ function codeCarte(c, lien) {
     + '</div>';
 }
 
-function codeEnteteCatalogue(titre, sous) {
+function codeEnteteCatalogue(titre) {
   return '<!-- En-tête de section -->\n'
     + '<div style="max-width: 960px; margin: 8px auto 18px; padding-bottom: 10px; border-bottom: 3px solid #f39200; ' + POLICE_CARTE + '">\n'
     + '  <h2 style="margin: 0; color: #0b1837; font-size: 24px; font-weight: 700; line-height: 1.25;">' + echapper(titre) + '</h2>\n'
-    + '  <p style="margin: 6px 0 0; color: #5b6578; font-size: 15px; line-height: 1.5;">' + echapper(sous) + '</p>\n'
     + '</div>';
 }
 
@@ -3413,7 +3412,7 @@ class Component extends DCLogic {
             const n = avecLien.length;
             if (!n) { this.setState({ catBlocMsg: "Aucune vidéo avec lien de partage dans cette sélection." }); return; }
             const titre = filtre === "Tous" ? "Vidéos GRETA" : "Vidéos de " + nomPropre(filtre);
-            const code = codeEnteteCatalogue(titre, n + (n > 1 ? " vidéos validées" : " vidéo validée"))
+            const code = codeEnteteCatalogue(titre)
               + "\n\n" + avecLien.map(t => codeCarte(carteDefaut(t), t.lien)).join("\n\n");
             copierTexte(code).then(ok => this.setState({ catBlocMsg: ok
               ? "Code de " + n + (n > 1 ? " cartes copié." : " carte copié.") + " Collez-le dans e-GRETA-CFA."
@@ -3443,7 +3442,7 @@ class Component extends DCLogic {
               carteOuverte: ouvert,
               sansLien: !t.lien,
               cf,
-              nomVignette: t.ref + ".jpg",
+              nomVignette: t.ref + ".gif",
               chTitre: champ("titre"), chDescription: champ("description"), chTheme: champ("theme"),
               chDuree: champ("duree"), chAuteur: champ("auteur"), chVignette: champ("vignette"),
               code: codeCarte(cf, t.lien || ""),
