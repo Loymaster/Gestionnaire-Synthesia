@@ -554,16 +554,28 @@
         </div>
       </div>
 
+      <div style="display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; padding: 16px 18px; background: white; border: 1px solid #dfe5f0; border-radius: 10px;">
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: oklch(0.45 0 0);">
+          <span>Formateur</span>
+          <select value="{{ catFiltre }}" onChange="{{ chCatFiltre }}" style="min-width: 240px; padding: 9px 12px; border: 1px solid #cfd8e8; border-radius: 8px; font-size: 14px; background: white;">
+            <sc-for list="{{ catFormateurs }}" as="f" hint-placeholder-count="3"><option value="{{ f.valeur }}">{{ f.label }}</option></sc-for>
+          </select>
+        </label>
+        <button onClick="{{ copierBlocCatalogue }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: #154194; color: white; border: 0;" style-hover="background: #0f3070;">Copier le code e-GRETA de ces {{ nbBlocCatalogue }} vidéos</button>
+        <span style="font-size: 13px; color: #1f6b42; padding-bottom: 10px;">{{ catBlocMsg }}</span>
+      </div>
+
       <sc-if value="{{ catalogueVide }}" hint-placeholder-val="{{ false }}">
         <div style="background: white; border: 1px dashed #c8d2e4; border-radius: 10px; padding: 48px; text-align: center; color: oklch(0.5 0 0); font-size: 15px;">Aucune vidéo validée pour le moment. Le catalogue se remplit à chaque signature.</div>
       </sc-if>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; align-items: start;">
         <sc-for list="{{ catalogue }}" as="v" hint-placeholder-count="3">
           <div style="display: flex; flex-direction: column; background: white; border: 1px solid #dfe5f0; border-top: 3px solid #154194; border-radius: 10px; padding: 20px;">
             <div style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
               <span style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: oklch(0.5 0 0);">{{ v.ref }}</span>
               <span style="padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 500; background: {{ v.etatBg }}; color: {{ v.etatFg }};">{{ v.etat }}</span>
+              <span style="padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 500; background: {{ v.carteBg }}; color: {{ v.carteFg }};">{{ v.carteEtat }}</span>
             </div>
             <div style="font-size: 16px; font-weight: 600; line-height: 1.35; margin-bottom: 14px;">{{ v.titre }}</div>
 
@@ -598,7 +610,45 @@
               <a href="{{ v.lien }}" target="_blank" rel="noopener" style="padding: 8px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; background: #154194; color: white; text-decoration: none;" style-hover="background: #0f3070; text-decoration: none;">Voir la vidéo</a>
               <button onClick="{{ v.onAttestation }}" style="cursor: pointer; padding: 8px 14px; border-radius: 7px; font-size: 13px; background: oklch(0.97 0 0); color: oklch(0.35 0 0); border: 1px solid #cfd8e8;" style-hover="background: oklch(0.94 0 0);">Attestation</button>
               <button onClick="{{ v.onTicket }}" style="cursor: pointer; padding: 8px 14px; border-radius: 7px; font-size: 13px; background: oklch(0.97 0 0); color: oklch(0.35 0 0); border: 1px solid #cfd8e8;" style-hover="background: oklch(0.94 0 0);">Ouvrir la demande</button>
+              <button onClick="{{ v.onCarte }}" style="cursor: pointer; padding: 8px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; background: #fff4e3; color: #8a4f00; border: 1px solid #f3c47a;" style-hover="background: #ffe9c7;">{{ v.carteLabel }}</button>
             </div>
+
+            <sc-if value="{{ v.carteOuverte }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid oklch(0.94 0 0);">
+                <div style="font-size: 14px; font-weight: 600;">Carte pour e-GRETA-CFA</div>
+                <sc-if value="{{ v.sansLien }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding: 10px 12px; border-radius: 8px; background: #fdecea; color: #8a1c12; font-size: 13px;">Cette demande n'a pas de lien de partage Synthesia : la carte n'aurait pas de vidéo à ouvrir.</div>
+                </sc-if>
+                <label style="display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: oklch(0.45 0 0);">Titre affiché
+                  <input value="{{ v.cf.titre }}" onChange="{{ v.chTitre }}" style="padding: 9px 11px; border: 1px solid #cfd8e8; border-radius: 7px; font-size: 14px; color: #1c2433;" />
+                </label>
+                <label style="display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: oklch(0.45 0 0);">Description (une phrase)
+                  <textarea value="{{ v.cf.description }}" onChange="{{ v.chDescription }}" rows="3" placeholder="Ce que le stagiaire va apprendre." style="padding: 9px 11px; border: 1px solid #cfd8e8; border-radius: 7px; font-size: 14px; line-height: 1.45; resize: vertical; color: #1c2433;"></textarea>
+                </label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <label style="flex: 1 1 140px; display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: oklch(0.45 0 0);">Thème
+                    <input value="{{ v.cf.theme }}" onChange="{{ v.chTheme }}" placeholder="Électricité" style="padding: 9px 11px; border: 1px solid #cfd8e8; border-radius: 7px; font-size: 14px; color: #1c2433;" />
+                  </label>
+                  <label style="flex: 1 1 100px; display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: oklch(0.45 0 0);">Durée
+                    <input value="{{ v.cf.duree }}" onChange="{{ v.chDuree }}" placeholder="2 min 30" style="padding: 9px 11px; border: 1px solid #cfd8e8; border-radius: 7px; font-size: 14px; color: #1c2433;" />
+                  </label>
+                  <label style="flex: 1 1 140px; display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: oklch(0.45 0 0);">Auteur
+                    <input value="{{ v.cf.auteur }}" onChange="{{ v.chAuteur }}" style="padding: 9px 11px; border: 1px solid #cfd8e8; border-radius: 7px; font-size: 14px; color: #1c2433;" />
+                  </label>
+                </div>
+                <label style="display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: oklch(0.45 0 0);">Adresse de la vignette
+                  <input value="{{ v.cf.vignette }}" onChange="{{ v.chVignette }}" style="padding: 9px 11px; border: 1px solid #cfd8e8; border-radius: 7px; font-size: 13px; font-family: 'JetBrains Mono', monospace; color: #1c2433;" />
+                  <span style="font-size: 12px; color: oklch(0.5 0 0); line-height: 1.45;">Par défaut, le fichier {{ v.nomVignette }} du dossier vignettes du dépôt GitHub. Image en 16:9, 640 × 360 px suffisent.</span>
+                </label>
+                <img src="{{ v.cf.vignette }}" alt="Aperçu de la vignette" style="display: block; width: 100%; max-width: 320px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; background: #e8eef9; border: 1px solid #dfe5f0;" />
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                  <button onClick="{{ v.onCopierCarte }}" style="cursor: pointer; padding: 9px 14px; border-radius: 7px; font-size: 13px; font-weight: 600; background: #154194; color: white; border: 0;" style-hover="background: #0f3070;">Copier le code e-GRETA</button>
+                  <button onClick="{{ v.onEnregistrerCarte }}" style="cursor: pointer; padding: 9px 14px; border-radius: 7px; font-size: 13px; background: white; color: #1c2433; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Enregistrer la carte</button>
+                  <span style="font-size: 13px; color: #1f6b42;">{{ v.catMsg }}</span>
+                </div>
+                <textarea value="{{ v.code }}" onChange="{{ v.rien }}" readOnly="{{ v.vrai }}" rows="5" aria-label="Code HTML de la carte" style="padding: 10px; border: 1px solid #dfe5f0; border-radius: 7px; font-size: 11.5px; line-height: 1.5; font-family: 'JetBrains Mono', monospace; color: #3a4458; background: #f8f9fc; resize: vertical;"></textarea>
+              </div>
+            </sc-if>
           </div>
         </sc-for>
       </div>
@@ -2088,6 +2138,78 @@ const SB_VIDE = () => [{ plan: "1", schema: "", presence: "Schéma + Avatar" }];
 const DUREES = ["30 s", "1 min", "1 min 30", "2 min", "2 min 30", "3 min", "3 min 30", "4 min", "4 min 30", "5 min"];
 const PRESENCES = ["Avatar seul", "Schéma seul", "Schéma + Avatar"];
 
+/* ---------- Cartes du catalogue e-GRETA-CFA ----------
+ * Code HTML autonome, à coller dans une page ou une étiquette Moodle :
+ * styles en ligne uniquement, aucune feuille ni script. La vignette est
+ * hébergée sur ce site (dossier vignettes/) pour ne pas dépendre des liens
+ * signés de Synthesia, qui expirent au bout de quelques jours. */
+const SITE_PUBLIC = "https://loymaster.github.io/Gestionnaire-Synthesia";
+const POLICE_CARTE = "font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;";
+const echapper = v => String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+/* « Pascal VITRY » → « Pascal Vitry » ; les noms composés gardent leur trait d'union. */
+const nomPropre = n => String(n || "").trim().toLowerCase().replace(/(^|[\s'’-])(\p{L})/gu, (m, a, b) => a + b.toUpperCase());
+
+function carteDefaut(t) {
+  const c = t.catalogue || {};
+  return {
+    titre: c.titre || t.titre || "",
+    description: c.description || "",
+    theme: c.theme || "",
+    duree: c.duree || t.duree || "",
+    auteur: c.auteur || nomPropre(t.demandeur),
+    vignette: c.vignette || SITE_PUBLIC + "/vignettes/" + t.ref + ".jpg"
+  };
+}
+
+function codeCarte(c, lien) {
+  const e = echapper;
+  const meta = [
+    c.theme ? '<span style="padding: 4px 10px; border-radius: 999px; background: #e8eef9; color: #154194; font-weight: 600;">' + e(c.theme) + '</span>' : "",
+    c.duree ? '<span style="color: #5b6578;">' + e(c.duree) + '</span>' : ""
+  ].filter(Boolean).join("\n      ");
+  return '<!-- Carte vidéo : ' + e(c.titre) + ' -->\n'
+    + '<div style="display: flex; flex-wrap: wrap; max-width: 960px; margin: 0 auto 20px; border: 1px solid #d9e1ee; border-radius: 12px; overflow: hidden; background: #ffffff; ' + POLICE_CARTE + '">\n'
+    + '  <a href="' + e(lien) + '" target="_blank" rel="noopener noreferrer" style="flex: 1 1 320px; max-width: 100%; display: block; background: #0b1837;">\n'
+    + '    <img src="' + e(c.vignette) + '" alt="Voir la vidéo : ' + e(c.titre) + '" width="640" height="360" loading="lazy" style="display: block; width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: cover;">\n'
+    + '  </a>\n'
+    + '  <div style="flex: 999 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 20px 24px;">\n'
+    + (meta ? '    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; line-height: 1.3;">\n      ' + meta + '\n    </div>\n' : "")
+    + '    <h3 style="margin: 0; color: #0b1837; font-size: 20px; font-weight: 700; line-height: 1.3;">' + e(c.titre) + '</h3>\n'
+    + (c.description ? '    <p style="margin: 0; color: #3f4a5c; font-size: 15px; line-height: 1.55;">' + e(c.description) + '</p>\n' : "")
+    + '    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 6px;">\n'
+    + '      <span style="color: #5b6578; font-size: 13px;">' + (c.auteur ? "Par " + e(c.auteur) : "") + '</span>\n'
+    + '      <a href="' + e(lien) + '" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 10px 18px; border-radius: 8px; background: #154194; color: #ffffff; font-size: 14px; font-weight: 700; line-height: 1.4; text-decoration: none;">&#9654;&nbsp; Regarder la vidéo<span class="sr-only visually-hidden"> (nouvel onglet)</span></a>\n'
+    + '    </div>\n'
+    + '  </div>\n'
+    + '</div>';
+}
+
+function codeEnteteCatalogue(titre, sous) {
+  return '<!-- En-tête de section -->\n'
+    + '<div style="max-width: 960px; margin: 8px auto 18px; padding-bottom: 10px; border-bottom: 3px solid #f39200; ' + POLICE_CARTE + '">\n'
+    + '  <h2 style="margin: 0; color: #0b1837; font-size: 24px; font-weight: 700; line-height: 1.25;">' + echapper(titre) + '</h2>\n'
+    + '  <p style="margin: 6px 0 0; color: #5b6578; font-size: 15px; line-height: 1.5;">' + echapper(sous) + '</p>\n'
+    + '</div>';
+}
+
+/* Presse-papiers, avec repli pour les navigateurs qui refusent l'API. */
+function copierTexte(txt) {
+  const secours = () => {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e) { return false; }
+  };
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(txt).then(() => true, () => secours());
+  }
+  return Promise.resolve(secours());
+}
+
 /* Les étiquettes du gabarit remis aux formateurs, dans l'ordre où l'IA les
  * produit. On accepte les variantes accentuées et la ponctuation flottante :
  * une IA respecte le gabarit à peu près, jamais au caractère près. */
@@ -2267,7 +2389,8 @@ class Component extends DCLogic {
     envoiEnCours: false,
     valRef: "", valId: null, valForm: null, valErreur: "", valConfirme: "",
     valSuivi: null, valCible: null, modifSuivi: null, modifCible: null,
-    base: { source: "local", erreur: "" }, testBase: "", silencieux: false, depotSilencieux: false
+    base: { source: "local", erreur: "" }, testBase: "", silencieux: false, depotSilencieux: false,
+    catFiltre: "Tous", catBlocMsg: "", catEdit: null, catForm: null, catMsg: ""
   };
 
   componentDidMount() {
@@ -3272,7 +3395,35 @@ class Component extends DCLogic {
         };
       })(),
       routeCatalogue: st.route === "catalogue" && st.authed,
-      catalogue: st.tickets.filter(t => estValidee(t.statut) && t.validation).map(t => ({
+      ...(() => {
+        const valides = st.tickets.filter(t => estValidee(t.statut) && t.validation);
+        const noms = [...new Set(valides.map(t => t.demandeur).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr"));
+        const filtre = noms.indexOf(st.catFiltre) >= 0 ? st.catFiltre : "Tous";
+        const liste = valides.filter(t => filtre === "Tous" || t.demandeur === filtre);
+        const avecLien = liste.filter(t => t.lien);
+        const champ = k => e => { const v = e.target.value; this.setState(s => ({ catForm: { ...(s.catForm || {}), [k]: v }, catMsg: "" })); };
+        return {
+          catFiltre: filtre,
+          catFormateurs: [{ valeur: "Tous", label: "Tous les formateurs (" + valides.length + ")" }]
+            .concat(noms.map(n => ({ valeur: n, label: n + " (" + valides.filter(t => t.demandeur === n).length + ")" }))),
+          chCatFiltre: e => this.setState({ catFiltre: e.target.value, catBlocMsg: "", catEdit: null, catForm: null }),
+          nbBlocCatalogue: avecLien.length,
+          catBlocMsg: st.catBlocMsg,
+          copierBlocCatalogue: () => {
+            const n = avecLien.length;
+            if (!n) { this.setState({ catBlocMsg: "Aucune vidéo avec lien de partage dans cette sélection." }); return; }
+            const titre = filtre === "Tous" ? "Vidéos GRETA" : "Vidéos de " + nomPropre(filtre);
+            const code = codeEnteteCatalogue(titre, n + (n > 1 ? " vidéos validées" : " vidéo validée"))
+              + "\n\n" + avecLien.map(t => codeCarte(carteDefaut(t), t.lien)).join("\n\n");
+            copierTexte(code).then(ok => this.setState({ catBlocMsg: ok
+              ? "Code de " + n + (n > 1 ? " cartes copié." : " carte copié.") + " Collez-le dans e-GRETA-CFA."
+              : "Copie refusée par le navigateur." }));
+          },
+          catalogue: liste.map(t => {
+            const ouvert = st.catEdit === t.id;
+            const cf = ouvert && st.catForm ? st.catForm : carteDefaut(t);
+            const prete = !!(t.catalogue && t.catalogue.description);
+            return {
         ref: t.ref, titre: t.titre, lien: t.lien,
         demandeur: t.demandeur, publicVise: t.publicVise, duree: t.duree,
         avatars: (t.avatars || []).filter(Boolean).join(", ") || "Avatar du formateur",
@@ -3283,8 +3434,32 @@ class Component extends DCLogic {
         etatBg: t.archive ? "oklch(0.95 0.005 250)" : "#e4f3ea",
         etatFg: t.archive ? "#4a5468" : "#1f6b42",
         onAttestation: () => this.ouvrirAttestation(t.ref),
-        onTicket: () => this.setState({ selected: t.id, route: "ticket", lienInput: t.lien || "", emailEdite: null })
-      })),
+        onTicket: () => this.setState({ selected: t.id, route: "ticket", lienInput: t.lien || "", emailEdite: null }),
+              carteEtat: prete ? "Carte prête" : "Carte à compléter",
+              carteBg: prete ? "#e4ecfb" : "#fff4e3",
+              carteFg: prete ? "#154194" : "#8a4f00",
+              carteLabel: ouvert ? "Fermer la carte" : "Carte e-GRETA",
+              onCarte: () => this.setState(ouvert ? { catEdit: null, catForm: null, catMsg: "" } : { catEdit: t.id, catForm: carteDefaut(t), catMsg: "" }),
+              carteOuverte: ouvert,
+              sansLien: !t.lien,
+              cf,
+              nomVignette: t.ref + ".jpg",
+              chTitre: champ("titre"), chDescription: champ("description"), chTheme: champ("theme"),
+              chDuree: champ("duree"), chAuteur: champ("auteur"), chVignette: champ("vignette"),
+              code: codeCarte(cf, t.lien || ""),
+              rien: () => {}, vrai: true,
+              catMsg: ouvert ? st.catMsg : "",
+              onCopierCarte: () => copierTexte(codeCarte(cf, t.lien || "")).then(ok => this.setState({ catMsg: ok
+                ? "Code copié : collez-le dans e-GRETA-CFA."
+                : "Copie refusée par le navigateur : copiez le code ci-dessous à la main." })),
+              onEnregistrerCarte: () => {
+                this.majTicket(t.id, { catalogue: { ...cf } });
+                this.setState({ catMsg: "Carte enregistrée." });
+              }
+            };
+          })
+        };
+      })(),
       catalogueVide: st.tickets.filter(t => estValidee(t.statut) && t.validation).length === 0,
       nbCatalogue: st.tickets.filter(t => estValidee(t.statut) && t.validation).length,
       routeAttestations: st.route === "attestations" && st.authed,
