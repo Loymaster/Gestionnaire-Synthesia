@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Demander une vidéo · Réseau GRETA</title>
+<link rel="stylesheet" href="formulaire.css">
+</head>
+<body>
+<div class="page">
+  <div class="bandeau">
+    <span class="logo"><img src="../logo-greta.jpg" alt="République française · GIP FCIP académie de Reims · Réseau GRETA académie de Reims Grand Est"></span>
+    <span class="marque">Vidéos pédagogiques</span>
+  </div>
+
+  <section id="vue-formulaire" style="display: flex; flex-direction: column; gap: 20px;">
+    <header>
+      <div class="surtitre">Réseau GRETA · Académie de Reims</div>
+      <h1>Demander une vidéo</h1>
+      <p>Décrivez votre besoin et joignez vos documents. La vidéo est produite à partir de vos réponses, puis vous est envoyée pour validation.</p>
+    </header>
+
+    <div class="bloc">
+      <div class="bloc-titre"><span class="num">1</span><h2>Vous</h2></div>
+      <div class="rangee">
+        <label class="champ" for="demandeur">
+          <span class="libelle">Prénom et nom</span>
+          <input type="text" id="demandeur" autocomplete="name">
+          <span class="msg-erreur" id="err-demandeur" hidden>Indiquez votre prénom et votre nom.</span>
+        </label>
+        <label class="champ" for="email">
+          <span class="libelle">Adresse mail professionnelle</span>
+          <input type="email" id="email" autocomplete="email" inputmode="email">
+          <span class="msg-erreur" id="err-email" hidden>Indiquez une adresse mail valide.</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="bloc">
+      <div class="bloc-titre"><span class="num">2</span><h2>Votre vidéo</h2></div>
+      <label class="champ" for="voixOff">
+        <span class="libelle">Type de voix off</span>
+        <input type="text" id="voixOff" placeholder="Ex. : voix féminine, calme et posée">
+        <span class="aide-bloc" style="font-size: 13.5px;">Toute indication pertinente : féminine / masculine, enjouée, calme, etc.</span>
+        <span class="msg-erreur" id="err-voixOff" hidden>Décrivez la voix off souhaitée.</span>
+      </label>
+      <label class="champ" for="sujet">
+        <span class="libelle">De quoi la vidéo parle-t-elle ?</span>
+        <input type="text" id="sujet" placeholder="Ex. : l'habilitation électrique BS et BE Manœuvres">
+        <span class="msg-erreur" id="err-sujet" hidden>Indiquez le sujet en une phrase.</span>
+      </label>
+      <label class="champ" for="objectif">
+        <span class="libelle">Objectif détaillé de la vidéo</span>
+        <textarea id="objectif" rows="5" placeholder="Ex. : présenter les deux habilitations, leurs limites, et permettre au spectateur de savoir laquelle demander à son employeur."></textarea>
+        <span class="msg-erreur" id="err-objectif" hidden>Décrivez l'objectif de la vidéo.</span>
+      </label>
+      <div class="champ" role="group" aria-labelledby="lib-public">
+        <span class="libelle" id="lib-public">À qui s'adresse-t-elle ? <span class="aide">Plusieurs choix possibles.</span></span>
+        <div class="puces" id="publics"></div>
+        <input type="text" id="public-autre" aria-label="Autre public, à préciser" placeholder="Précisez le public" hidden>
+        <span class="msg-erreur" id="err-public" hidden>Choisissez au moins un public (et précisez « Autre » le cas échéant).</span>
+      </div>
+      <div class="champ" role="group" aria-labelledby="lib-duree">
+        <span class="libelle" id="lib-duree">Durée souhaitée</span>
+        <div class="puces" id="durees"></div>
+        <span class="aide-bloc" id="aide-duree" style="font-size: 13.5px;" hidden>Au-delà de 3 minutes, la vidéo est produite en deux parties.</span>
+        <span class="msg-erreur" id="err-duree" hidden>Choisissez une durée.</span>
+      </div>
+    </div>
+
+    <div class="bloc">
+      <div class="bloc-titre"><span class="num">3</span><h2>Vos documents</h2><span class="note">facultatif, mais recommandé</span></div>
+      <p class="aide-bloc">Cours, supports, référentiels, et les visuels à intégrer (captures, logos). La vidéo est construite à partir de vos documents.</p>
+      <label class="depot" id="depot" for="fichier">
+        <input type="file" id="fichier" multiple>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--bleu)"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        <strong>Choisir des fichiers ou les déposer ici</strong>
+        <span>PDF, Word, PowerPoint, Excel, images, texte · 5 fichiers · 10 Mo par fichier · 25 Mo au total</span>
+      </label>
+      <span class="msg-erreur" id="err-fichiers" hidden></span>
+      <ul class="fichiers" id="liste-fichiers"></ul>
+      <label class="attestation" id="bloc-attestation" for="attestation" hidden>
+        <input type="checkbox" id="attestation">
+        <span>Je suis propriétaire des documents transmis ou j'ai l'autorisation de les utiliser.</span>
+      </label>
+      <span class="msg-erreur" id="err-attestation" hidden>Cochez l'attestation pour transmettre vos documents.</span>
+    </div>
+
+    <div class="bloc options">
+      <button type="button" class="options-tete" id="options-tete" aria-expanded="false" aria-controls="options-corps">
+        <span class="txt"><b>Options</b><small id="resume-options"></small></span>
+        <span class="action" id="options-action">Modifier</span>
+      </button>
+      <div class="options-corps" id="options-corps" hidden>
+        <div class="champ" role="group" aria-labelledby="lib-urgence">
+          <span class="libelle" id="lib-urgence">Niveau d'urgence</span>
+          <div class="puces" id="urgences"></div>
+        </div>
+        <div class="rangee">
+          <label class="champ" for="ton">
+            <span class="libelle">Ton</span>
+            <select id="ton"><option>Pédagogique</option><option>Institutionnel</option><option>Incitatif</option><option>Autre</option></select>
+            <input type="text" id="ton-autre" aria-label="Ton, à préciser" placeholder="Précisez le ton" hidden>
+          </label>
+          <label class="champ" for="langue">
+            <span class="libelle">Langue</span>
+            <select id="langue"><option>Français</option><option>Autre</option></select>
+            <input type="text" id="langue-autre" aria-label="Langue, à préciser" placeholder="Précisez la ou les langues" hidden>
+          </label>
+        </div>
+        <label class="champ" for="info">
+          <span class="libelle">Information complémentaire</span>
+          <span class="aide-bloc" style="font-size: 13.5px;">Toute contrainte utile : un terme à employer, un visuel à placer, une échéance.</span>
+          <textarea id="info" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+
+    <p class="rgpd" id="rgpd"></p>
+
+    <div id="alerte" class="alerte" role="alert" hidden></div>
+    <div class="envoi">
+      <button type="button" class="bouton" id="envoyer">Envoyer ma demande</button>
+      <span class="etat" id="etat" aria-live="polite"></span>
+    </div>
+    <div class="progression" id="progression" hidden></div>
+  </section>
+
+  <section id="vue-confirmation" class="bloc confirmation" hidden>
+    <span class="pastille-ok"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--ok)"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+    <div>
+      <h1 style="font-size: 27px; margin: 0;">Demande enregistrée</h1>
+      <p style="margin: 10px 0 0; color: var(--doux); max-width: 58ch;">Votre demande « <span id="conf-sujet"></span> » est enregistrée sous la référence <strong id="conf-ref" style="color: var(--encre)"></strong>, avec <span id="conf-docs"></span>.</p>
+      <p id="conf-courriel" style="margin: 10px 0 0; color: var(--doux); max-width: 58ch;"></p>
+    </div>
+    <div id="conf-echecs" class="alerte" hidden></div>
+    <button type="button" class="bouton second" id="reessayer" hidden>Renvoyer les fichiers en échec</button>
+    <div class="champ" style="width: 100%;">
+      <span class="libelle">Votre lien de suivi personnel</span>
+      <div class="lien-suivi"><input type="text" id="conf-lien" readonly><button type="button" class="bouton second" id="copier-lien">Copier</button></div>
+      <span class="aide-bloc" style="font-size: 13.5px;">Il vous permet de suivre la demande, puis de valider la vidéo. Conservez-le.</span>
+    </div>
+    <ol class="etapes">
+      <li><span class="n">1</span><span class="t">La vidéo est produite à partir de vos réponses et de vos documents.</span></li>
+      <li><span class="n">2</span><span class="t">Vous la recevez par courriel, pour la valider ou demander une modification (2 demandes de modification au maximum).</span></li>
+      <li><span class="n">3</span><span class="t">Une fois validée, elle peut être diffusée. Une mise à jour reste possible plus tard.</span></li>
+    </ol>
+    <button type="button" class="bouton second" id="nouvelle">Déposer une autre demande</button>
+  </section>
+</div>
+
+<script src="config.js"></script>
+<script src="chiffrement.js"></script>
+<script src="api.js"></script>
+<script src="rgpd.js"></script>
+<script>
+(function () {
+  'use strict';
+  var PUBLICS = ["Demandeurs d'emploi", "Stagiaires", "Formateurs", "Autre"];
+  var DUREES = ["30 s", "1 min", "1 min 30", "2 min", "2 min 30", "3 min", "3 min 30", "4 min", "4 min 30", "5 min"];
+  var URGENCES = ["Urgent", "Normal", "Faible"];
+  var MAX_NB = 5, MAX_FICHIER = 10 * 1024 * 1024, MAX_TOTAL = 25 * 1024 * 1024;
+
+  var etat = { publics: [], duree: "", urgence: "Normal", fichiers: [], essai: false, envoi: false, cle: "", depot: null, echecs: [] };
+  var $ = function (id) { return document.getElementById(id); };
+
+  $("rgpd").innerHTML = window.mentionRgpd();
+
+  function puces(conteneur, valeurs, classe, estActif, auClic) {
+    conteneur.textContent = "";
+    valeurs.forEach(function (v) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "puce" + (classe ? " " + classe : ""); b.textContent = v;
+      b.setAttribute("aria-pressed", estActif(v) ? "true" : "false");
+      b.addEventListener("click", function () { auClic(v); });
+      conteneur.appendChild(b);
+    });
+  }
+
+  function taille(o) {
+    if (o < 1024 * 1024) return Math.max(1, Math.round(o / 1024)) + " Ko";
+    return (o / 1048576).toFixed(1).replace(".", ",") + " Mo";
+  }
+
+  function val(id) { return $(id).value.trim(); }
+  function texteTon() { return $("ton").value === "Autre" ? (val("ton-autre") || "ton à préciser") : $("ton").value.toLowerCase(); }
+  function texteLangue() { return $("langue").value === "Autre" ? (val("langue-autre") || "langue à préciser") : $("langue").value.toLowerCase(); }
+
+  function rendre() {
+    puces($("publics"), PUBLICS, "", function (v) { return etat.publics.indexOf(v) >= 0; }, function (v) {
+      var i = etat.publics.indexOf(v);
+      if (i >= 0) etat.publics.splice(i, 1); else etat.publics.push(v);
+      rendre();
+    });
+    $("public-autre").hidden = etat.publics.indexOf("Autre") < 0;
+    puces($("durees"), DUREES, "carree", function (v) { return etat.duree === v; }, function (v) { etat.duree = v; rendre(); });
+    $("aide-duree").hidden = DUREES.indexOf(etat.duree) <= DUREES.indexOf("3 min");
+    puces($("urgences"), URGENCES, "carree", function (v) { return etat.urgence === v; }, function (v) { etat.urgence = v; rendre(); });
+
+    var liste = $("liste-fichiers"); liste.textContent = "";
+    etat.fichiers.forEach(function (f, i) {
+      var li = document.createElement("li");
+      var nom = document.createElement("span"); nom.className = "nom"; nom.textContent = f.name;
+      var t = document.createElement("span"); t.className = "taille"; t.textContent = taille(f.size);
+      var x = document.createElement("button"); x.type = "button"; x.className = "retirer"; x.textContent = "×";
+      x.setAttribute("aria-label", "Retirer " + f.name);
+      x.disabled = etat.envoi;
+      x.addEventListener("click", function () { etat.fichiers.splice(i, 1); $("err-fichiers").hidden = true; rendre(); });
+      li.appendChild(nom); li.appendChild(t); li.appendChild(x); liste.appendChild(li);
+    });
+    $("bloc-attestation").hidden = etat.fichiers.length === 0;
+    $("ton-autre").hidden = $("ton").value !== "Autre";
+    $("langue-autre").hidden = $("langue").value !== "Autre";
+    $("resume-options").textContent = "Urgence " + etat.urgence.toLowerCase() + " · ton " + texteTon() + " · " + texteLangue();
+
+    var m = manques();
+    var nb = Object.keys(m).filter(function (k) { return m[k]; }).length;
+    if (!etat.envoi) $("etat").textContent = nb === 0 ? "Tout est prêt." : (nb === 1 ? "1 élément à compléter" : nb + " éléments à compléter");
+    if (etat.essai) afficherErreurs(m);
+    $("envoyer").disabled = etat.envoi;
+  }
+
+  function manques() {
+    var publicOk = etat.publics.length > 0 && !(etat.publics.indexOf("Autre") >= 0 && etat.publics.length === 1 && !val("public-autre"));
+    return {
+      demandeur: !val("demandeur"),
+      email: !ApiV2.adresseValide(val("email")),
+      voixOff: !val("voixOff"),
+      sujet: !val("sujet"),
+      objectif: !val("objectif"),
+      public: !publicOk,
+      duree: !etat.duree,
+      attestation: etat.fichiers.length > 0 && !$("attestation").checked
+    };
+  }
+
+  function afficherErreurs(m) {
+    ["demandeur", "email", "voixOff", "sujet", "objectif"].forEach(function (k) {
+      $("err-" + k).hidden = !m[k]; $(k).classList.toggle("invalide", m[k]);
+      $(k).setAttribute("aria-invalid", m[k] ? "true" : "false");
+    });
+    $("err-public").hidden = !m.public; $("err-duree").hidden = !m.duree;
+    $("err-attestation").hidden = !m.attestation; $("bloc-attestation").classList.toggle("invalide", m.attestation);
+    var noms = { demandeur: "votre nom", email: "votre adresse mail", voixOff: "le type de voix off", sujet: "le sujet", objectif: "l'objectif", public: "le public", duree: "la durée", attestation: "l'attestation sur vos documents" };
+    var l = Object.keys(m).filter(function (k) { return m[k]; }).map(function (k) { return noms[k]; });
+    $("alerte").hidden = l.length === 0;
+    $("alerte").textContent = l.length ? "Il manque " + l.join(", ") + "." : "";
+  }
+
+  function ajouter(liste) {
+    var err = "";
+    Array.prototype.forEach.call(liste, function (f) {
+      var total = etat.fichiers.reduce(function (t, x) { return t + x.size; }, 0);
+      if (etat.fichiers.length >= MAX_NB) { err = MAX_NB + " fichiers au maximum."; return; }
+      if (f.size === 0) { err = "« " + f.name + " » est vide."; return; }
+      if (f.size > MAX_FICHIER) { err = "« " + f.name + " » dépasse 10 Mo."; return; }
+      if (total + f.size > MAX_TOTAL) { err = "Le total dépasserait 25 Mo : « " + f.name + " » n'a pas été ajouté."; return; }
+      if (etat.fichiers.some(function (x) { return x.name === f.name && x.size === f.size; })) { err = "« " + f.name + " » est déjà joint."; return; }
+      etat.fichiers.push(f);
+    });
+    $("err-fichiers").textContent = err; $("err-fichiers").hidden = !err;
+    rendre();
+  }
+
+  /* Contenu de la demande : tout ce que le formateur a rempli, sauf son identité (chiffrée à part) */
+  function contenu() {
+    var publics = etat.publics.filter(function (p) { return p !== "Autre"; });
+    if (etat.publics.indexOf("Autre") >= 0 && val("public-autre")) publics.push(val("public-autre"));
+    return {
+      voixOff: val("voixOff"), sujet: val("sujet"), objectif: val("objectif"),
+      publics: etat.publics.slice(), publicAutre: val("public-autre"), publicVise: publics.join(", "),
+      duree: etat.duree, urgence: etat.urgence,
+      ton: $("ton").value, tonAutre: val("ton-autre"), langue: $("langue").value, langueAutre: val("langue-autre"),
+      info: val("info"),
+      documents: etat.fichiers.map(function (f) { return f.name; }),
+      attestationDroits: etat.fichiers.length > 0 ? $("attestation").checked : null
+    };
+  }
+
+  /* Affiche une ligne de progression par fichier */
+  function lignesProgression(fichiers) {
+    var zone = $("progression"); zone.textContent = ""; zone.hidden = fichiers.length === 0;
+    return fichiers.map(function (f) {
+      var l = document.createElement("div"); l.className = "ligne";
+      var n = document.createElement("span"); n.className = "nom"; n.textContent = f.name;
+      var b = document.createElement("span"); b.className = "barre"; var i = document.createElement("i"); b.appendChild(i);
+      var s = document.createElement("span"); s.textContent = "en attente";
+      l.appendChild(n); l.appendChild(b); l.appendChild(s); zone.appendChild(l);
+      return {
+        avance: function (p) { i.style.width = Math.round(p * 100) + "%"; s.textContent = Math.round(p * 100) + " %"; s.className = ""; },
+        fini: function () { i.style.width = "100%"; s.textContent = "envoyé"; s.className = "ok"; },
+        echec: function (m) { s.textContent = "échec : " + m; s.className = "ko"; }
+      };
+    });
+  }
+
+  async function envoyerFichiers(fichiers) {
+    var lignes = lignesProgression(fichiers);
+    var echecs = [];
+    for (var i = 0; i < fichiers.length; i++) {
+      $("etat").textContent = "Envoi des fichiers (" + (i + 1) + " sur " + fichiers.length + ")…";
+      try {
+        await ApiV2.envoyerFichier(etat.depot.id, etat.depot.token, fichiers[i], i, lignes[i].avance);
+        lignes[i].fini();
+      } catch (e) { lignes[i].echec(e.message); echecs.push({ fichier: fichiers[i], erreur: e.message }); }
+    }
+    return echecs;
+  }
+
+  async function envoyer() {
+    etat.essai = true;
+    var m = manques();
+    afficherErreurs(m);
+    if (Object.keys(m).some(function (k) { return m[k]; })) { rendre(); $("alerte").scrollIntoView({ block: "center" }); return; }
+    etat.envoi = true; rendre();
+    $("alerte").hidden = true;
+    if (!etat.cle) etat.cle = ApiV2.nouvelleCle();   // conservée pour qu'une nouvelle tentative ne crée pas de doublon
+    try {
+      $("etat").textContent = "Enregistrement de la demande…";
+      var nom = val("demandeur"), email = val("email");
+      etat.depot = await ApiV2.deposer(etat.cle, "syren", { demandeur: nom, email: email }, contenu());
+
+      var echecs = etat.fichiers.length ? await envoyerFichiers(etat.fichiers) : [];
+      etat.echecs = echecs;
+
+      $("etat").textContent = "Envoi de l'accusé de réception…";
+      var c = etat.depot.deja ? { ok: true } : await ApiV2.courriel({ action: "depot", token: etat.depot.token, email: email, nom: nom });
+      confirmer(c, email);
+    } catch (e) {
+      $("alerte").textContent = "L'envoi a échoué (" + e.message + "). Vos réponses sont conservées : réessayez dans un instant. Aucun doublon ne sera créé.";
+      $("alerte").hidden = false;
+      $("etat").textContent = "";
+    } finally {
+      etat.envoi = false; rendre();
+    }
+  }
+
+  function confirmer(c, email) {
+    var base = location.href.replace(/[^\/]*([?#].*)?$/, "");
+    $("conf-sujet").textContent = val("sujet");
+    $("conf-ref").textContent = etat.depot.ref;
+    var n = etat.fichiers.length - etat.echecs.length;
+    $("conf-docs").textContent = n === 0 ? "aucun document joint" : (n === 1 ? "1 document joint" : n + " documents joints");
+    $("conf-courriel").textContent = c && c.ok
+      ? "Un accusé de réception vient de vous être envoyé à " + email + "."
+      : "L'accusé de réception n'a pas pu être envoyé. Votre demande est bien enregistrée : conservez le lien ci-dessous.";
+    $("conf-lien").value = base + "suivi.html?suivi=" + etat.depot.token;
+    afficherEchecs();
+    $("vue-formulaire").hidden = true; $("vue-confirmation").hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  function afficherEchecs() {
+    var e = etat.echecs;
+    $("conf-echecs").hidden = e.length === 0;
+    $("reessayer").hidden = e.length === 0;
+    $("conf-echecs").textContent = e.length
+      ? "Fichier" + (e.length > 1 ? "s" : "") + " non transmis : " + e.map(function (x) { return x.fichier.name + " (" + x.erreur + ")"; }).join(" · ") + ". Vous pouvez réessayer pendant 2 heures."
+      : "";
+  }
+
+  $("reessayer").addEventListener("click", async function () {
+    $("reessayer").disabled = true;
+    var ok = [];
+    for (var i = 0; i < etat.echecs.length; i++) {
+      try { await ApiV2.envoyerFichier(etat.depot.id, etat.depot.token, etat.echecs[i].fichier, 10 + i); ok.push(i); }
+      catch (err) { etat.echecs[i].erreur = err.message; }
+    }
+    etat.echecs = etat.echecs.filter(function (_, i) { return ok.indexOf(i) < 0; });
+    var n = etat.fichiers.length - etat.echecs.length;
+    $("conf-docs").textContent = n === 0 ? "aucun document joint" : (n === 1 ? "1 document joint" : n + " documents joints");
+    afficherEchecs();
+    $("reessayer").disabled = false;
+  });
+
+  $("copier-lien").addEventListener("click", async function () {
+    try { await navigator.clipboard.writeText($("conf-lien").value); $("copier-lien").textContent = "Copié"; }
+    catch (e) { $("conf-lien").select(); }
+  });
+
+  function reinitialiser() {
+    ["voixOff", "sujet", "objectif", "public-autre", "info", "ton-autre", "langue-autre"].forEach(function (k) { $(k).value = ""; });
+    $("ton").value = "Pédagogique"; $("langue").value = "Français"; $("attestation").checked = false;
+    etat = { publics: [], duree: "", urgence: "Normal", fichiers: [], essai: false, envoi: false, cle: "", depot: null, echecs: [] };
+    ["demandeur", "email", "voixOff", "sujet", "objectif"].forEach(function (k) { $("err-" + k).hidden = true; $(k).classList.remove("invalide"); });
+    ["err-public", "err-duree", "err-attestation", "err-fichiers", "alerte", "progression"].forEach(function (k) { $(k).hidden = true; });
+    $("copier-lien").textContent = "Copier";
+    $("vue-confirmation").hidden = true; $("vue-formulaire").hidden = false;
+    window.scrollTo(0, 0);
+    rendre();
+  }
+
+  $("fichier").addEventListener("change", function (e) { ajouter(e.target.files); e.target.value = ""; });
+  var depot = $("depot");
+  ["dragenter", "dragover"].forEach(function (t) { depot.addEventListener(t, function (e) { e.preventDefault(); depot.classList.add("survol"); }); });
+  ["dragleave", "drop"].forEach(function (t) { depot.addEventListener(t, function (e) { e.preventDefault(); depot.classList.remove("survol"); }); });
+  depot.addEventListener("drop", function (e) { if (e.dataTransfer && e.dataTransfer.files) ajouter(e.dataTransfer.files); });
+  $("options-tete").addEventListener("click", function () {
+    var ouvert = $("options-corps").hidden;
+    $("options-corps").hidden = !ouvert;
+    $("options-tete").setAttribute("aria-expanded", ouvert ? "true" : "false");
+    $("options-action").textContent = ouvert ? "Replier" : "Modifier";
+  });
+  ["demandeur", "email", "voixOff", "sujet", "objectif", "public-autre", "ton", "ton-autre", "langue", "langue-autre", "attestation"].forEach(function (id) {
+    $(id).addEventListener(id === "ton" || id === "langue" || id === "attestation" ? "change" : "input", rendre);
+  });
+  $("envoyer").addEventListener("click", envoyer);
+  $("nouvelle").addEventListener("click", reinitialiser);
+  rendre();
+})();
+</script>
+</body>
+</html>
