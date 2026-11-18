@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Suivi de ma vidéo · Réseau GRETA</title>
+<link rel="stylesheet" href="formulaire.css">
+<style>
+  .entete-demande { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: baseline; }
+  .entete-demande .ref { font-weight: 700; color: var(--bleu); font-variant-numeric: tabular-nums; }
+  .badge { font-size: 12.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--fond); color: var(--doux); white-space: nowrap; }
+  .badge.nouvelle, .badge.maj { background: var(--attente-fond); color: var(--attente); }
+  .badge.production, .badge.modif { background: var(--fond); color: var(--bleu); }
+  .badge.validation { background: #fff3dd; color: #8a5300; }
+  .badge.validee { background: var(--ok-fond); color: var(--ok); }
+  .frise { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .frise li { display: flex; gap: 14px; padding: 10px 0; border-top: 1px solid var(--trait); font-size: 14.5px; }
+  .frise li:first-child { border-top: 0; }
+  .frise .quand { flex: 0 0 120px; color: var(--doux); font-variant-numeric: tabular-nums; font-size: 13.5px; }
+  .frise .quoi { flex: 1; min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  a.bouton { display: inline-flex; align-items: center; text-decoration: none; }
+  .declarations { display: flex; flex-direction: column; gap: 10px; }
+  .video { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 14px 16px; border-radius: 8px; background: var(--zone); border: 1px solid var(--trait); }
+  .video a { color: var(--bleu); font-weight: 500; overflow-wrap: anywhere; }
+  .sb { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .sb td, .sb th { padding: 6px; border-bottom: 1px solid var(--trait); text-align: left; vertical-align: top; }
+  .sb input, .sb select { width: 100%; }
+  .versions { display: flex; flex-direction: column; gap: 8px; }
+  .versions .v { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 14.5px; }
+  @media print {
+    .bandeau, .actions, .ne-pas-imprimer { display: none !important; }
+    body { background: #fff; }
+    .bloc { border: 0; padding: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="bandeau">
+    <span class="logo"><img src="../logo-greta.jpg" alt="République française · GIP FCIP académie de Reims · Réseau GRETA académie de Reims Grand Est"></span>
+    <span class="marque">Vidéos pédagogiques</span>
+  </div>
+  <main id="contenu" style="display: flex; flex-direction: column; gap: 20px;">
+    <div class="bloc"><p class="aide-bloc">Chargement de votre demande…</p></div>
+  </main>
+</div>
+
+<script src="config.js"></script>
+<script src="chiffrement.js"></script>
+<script src="api.js"></script>
+<script src="rgpd.js"></script>
+<script>
+(function () {
+  'use strict';
+  var DECLARATIONS_DEFAUT = [
+    "En cochant cette case, je confirme avoir visionné dans son intégralité la vidéo référencée ci-dessus, produite avec l'outil Synthesia à ma demande.",
+    "Je certifie l'exactitude des informations pédagogiques, réglementaires et factuelles qu'elle contient, dont je demeure l'auteur et le responsable, et j'atteste qu'elle ne comporte aucun propos contraire aux valeurs du service public d'éducation.",
+    "Je garantis détenir les droits d'usage sur l'ensemble des éléments que j'ai transmis (textes, visuels, captures, documents) et que leur intégration dans la vidéo ne porte atteinte à aucun droit de tiers, notamment aux droits d'auteur et au droit à l'image.",
+    "J'ai été informé que la voix et le personnage présents à l'image sont générés artificiellement par l'outil Synthesia, qu'aucune personne réelle n'y est filmée, et que cette nature synthétique doit être portée à la connaissance du public destinataire.",
+    "Je valide l'utilisation de cette vidéo et j'autorise sa mutualisation, sa diffusion et sa réutilisation à des fins de formation, sans limitation de durée, au sein du réseau des GRETA de l'académie de Reims et des services académiques, à l'exclusion de tout usage commercial."
+  ];
+  var STATUTS = {
+    nouvelle: "Demande reçue", production: "En production", validation: "À valider",
+    modif: "Modification demandée", maj: "Mise à jour demandée", validee: "Validée"
+  };
+  var EVENEMENTS = {
+    depot: "Demande déposée", production: "Production lancée", livraison: "Vidéo livrée pour validation",
+    relance: "Relance", validation: "Vidéo validée", modification: "Modification demandée",
+    mise_a_jour: "Mise à jour demandée", note: "Information du service", purge_pieces: "Documents joints supprimés",
+    anonymisation: "Données personnelles supprimées"
+  };
+  var PRESENCES = ["Avatar seul", "Schéma seul", "Schéma + Avatar"];
+  var MAX_NB = 5, MAX_FICHIER = 10 * 1024 * 1024;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var zone = $("contenu");
+  var q = new URLSearchParams(location.search);
+  var token = q.get("suivi") || q.get("valider") || q.get("modifier") || q.get("mise-a-jour") || q.get("attestation") || "";
+  var vueDemandee = q.has("valider") ? "valider" : q.has("modifier") ? "modifier" : q.has("mise-a-jour") ? "maj" : q.has("attestation") ? "attestation" : "suivi";
+  var s = null, reglages = {}, declarations = DECLARATIONS_DEFAUT;
+
+  function h(x) { return String(x === undefined || x === null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function date(iso, heure) {
+    if (!iso) return "";
+    var d = new Date(iso), p = function (n) { return ("0" + n).slice(-2); };
+    return p(d.getDate()) + "/" + p(d.getMonth() + 1) + "/" + d.getFullYear() + (heure ? " à " + p(d.getHours()) + "h" + p(d.getMinutes()) : "");
+  }
+  function titre() { return (s.contenu && (s.contenu.titre || s.contenu.sujet)) || "Votre vidéo"; }
+  function refVersion() { return s.ref + (s.version > 1 ? " v" + s.version : ""); }
+  function lien(vue) { return location.pathname + "?" + vue + "=" + encodeURIComponent(token); }
+  function aller(vue) { history.pushState(null, "", lien(vue === "maj" ? "mise-a-jour" : vue)); vueDemandee = vue; afficher(); window.scrollTo(0, 0); }
+  window.addEventListener("popstate", function () {
+    var p = new URLSearchParams(location.search);
+    vueDemandee = p.has("valider") ? "valider" : p.has("modifier") ? "modifier" : p.has("mise-a-jour") ? "maj" : p.has("attestation") ? "attestation" : "suivi";
+    afficher();
+  });
+
+  function erreur(texte) { zone.innerHTML = '<div class="bloc"><h1 style="font-size: 24px; margin: 0;">Demande introuvable</h1><p class="aide-bloc">' + h(texte) + '</p></div>'; }
+
+  function entete() {
+    return '<header><div class="surtitre">' + (s.type === "syren" ? "Vidéo Syren" : "Vidéo Synthesia") + '</div>' +
+      '<h1>' + h(titre()) + '</h1>' +
+      '<div class="entete-demande" style="margin-top: 10px;"><span class="ref">' + h(refVersion()) + '</span>' +
+      '<span class="badge ' + h(s.statut) + '">' + h(STATUTS[s.statut] || s.statut) + '</span>' +
+      '<span class="aide">Déposée le ' + date(s.depose_le) + '</span></div></header>';
+  }
+
+  function compteur() {
+    if (s.type !== "syren") return "";
+    var n = s.modifs_restantes;
+    return '<span class="compteur">' + (n > 0 ? "Il vous reste " + n + " demande" + (n > 1 ? "s" : "") + " de modification" : "Les 2 demandes de modification ont été utilisées") + '</span>';
+  }
+
+  function blocVideo() {
+    if (!s.lien) return "";
+    var libelle = s.statut === "maj" || s.statut === "production" && s.version > 1 ? "Version actuellement en ligne :" : "Vidéo :";
+    return '<div class="video"><span>' + libelle + '</span><a href="' + h(s.lien) + '" target="_blank" rel="noopener">' + h(s.lien) + '</a></div>';
+  }
+
+  /* ---------- vue suivi ---------- */
+  function vueSuivi() {
+    var actions = [];
+    if (s.peut_valider) actions.push('<button class="bouton" data-aller="valider">Valider la vidéo</button>');
+    if (s.peut_modifier) actions.push('<button class="bouton second" data-aller="modifier">Demander une modification</button>');
+    if (s.peut_mettre_a_jour) actions.push('<button class="bouton second" data-aller="maj">Demande de mise à jour</button>');
+    var quota = s.statut === "validation" && s.type === "syren" && s.modifs_restantes === 0
+      ? '<p class="info">Les 2 demandes de modification prévues pour cette vidéo ont été utilisées : elle peut être validée telle quelle. Pour toute situation particulière, répondez au courriel reçu ou écrivez au service.</p>' : "";
+    var etape = {
+      nouvelle: "Votre demande est enregistrée. Vous serez prévenu par courriel dès que la production commence.",
+      production: "La vidéo est en cours de production. Vous recevrez un courriel dès qu'elle sera prête.",
+      validation: "La vidéo est prête : visionnez-la, puis validez-la ou demandez une modification.",
+      modif: "Votre demande de modification est prise en compte. Une nouvelle version vous sera proposée.",
+      maj: "Votre demande de mise à jour est enregistrée. La version validée précédente reste en ligne d'ici là.",
+      validee: "La vidéo est validée. Si son contenu doit évoluer, vous pouvez demander une mise à jour."
+    }[s.statut] || "";
+
+    var validees = (s.versions || []).filter(function (v) { return v.statut === "validee" || v.valide_le; });
+    var versions = validees.length ? '<div class="bloc"><div class="bloc-titre"><h2>Versions validées</h2></div><div class="versions">' +
+      validees.map(function (v) {
+        return '<div class="v"><strong>' + h(s.ref + (v.numero > 1 ? " v" + v.numero : "")) + '</strong><span class="aide">validée le ' + date(v.valide_le) + '</span>' +
+          (v.lien ? '<a href="' + h(v.lien) + '" target="_blank" rel="noopener">voir la vidéo</a>' : "") +
+          '<a href="' + lien("attestation") + '&v=' + v.numero + '">attestation</a></div>';
+      }).join("") + '</div></div>' : "";
+
+    var frise = (s.historique || []).slice().reverse().map(function (e) {
+      var texte = EVENEMENTS[e.evenement] || e.evenement;
+      if (e.texte && ["modification", "mise_a_jour", "note"].indexOf(e.evenement) >= 0) texte += " :\n" + e.texte;
+      return '<li><span class="quand">' + date(e.quand, true) + '</span><span class="quoi">' + h(texte) + (e.version > 1 ? ' <span class="aide">(v' + e.version + ')</span>' : "") + '</span></li>';
+    }).join("");
+
+    zone.innerHTML = entete() +
+      '<div class="bloc"><p style="margin: 0;">' + h(etape) + '</p>' + blocVideo() + compteur() + quota +
+      (actions.length ? '<div class="actions">' + actions.join("") + '</div>' : "") + '</div>' +
+      versions +
+      '<div class="bloc"><div class="bloc-titre"><h2>Historique</h2></div><ul class="frise">' + frise + '</ul></div>' +
+      '<p class="aide-bloc">Conservez le lien de cette page : il est votre accès personnel à la demande.</p>';
+  }
+
+  /* ---------- vue validation ---------- */
+  function vueValider() {
+    if (!s.peut_valider) return message("Validation indisponible", s.statut === "validee"
+      ? "Cette vidéo est déjà validée. Aucune nouvelle signature n'est nécessaire."
+      : "La vidéo n'est pas encore soumise à votre validation (statut : " + (STATUTS[s.statut] || s.statut) + ").");
+    zone.innerHTML = entete() +
+      '<div class="bloc"><div class="bloc-titre"><span class="num">1</span><h2>Visionner la vidéo</h2></div>' + blocVideo() + '</div>' +
+      '<div class="bloc"><div class="bloc-titre"><span class="num">2</span><h2>Vos déclarations</h2></div><div class="declarations">' +
+      declarations.map(function (d, i) { return '<label class="attestation"><input type="checkbox" class="decl" data-i="' + i + '"><span>' + h(d) + '</span></label>'; }).join("") +
+      '</div></div>' +
+      '<div class="bloc"><div class="bloc-titre"><span class="num">3</span><h2>Signature</h2></div><div class="rangee">' +
+      '<label class="champ"><span class="libelle">Prénom et nom</span><input type="text" id="nom" autocomplete="name"></label>' +
+      '<label class="champ"><span class="libelle">Adresse mail <span class="aide">pour recevoir l\'attestation</span></span><input type="email" id="email" autocomplete="email"></label>' +
+      '</div><p class="aide-bloc" style="font-size: 13.5px;">Votre nom est conservé chiffré avec l\'attestation. L\'adresse sert uniquement à vous envoyer l\'attestation : elle n\'est pas enregistrée.</p></div>' +
+      '<div id="alerte" class="alerte" hidden></div>' +
+      '<div class="envoi"><button class="bouton" id="signer">Signer et valider la vidéo</button><button class="bouton second" data-aller="suivi">Retour au suivi</button><span class="etat" id="etat"></span></div>';
+    $("signer").addEventListener("click", signer);
+  }
+
+  async function signer() {
+    var cochees = Array.prototype.filter.call(document.querySelectorAll(".decl"), function (c) { return c.checked; }).length;
+    var nom = $("nom").value.trim(), email = $("email").value.trim();
+    var manque = [];
+    if (cochees < declarations.length) manque.push("toutes les déclarations à cocher");
+    if (!nom) manque.push("votre prénom et votre nom");
+    if (!ApiV2.adresseValide(email)) manque.push("une adresse mail valide");
+    if (manque.length) { $("alerte").textContent = "Il manque " + manque.join(", ") + "."; $("alerte").hidden = false; return; }
+    $("signer").disabled = true; $("alerte").hidden = true; $("etat").textContent = "Enregistrement de la validation…";
+    try {
+      var signeLe = new Date().toISOString();
+      var signature = await ApiV2.chiffrer({ nom: nom, signe_le: signeLe });
+      var r = await ApiV2.retour(token, "validation", { signature_chiffree: signature, declarations: declarations });
+      if (!r || !r.ok) throw new Error((r && r.erreur) || "réponse inattendue");
+      $("etat").textContent = "Envoi de l'attestation…";
+      var c = await ApiV2.courriel({ action: "formateur", modele: "attestation", token: token, email: email, nom: nom });
+      await charger();
+      message("Vidéo validée", "Merci : votre validation est enregistrée. " + (c && c.ok ? "L'attestation vous a été envoyée à " + email + "." : "L'attestation n'a pas pu être envoyée par courriel ; elle reste consultable ci-dessous."),
+        '<div class="actions"><a class="bouton" href="' + lien("attestation") + '">Voir l\'attestation</a><button class="bouton second" data-aller="suivi">Suivi de la demande</button></div>');
+    } catch (e) {
+      $("alerte").textContent = "La validation n'a pas pu être enregistrée (" + e.message + "). Réessayez.";
+      $("alerte").hidden = false; $("signer").disabled = false; $("etat").textContent = "";
+    }
+  }
+
+  /* ---------- vues modification et mise à jour ---------- */
+  function champsEditables() {
+    var c = s.contenu || {};
+    if (s.type === "syren") {
+      return '<details class="ne-pas-imprimer"><summary style="cursor: pointer; font-weight: 500;">Modifier aussi les informations de la demande (facultatif)</summary><div style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">' +
+        '<label class="champ"><span class="libelle">Type de voix off</span><input type="text" data-champ="voixOff" value="' + h(c.voixOff) + '"></label>' +
+        '<label class="champ"><span class="libelle">Objectif détaillé de la vidéo</span><textarea rows="5" data-champ="objectif">' + h(c.objectif) + '</textarea></label>' +
+        '<label class="champ"><span class="libelle">Information complémentaire</span><textarea rows="3" data-champ="info">' + h(c.info) + '</textarea></label>' +
+        '</div></details>';
+    }
+    var sb = (c.storyboard || []).map(function (r, i) {
+      return '<tr><td style="width: 60px;"><input type="text" data-sb="plan" data-i="' + i + '" value="' + h(r.plan) + '"></td>' +
+        '<td><input type="text" data-sb="schema" data-i="' + i + '" value="' + h(r.schema) + '"></td>' +
+        '<td style="width: 160px;"><select data-sb="presence" data-i="' + i + '">' + PRESENCES.map(function (p) { return '<option' + (p === r.presence ? " selected" : "") + '>' + p + '</option>'; }).join("") + '</select></td></tr>';
+    }).join("");
+    return '<details class="ne-pas-imprimer"><summary style="cursor: pointer; font-weight: 500;">Modifier aussi le script, les précisions ou le storyboard (facultatif)</summary><div style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">' +
+      '<label class="champ"><span class="libelle">Script audio</span><textarea rows="10" data-champ="script">' + h(c.script) + '</textarea></label>' +
+      '<label class="champ"><span class="libelle">Précisions</span><textarea rows="4" data-champ="precisions">' + h(c.precisions) + '</textarea></label>' +
+      (sb ? '<div class="champ"><span class="libelle">Storyboard</span><div style="overflow-x: auto;"><table class="sb"><tr><th>Plan</th><th>Schéma</th><th>Présence</th></tr>' + sb + '</table></div></div>' : "") +
+      '</div></details>';
+  }
+
+  function vueModifier(maj) {
+    if (maj ? !s.peut_mettre_a_jour : !s.peut_modifier) {
+      var raison = maj ? "Une mise à jour ne peut être demandée que pour une vidéo validée."
+        : (s.statut === "validation" && s.type === "syren" ? "Les 2 demandes de modification prévues pour cette vidéo ont été utilisées : elle peut être validée telle quelle. Pour toute situation particulière, écrivez au service."
+          : "La vidéo n'est pas en attente de validation (statut : " + (STATUTS[s.statut] || s.statut) + ").");
+      return message(maj ? "Mise à jour indisponible" : "Modification indisponible", raison);
+    }
+    var cadre = maj
+      ? '<p style="margin: 0;"><strong>Votre vidéo a été validée. Vous demandez une nouvelle version.</strong> La version actuelle reste en ligne jusqu\'à la validation de la nouvelle.</p>'
+      : '<p style="margin: 0;">Décrivez précisément ce qui doit changer : minutage, formulation, visuels.</p>';
+    zone.innerHTML = entete() +
+      '<div class="bloc">' + cadre + compteur() +
+      (!maj && s.type === "syren" && s.modifs_restantes === 1 ? '<p class="info" style="margin: 0;">C\'est votre dernière demande de modification pour cette vidéo.</p>' : "") +
+      (maj && s.type === "syren" ? '<p class="aide-bloc" style="margin: 0;">La mise à jour ne remet pas à zéro le compteur de modifications, qui vaut pour toute la vie de la vidéo.</p>' : "") +
+      blocVideo() +
+      '<label class="champ"><span class="libelle">' + (maj ? "Ce qui doit évoluer" : "Vos remarques") + '</span><textarea id="remarques" rows="7"></textarea></label>' +
+      champsEditables() + '</div>' +
+      '<div class="bloc"><div class="bloc-titre"><h2>Nouveaux documents</h2><span class="note">facultatif</span></div>' +
+      '<label class="depot" for="fichier"><input type="file" id="fichier" multiple><strong>Choisir des fichiers</strong><span>5 fichiers · 10 Mo par fichier</span></label>' +
+      '<ul class="fichiers" id="liste-fichiers"></ul><span class="msg-erreur" id="err-fichiers" hidden></span>' +
+      '<label class="attestation" id="bloc-attestation" hidden><input type="checkbox" id="attestation"><span>Je suis propriétaire des documents transmis ou j\'ai l\'autorisation de les utiliser.</span></label></div>' +
+      '<div class="bloc"><div class="rangee">' +
+      '<label class="champ"><span class="libelle">Prénom et nom</span><input type="text" id="nom" autocomplete="name"></label>' +
+      '<label class="champ"><span class="libelle">Adresse mail <span class="aide">pour recevoir la confirmation</span></span><input type="email" id="email" autocomplete="email"></label>' +
+      '</div><p class="aide-bloc" style="font-size: 13.5px;">L\'adresse sert uniquement à vous envoyer la confirmation : elle n\'est pas enregistrée.</p></div>' +
+      '<p class="rgpd">' + window.mentionRgpd() + '</p>' +
+      '<div id="alerte" class="alerte" hidden></div>' +
+      '<div class="envoi"><button class="bouton" id="transmettre">' + (maj ? "Demander la mise à jour" : "Transmettre la demande de modification") + '</button><button class="bouton second" data-aller="suivi">Retour au suivi</button><span class="etat" id="etat"></span></div>' +
+      '<div class="progression" id="progression" hidden></div>';
+
+    var fichiers = [];
+    function rendreFichiers() {
+      var l = $("liste-fichiers"); l.textContent = "";
+      fichiers.forEach(function (f, i) {
+        var li = document.createElement("li");
+        li.innerHTML = '<span class="nom"></span><span class="taille"></span><button type="button" class="retirer" aria-label="Retirer">×</button>';
+        li.querySelector(".nom").textContent = f.name;
+        li.querySelector(".taille").textContent = Math.max(1, Math.round(f.size / 1024)) + " Ko";
+        li.querySelector("button").addEventListener("click", function () { fichiers.splice(i, 1); rendreFichiers(); });
+        l.appendChild(li);
+      });
+      $("bloc-attestation").hidden = fichiers.length === 0;
+    }
+    $("fichier").addEventListener("change", function (e) {
+      var err = "";
+      Array.prototype.forEach.call(e.target.files, function (f) {
+        if (fichiers.length >= MAX_NB) { err = MAX_NB + " fichiers au maximum."; return; }
+        if (f.size === 0 || f.size > MAX_FICHIER) { err = "« " + f.name + " » est vide ou dépasse 10 Mo."; return; }
+        fichiers.push(f);
+      });
+      e.target.value = ""; $("err-fichiers").textContent = err; $("err-fichiers").hidden = !err; rendreFichiers();
+    });
+
+    $("transmettre").addEventListener("click", async function () {
+      var remarques = $("remarques").value.trim(), nom = $("nom").value.trim(), email = $("email").value.trim();
+      var manque = [];
+      if (remarques.length < 3) manque.push(maj ? "la description de la mise à jour" : "vos remarques");
+      if (!nom) manque.push("votre prénom et votre nom");
+      if (!ApiV2.adresseValide(email)) manque.push("une adresse mail valide");
+      if (fichiers.length && !$("attestation").checked) manque.push("l'attestation sur vos documents");
+      if (manque.length) { $("alerte").textContent = "Il manque " + manque.join(", ") + "."; $("alerte").hidden = false; return; }
+
+      var champs = {}, c = s.contenu || {};
+      document.querySelectorAll("[data-champ]").forEach(function (el) {
+        var k = el.getAttribute("data-champ"), v = el.value.trim();
+        if (v !== String(c[k] || "").trim()) champs[k] = v;
+      });
+      if (document.querySelector("[data-sb]")) {
+        var sb = (c.storyboard || []).map(function (r) { return Object.assign({}, r); });
+        document.querySelectorAll("[data-sb]").forEach(function (el) { sb[+el.getAttribute("data-i")][el.getAttribute("data-sb")] = el.value.trim(); });
+        if (JSON.stringify(sb) !== JSON.stringify(c.storyboard || [])) champs.storyboard = sb;
+      }
+      if (fichiers.length) champs.documents = (c.documents || []).concat(fichiers.map(function (f) { return f.name; }));
+
+      $("transmettre").disabled = true; $("alerte").hidden = true; $("etat").textContent = "Enregistrement…";
+      try {
+        var r = await ApiV2.retour(token, maj ? "mise_a_jour" : "modification", { remarques: remarques, champs: champs });
+        if (!r || !r.ok) throw new Error((r && r.erreur) || "réponse inattendue");
+        var echecs = [];
+        if (fichiers.length) {
+          var zoneP = $("progression"); zoneP.hidden = false;
+          var id = await idDemande();
+          for (var i = 0; i < fichiers.length; i++) {
+            $("etat").textContent = "Envoi des fichiers (" + (i + 1) + " sur " + fichiers.length + ")…";
+            try { await ApiV2.envoyerFichier(id, token, fichiers[i], 20 + i); } catch (e) { echecs.push(fichiers[i].name + " (" + e.message + ")"); }
+          }
+        }
+        $("etat").textContent = "Envoi de la confirmation…";
+        var cr = await ApiV2.courriel({ action: "formateur", modele: maj ? "maj_confirmation" : "modif_confirmation", token: token, email: email, nom: nom });
+        await charger();
+        message(maj ? "Mise à jour demandée" : "Modification demandée",
+          (maj ? "Votre demande de mise à jour est enregistrée : une nouvelle version (" + refVersion() + ") est ouverte. " : "Votre demande de modification est enregistrée. ") +
+          (cr && cr.ok ? "Une confirmation vous a été envoyée à " + email + "." : "La confirmation n'a pas pu être envoyée par courriel.") +
+          (echecs.length ? " Fichiers non transmis : " + echecs.join(" · ") + ". Envoyez-les en répondant au courriel du service." : ""),
+          '<div class="actions"><button class="bouton second" data-aller="suivi">Suivi de la demande</button></div>');
+      } catch (e) {
+        $("alerte").textContent = "La demande n'a pas pu être enregistrée (" + e.message + "). Réessayez.";
+        $("alerte").hidden = false; $("transmettre").disabled = false; $("etat").textContent = "";
+      }
+    });
+  }
+
+  /* L'identifiant interne de la demande sert de dossier pour les fichiers : il est lu depuis le chemin des pièces
+     existantes ou demandé à la base. */
+  async function idDemande() {
+    var r = await ApiV2.rpc("id_demande", { p_token: token });
+    if (!r) throw new Error("demande introuvable");
+    return r;
+  }
+
+  /* ---------- attestation ---------- */
+  function vueAttestation() {
+    var num = parseInt(q.get("v") || new URLSearchParams(location.search).get("v"), 10);
+    var validees = (s.versions || []).filter(function (v) { return v.valide_le; });
+    var v = validees.filter(function (x) { return x.numero === num; })[0] || validees[validees.length - 1];
+    if (!v) return message("Attestation indisponible", "Cette vidéo n'a pas encore été validée : aucune attestation ne peut être établie.");
+    var decl = (v.declarations && v.declarations.length ? v.declarations : declarations);
+    zone.innerHTML =
+      '<div class="bloc"><div class="surtitre">' + h(reglages.entite || "GIP FCIP de l'académie de Reims") + '</div>' +
+      '<h1 style="margin: 4px 0 0;">Attestation de validation</h1>' +
+      '<table class="sb" style="margin-top: 8px;">' +
+      '<tr><th style="width: 170px;">Référence</th><td>' + h(s.ref + (v.numero > 1 ? " v" + v.numero : "")) + '</td></tr>' +
+      '<tr><th>Vidéo</th><td>' + h(titre()) + '</td></tr>' +
+      '<tr><th>Lien</th><td>' + h(v.lien || s.lien || "") + '</td></tr>' +
+      '<tr><th>Validée le</th><td>' + date(v.valide_le, true) + '</td></tr>' +
+      '<tr><th>Validée par</th><td>Le demandeur de la vidéo. Son identité et sa signature sont conservées de façon chiffrée par le service.</td></tr></table>' +
+      '<div><strong>Le demandeur a déclaré :</strong><ul>' + decl.map(function (d) { return '<li style="margin-bottom: 6px;">' + h(d) + '</li>'; }).join("") + '</ul></div>' +
+      '<p class="aide-bloc" style="font-size: 13px;">' + h(reglages.mentionLegale || "Attestation établie par voie électronique. La signature du demandeur vaut acceptation des déclarations reproduites ci-dessus et engage sa responsabilité au titre du contenu de la vidéo.") + '</p>' +
+      '<div class="actions"><button class="bouton" id="imprimer">Imprimer ou enregistrer en PDF</button><button class="bouton second" data-aller="suivi">Suivi de la demande</button></div></div>';
+    $("imprimer").addEventListener("click", function () { window.print(); });
+  }
+
+  function message(titreMsg, texte, suite) {
+    zone.innerHTML = entete() + '<div class="bloc"><h2>' + h(titreMsg) + '</h2><p style="margin: 0;">' + h(texte) + '</p>' +
+      (suite || '<div class="actions"><button class="bouton second" data-aller="suivi">Suivi de la demande</button></div>') + '</div>';
+  }
+
+  function afficher() {
+    if (!s) return;
+    document.title = (vueDemandee === "attestation" ? "Attestation " : "Suivi ") + refVersion() + " · Réseau GRETA";
+    if (vueDemandee === "valider") vueValider();
+    else if (vueDemandee === "modifier") vueModifier(false);
+    else if (vueDemandee === "maj") vueModifier(true);
+    else if (vueDemandee === "attestation") vueAttestation();
+    else vueSuivi();
+  }
+
+  zone.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-aller]");
+    if (b) { e.preventDefault(); aller(b.getAttribute("data-aller")); }
+  });
+
+  async function charger() {
+    s = await ApiV2.lireSuivi(token);
+  }
+
+  (async function () {
+    if (!ApiV2.estJeton(token)) return erreur("Le lien utilisé est incomplet. Ouvrez le lien reçu par courriel, sans le modifier.");
+    try {
+      var r = await Promise.all([ApiV2.lireSuivi(token), ApiV2.reglagesPublics().catch(function () { return null; })]);
+      s = r[0];
+      if (r[1]) {
+        reglages = r[1].reglages || {};
+        if (Array.isArray(r[1].declarations) && r[1].declarations.filter(function (x) { return String(x).trim(); }).length)
+          declarations = r[1].declarations.filter(function (x) { return String(x).trim(); });
+      }
+    } catch (e) { return erreur("Le service n'a pas pu être joint (" + e.message + "). Réessayez dans un instant."); }
+    if (!s) return erreur("Aucune demande ne correspond à ce lien. Vérifiez le lien reçu par courriel.");
+    afficher();
+  })();
+})();
+</script>
+</body>
+</html>
