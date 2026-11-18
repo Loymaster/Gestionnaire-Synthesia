@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Clés de chiffrement · Gestionnaire Synthesia</title>
+<style>
+  @font-face { font-family: "Marianne"; src: url("../fonts/Marianne-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Marianne"; src: url("../fonts/Marianne-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: "Marianne"; src: url("../fonts/Marianne-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+  :root { --bleu: #154194; --ciel: #5BC1DC; --orange: #F39200; --pale: #E3E5F1; --gris: #5A5E67; --fond: #f4f6fa; --texte: #1c2433; --ok: #1d7a3e; --alerte: #b42318; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Marianne", system-ui, sans-serif; background: var(--fond); color: var(--texte); line-height: 1.55; }
+  header { background: linear-gradient(90deg, var(--bleu), var(--ciel)); color: #fff; padding: 28px max(16px, env(safe-area-inset-left)); }
+  header h1 { margin: 0 auto; max-width: 760px; font-size: 1.5rem; font-weight: 700; }
+  header p { margin: 6px auto 0; max-width: 760px; opacity: .9; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px max(16px, env(safe-area-inset-left)) 64px; display: grid; gap: 20px; }
+  section { background: #fff; border-radius: 10px; padding: 22px 24px; border: 1px solid var(--pale); }
+  h2 { margin: 0 0 4px; font-size: 1.1rem; color: var(--bleu); display: flex; gap: 10px; align-items: baseline; }
+  h2 .n { color: var(--orange); font-weight: 700; }
+  h2::after { content: none; }
+  .souligne { width: 48px; height: 3px; background: var(--orange); border-radius: 2px; margin: 6px 0 14px; }
+  p { margin: 0 0 12px; }
+  .aide { color: var(--gris); font-size: .92rem; }
+  label { display: block; font-weight: 500; margin: 12px 0 4px; }
+  input[type=password], input[type=text], textarea { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid #c9cddb; border-radius: 6px; background: #fff; color: var(--texte); }
+  textarea { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8rem; min-height: 120px; resize: vertical; }
+  button { font: inherit; font-weight: 500; border: 0; border-radius: 6px; padding: 10px 18px; background: var(--bleu); color: #fff; cursor: pointer; margin-top: 14px; }
+  button.second { background: var(--pale); color: var(--bleu); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .msg { margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: .95rem; }
+  .msg.ok { background: #e5f4e4; color: var(--ok); }
+  .msg.err { background: #fbebeb; color: var(--alerte); }
+  .empreinte { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 1.15rem; letter-spacing: .05em; color: var(--bleu); background: var(--pale); padding: 6px 12px; border-radius: 6px; display: inline-block; }
+  .verrou { opacity: .5; pointer-events: none; }
+  ul { margin: 0 0 12px; padding-left: 20px; }
+  .rangee { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Clés de chiffrement</h1>
+  <p>Gestionnaire Synthesia · espace administrateur</p>
+</header>
+<main>
+  <section>
+    <p>Cette page crée la paire de clés qui protège les noms et adresses des formateurs.</p>
+    <ul>
+      <li>La <strong>clé publique</strong> sera inscrite dans le site. Elle permet seulement de chiffrer : elle peut être vue de tous sans risque.</li>
+      <li>La <strong>clé privée</strong> permet de relire. Elle ne quitte jamais votre ordinateur : vous la téléchargez dans un fichier protégé par une phrase secrète.</li>
+    </ul>
+    <p class="aide">Tout se passe dans ce navigateur. Rien n'est envoyé à un serveur. Une clé privée perdue rend illisibles les identités enregistrées : gardez une copie hors ligne (clé USB rangée à part).</p>
+  </section>
+
+  <section id="etape1">
+    <h2><span class="n">1</span> Choisir une phrase secrète</h2>
+    <div class="souligne"></div>
+    <p class="aide">Au moins 20 caractères. Une suite de 4 ou 5 mots sans rapport entre eux est à la fois solide et facile à retenir. Elle ne pourra pas être récupérée si vous l'oubliez.</p>
+    <label for="phrase1">Phrase secrète</label>
+    <input id="phrase1" type="password" autocomplete="new-password">
+    <label for="phrase2">Confirmer la phrase secrète</label>
+    <input id="phrase2" type="password" autocomplete="new-password">
+    <button id="generer">Créer la paire de clés</button>
+    <div id="msg1"></div>
+  </section>
+
+  <section id="etape2" class="verrou">
+    <h2><span class="n">2</span> Enregistrer la clé privée</h2>
+    <div class="souligne"></div>
+    <p>Téléchargez le fichier, puis faites-en une seconde copie hors ligne.</p>
+    <div class="rangee">
+      <button id="telecharger">Télécharger la clé privée</button>
+      <span class="aide" id="nomFichier"></span>
+    </div>
+  </section>
+
+  <section id="etape3" class="verrou">
+    <h2><span class="n">3</span> Transmettre la clé publique</h2>
+    <div class="souligne"></div>
+    <p>Empreinte : <span class="empreinte" id="empreinte">—</span></p>
+    <p class="aide">Copiez la clé publique ci-dessous et transmettez-la pour qu'elle soit inscrite dans le site. Ce texte peut circuler sans risque.</p>
+    <textarea id="publique" readonly></textarea>
+    <button id="copier" class="second">Copier la clé publique</button>
+    <span id="copie" class="aide"></span>
+  </section>
+
+  <section id="etape4">
+    <h2><span class="n">4</span> Vérifier un fichier de clé</h2>
+    <div class="souligne"></div>
+    <p class="aide">À faire après l'enregistrement, puis de temps en temps sur la copie de secours : la page ouvre le fichier avec votre phrase, chiffre un texte d'essai et le relit.</p>
+    <label for="fichier">Fichier de clé privée</label>
+    <input id="fichier" type="file" accept=".json,application/json">
+    <label for="phraseTest">Phrase secrète</label>
+    <input id="phraseTest" type="password" autocomplete="current-password">
+    <button id="verifier">Vérifier</button>
+    <div id="msg4"></div>
+  </section>
+</main>
+
+<script src="chiffrement.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const message = (zone, texte, ok) => { $(zone).innerHTML = ''; const d = document.createElement('div'); d.className = 'msg ' + (ok ? 'ok' : 'err'); d.textContent = texte; $(zone).appendChild(d); };
+  let fichierCle = null, nom = '';
+
+  $('generer').addEventListener('click', async () => {
+    const p1 = $('phrase1').value, p2 = $('phrase2').value;
+    if (p1.length < 20) return message('msg1', 'La phrase secrète doit compter au moins 20 caractères.');
+    if (p1 !== p2) return message('msg1', 'Les deux saisies ne sont pas identiques.');
+    $('generer').disabled = true; $('generer').textContent = 'Création en cours…';
+    try {
+      const { paire, publique, empreinte } = await Chiffrement.genererPaire();
+      fichierCle = await Chiffrement.protegerClePrivee(paire.privateKey, publique, p1);
+      nom = 'cle-privee-gestionnaire-synthesia-' + empreinte.toLowerCase() + '.json';
+      $('publique').value = publique;
+      $('empreinte').textContent = empreinte;
+      $('nomFichier').textContent = nom;
+      $('phrase1').value = $('phrase2').value = '';
+      $('etape2').classList.remove('verrou'); $('etape3').classList.remove('verrou');
+      message('msg1', 'Paire de clés créée. Enregistrez maintenant la clé privée (étape 2).', true);
+      $('generer').textContent = 'Paire créée';
+    } catch (e) {
+      message('msg1', e.message); $('generer').disabled = false; $('generer').textContent = 'Créer la paire de clés';
+    }
+  });
+
+  $('telecharger').addEventListener('click', () => {
+    const url = URL.createObjectURL(new Blob([fichierCle], { type: 'application/json' }));
+    const a = document.createElement('a'); a.href = url; a.download = nom; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  });
+
+  $('copier').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText($('publique').value); $('copie').textContent = ' Copiée.'; }
+    catch (e) { $('publique').select(); $('copie').textContent = ' Sélectionnée : copiez avec Ctrl+C.'; }
+  });
+
+  $('verifier').addEventListener('click', async () => {
+    const f = $('fichier').files[0];
+    if (!f) return message('msg4', 'Choisissez le fichier de clé privée.');
+    try {
+      const ouvert = await Chiffrement.ouvrirClePrivee(await f.text(), $('phraseTest').value);
+      const essai = await Chiffrement.chiffrer({ essai: 'Gestionnaire Synthesia' }, ouvert.publique);
+      const relu = await Chiffrement.dechiffrer(essai, ouvert.cle);
+      if (relu.essai !== 'Gestionnaire Synthesia') throw new Error('relecture incorrecte');
+      $('phraseTest').value = '';
+      message('msg4', 'Fichier valide. Empreinte : ' + ouvert.empreinte + '.', true);
+    } catch (e) { message('msg4', e.message); }
+  });
+})();
+</script>
+</body>
+</html>
