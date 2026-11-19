@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Reprise des demandes · Gestionnaire Synthesia</title>
+<link rel="stylesheet" href="formulaire.css">
+<style>
+  .page { max-width: 1100px; }
+  table.liste { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.liste th, table.liste td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--trait); vertical-align: top; }
+  table.liste th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--doux); font-weight: 500; }
+  .defile { overflow-x: auto; max-width: 100%; }
+  .ok { color: var(--ok); font-weight: 500; } .ko { color: var(--erreur); font-weight: 500; } .attente { color: var(--doux); }
+  .journal { font-size: 13px; max-height: 320px; overflow: auto; background: var(--zone); border: 1px solid var(--trait); border-radius: 8px; padding: 10px 14px; white-space: pre-wrap; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="bandeau">
+    <span class="logo"><img src="../logo-greta.jpg" alt="République française · GIP FCIP académie de Reims · Réseau GRETA"></span>
+    <span class="marque">Espace administrateur</span>
+  </div>
+  <header>
+    <div class="surtitre">Gestionnaire Synthesia v2</div>
+    <h1>Reprise des demandes de l'ancien outil</h1>
+    <p>Cette page lit les demandes de l'ancien outil (Google Sheets), chiffre dans ce navigateur les noms, adresses et signatures avec la clé publique du site, puis les enregistre dans Supabase. L'ancien classeur n'est pas modifié.</p>
+  </header>
+
+  <div class="bloc" id="etape-session">
+    <div class="bloc-titre"><span class="num">1</span><h2>Session administrateur</h2></div>
+    <p id="session-etat" class="aide-bloc">Vérification…</p>
+  </div>
+
+  <div class="bloc" id="etape-lecture" hidden>
+    <div class="bloc-titre"><span class="num">2</span><h2>Lecture de l'ancien outil</h2></div>
+    <label class="champ"><span class="libelle">Jeton d'administration de l'ancien outil</span>
+      <input type="password" id="jeton" autocomplete="off">
+      <span class="aide-bloc" style="font-size: 13.5px;" id="jeton-aide"></span></label>
+    <div class="actions"><button class="bouton" id="lire">Lire les demandes</button><span class="etat" id="lecture-etat"></span></div>
+    <div class="defile" id="apercu"></div>
+  </div>
+
+  <div class="bloc" id="etape-import" hidden>
+    <div class="bloc-titre"><span class="num">3</span><h2>Reprise</h2></div>
+    <label class="attestation"><input type="checkbox" id="remplacer"><span>Remplacer les demandes déjà reprises (à cocher pour une nouvelle reprise juste avant la bascule, afin de récupérer les changements faits entre-temps dans l'ancien outil).</span></label>
+    <label class="attestation"><input type="checkbox" id="modeles" checked><span>Reprendre aussi les modèles de courriels personnalisés, les déclarations de validation et les réglages (sauf la durée de conservation et le contact RGPD, propres à la v2).</span></label>
+    <div class="actions"><button class="bouton" id="importer">Reprendre les demandes</button><span class="etat" id="import-etat"></span></div>
+    <div class="journal" id="journal" hidden></div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="chiffrement.js"></script>
+<script src="api.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="stockage-v2.js"></script>
+<script>
+(function () {
+  'use strict';
+  /* Adresse de l'ancien service (stockage.js de l'outil v1) */
+  var ANCIENNE_API = "https://script.google.com/macros/s/AKfycbw66cqsPqkPfkqWK4qf7ptQ-A4tTN0C2qasss779-IM0t9v8wN2L0fjqGBZFKLnGJGNBQ/exec";
+  var PT = { "oklch(0.42 0.01 250)": "nouvelle", "#154194": "production", "oklch(0.44 0.11 70)": "validation", "oklch(0.47 0.14 25)": "modif", "oklch(0.4 0.1 155)": "validee", "#c47a00": "correction", "#1f5f43": "corrigee" };
+  var EVENEMENT = { nouvelle: "depot", production: "production", validation: "livraison", modif: "modification", validee: "validation", correction: "note", corrigee: "note" };
+  var CHAMPS_HORS_CONTENU = ["id", "ref", "token", "statut", "lien", "archive", "catalogue", "depose", "historique", "validation", "pieces", "demandeur", "email", "cle", "prefixe"];
+  var $ = function (id) { return document.getElementById(id); };
+  var anciennes = [], anciensModeles = null;
+
+  function h(x) { return String(x === undefined || x === null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function ecrire(texte, classe) { var j = $("journal"); j.hidden = false; var l = document.createElement("div"); if (classe) l.className = classe; l.textContent = texte; j.appendChild(l); j.scrollTop = j.scrollHeight; }
+
+  /* « 10/09 · 09:12 » (ancien format, sans année) → date ISO, l'année étant déduite de la date de dépôt */
+  function dateHistorique(quand, depose) {
+    var m = String(quand || "").match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\s*·?\s*(\d{1,2})[:h](\d{2})/);
+    var base = new Date(depose || Date.now());
+    if (!m) return null;
+    var annee = m[3] ? (m[3].length === 2 ? 2000 + Number(m[3]) : Number(m[3])) : base.getFullYear();
+    var d = new Date(annee, Number(m[2]) - 1, Number(m[1]), Number(m[4]), Number(m[5]));
+    if (!m[3] && d < new Date(base.getTime() - 86400000)) d.setFullYear(annee + 1);
+    return d.toISOString();
+  }
+
+  function apercuStatut(s) { return s === "correction" || s === "corrigee" ? s + " → validee" : s; }
+
+  async function lireAncien(collection, jeton) {
+    var r = await fetch(ANCIENNE_API + "?jeton=" + encodeURIComponent(jeton) + "&collection=" + collection);
+    if (!r.ok) throw new Error("réponse " + r.status);
+    var d = await r.json();
+    if (d && d.erreur) throw new Error(d.erreur);
+    return d;
+  }
+
+  async function preparer(t, remplacer) {
+    var contenu = {};
+    Object.keys(t).forEach(function (k) { if (CHAMPS_HORS_CONTENU.indexOf(k) < 0) contenu[k] = t[k]; });
+    if (Array.isArray(t.pieces) && t.pieces.length) contenu.piecesDrive = t.pieces;
+    var v = null;
+    if (t.validation && (t.validation.nom || t.validation.signeLe)) {
+      v = {
+        signature_chiffree: await ApiV2.chiffrer({ nom: t.validation.nom || "", fonction: t.validation.fonction || "", signe_le: t.validation.signeLe || "" }),
+        nom: t.validation.nom || "", fonction: t.validation.fonction || "",
+        declarations: Array.isArray(t.validation.engagements) ? t.validation.engagements : [],
+        signe_le: t.validation.signeLe || null
+      };
+    }
+    var historique = (t.historique || []).map(function (e) {
+      var etat = PT[e.point] || null;
+      var texte = String(e.texte || "");
+      var ev = etat ? EVENEMENT[etat] : "note";
+      if (etat === "validation" && /relance/i.test(texte)) ev = "relance";
+      return { acteur: e.qui === "Administrateur" ? "admin" : (e.qui === "Système" ? "systeme" : "formateur"), evenement: ev, texte: texte, quand: dateHistorique(e.quand, t.depose) };
+    });
+    return {
+      ref: t.ref, ancien_jeton: t.token || null, statut: t.statut,
+      identite_chiffree: await ApiV2.chiffrer({ demandeur: t.demandeur || "", email: t.email || "" }),
+      contenu: contenu, lien: t.lien || "", archive: !!t.archive, catalogue: t.catalogue || null,
+      depose_le: t.depose || null, validation: v, historique: historique, remplacer: !!remplacer
+    };
+  }
+
+  /* 1. Session : la reprise exige un compte administrateur en double authentification (la clé privée n'est pas nécessaire) */
+  (async function () {
+    try {
+      var s = await Stockage.reprendreSession();
+      if (s.etape === "cle" || s.etape === "pret") {
+        $("session-etat").innerHTML = '<span class="ok">Session administrateur active, double authentification vérifiée.</span>';
+        $("etape-lecture").hidden = false;
+        var cfg = {}; try { cfg = JSON.parse(localStorage.getItem("synthesia_config_v1") || "{}") || {}; } catch (e) {}
+        if (cfg.baseCle) { $("jeton").value = cfg.baseCle; $("jeton-aide").textContent = "Jeton trouvé dans ce navigateur (ancien outil)."; }
+        else $("jeton-aide").textContent = "Saisissez le jeton inscrit dans la page Configuration de l'ancien outil.";
+      } else {
+        $("session-etat").innerHTML = 'Connectez-vous d\'abord à <a href="index.html?admin">l\'espace administrateur v2</a> (mot de passe et double authentification), puis rechargez cette page.';
+      }
+    } catch (e) { $("session-etat").textContent = "Vérification impossible : " + e.message; }
+  })();
+
+  /* 2. Lecture */
+  $("lire").addEventListener("click", async function () {
+    var jeton = $("jeton").value.trim();
+    if (!jeton) { $("lecture-etat").textContent = "Jeton manquant."; return; }
+    $("lire").disabled = true; $("lecture-etat").textContent = "Lecture…";
+    try {
+      var r = await Promise.all([lireAncien("demandes", jeton), lireAncien("modeles", jeton).catch(function () { return null; })]);
+      anciennes = (Array.isArray(r[0]) ? r[0] : []).filter(function (t) { return t && t.ref; });
+      anciensModeles = r[1] && !Array.isArray(r[1]) ? r[1] : null;
+      var compte = {}; anciennes.forEach(function (t) { compte[t.statut] = (compte[t.statut] || 0) + 1; });
+      $("lecture-etat").textContent = anciennes.length + " demande(s) lue(s) : " + Object.keys(compte).map(function (k) { return compte[k] + " " + k; }).join(", ") + ".";
+      $("apercu").innerHTML = '<table class="liste"><tr><th>Réf.</th><th>Titre</th><th>Statut</th><th>Demandeur</th><th>Validation</th><th>Pièces</th><th>Historique</th></tr>' +
+        anciennes.map(function (t) {
+          return '<tr><td>' + h(t.ref) + '</td><td>' + h(t.titre) + '</td><td>' + h(apercuStatut(t.statut)) + (t.archive ? ' · archivée' : '') + '</td><td>' + (t.demandeur && t.email ? '<span class="ok">nom et adresse</span>' : '<span class="ko">incomplet</span>') + '</td>' +
+            '<td>' + (t.validation ? h((t.validation.nom || "?") + " · " + String(t.validation.signeLe || "").slice(0, 10)) : "—") + '</td><td>' + ((t.pieces || []).length || "—") + '</td><td>' + (t.historique || []).length + '</td></tr>';
+        }).join("") + '</table>';
+      $("etape-import").hidden = anciennes.length === 0;
+    } catch (e) { $("lecture-etat").textContent = "Lecture impossible : " + e.message; }
+    $("lire").disabled = false;
+  });
+
+  /* 3. Reprise */
+  $("importer").addEventListener("click", async function () {
+    var remplacer = $("remplacer").checked;
+    $("importer").disabled = true; $("journal").textContent = "";
+    var bilan = { reprises: 0, deja: 0, erreurs: 0 };
+    for (var i = 0; i < anciennes.length; i++) {
+      var t = anciennes[i];
+      $("import-etat").textContent = "Demande " + (i + 1) + " sur " + anciennes.length + "…";
+      try {
+        var p = await preparer(t, remplacer);
+        var r = await Stockage.client().rpc("admin_importer_demande", { p: p });
+        if (r.error) throw new Error(r.error.message);
+        if (r.data.deja) { bilan.deja++; ecrire(t.ref + " : déjà reprise (non remplacée).", "attente"); }
+        else { bilan.reprises++; ecrire(t.ref + " : reprise (" + apercuStatut(t.statut) + ").", "ok"); }
+      } catch (e) { bilan.erreurs++; ecrire(t.ref + " : ÉCHEC — " + e.message, "ko"); }
+    }
+    if ($("modeles").checked && anciensModeles) {
+      try {
+        var m = JSON.parse(JSON.stringify(anciensModeles));
+        if (m.__reglages) { delete m.__reglages.conservation; delete m.__reglages.contactDpo; delete m.__reglages.adminMdp; delete m.__reglages.baseCle; }
+        var ex = await Stockage.client().from("reglages").select("valeur").eq("cle", "modeles");
+        var fusion = Object.assign({}, m, (ex.data && ex.data[0] && ex.data[0].valeur) || {});
+        var w = await Stockage.client().from("reglages").upsert({ cle: "modeles", valeur: fusion, maj_le: new Date().toISOString() });
+        if (w.error) throw new Error(w.error.message);
+        ecrire("Modèles, déclarations et réglages repris (ceux déjà définis en v2 sont conservés).", "ok");
+      } catch (e) { ecrire("Modèles : ÉCHEC — " + e.message, "ko"); bilan.erreurs++; }
+    }
+    $("import-etat").textContent = "Terminé : " + bilan.reprises + " reprise(s), " + bilan.deja + " déjà présente(s), " + bilan.erreurs + " erreur(s).";
+    $("importer").disabled = false;
+  });
+})();
+</script>
+</body>
+</html>

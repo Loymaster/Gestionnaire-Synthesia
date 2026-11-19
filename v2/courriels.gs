@@ -55,55 +55,57 @@ function configurer() {
 
 /* ---------- modèles ---------- */
 
+/* Textes par défaut : ceux de l'outil (page « Modèles de courriels »).
+   Un modèle personnalisé dans l'outil remplace celui-ci (lu dans la base à chaque envoi). */
 const MODELES = {
-  depot_confirmation: {
-    objet: 'Votre demande de vidéo a bien été reçue · {{ref}}',
-    corps: "Bonjour {{demandeur}},\n\nNous vous remercions pour votre demande de vidéo, déposée dans le cadre du projet de création de vidéos de l'académie de Reims. Elle a bien été enregistrée sous la référence {{ref}}.\n\nVotre projet « {{titre}} » va être étudié dans les meilleurs délais. Vous serez informé par courriel dès que la production sera lancée, puis dès que la vidéo sera prête à être visionnée.\n\nVous pouvez suivre l'avancement de votre demande et, le moment venu, valider la vidéo depuis ce lien personnel :\n{{lienSuivi}}\n\nNous vous invitons à conserver ce courriel : ce lien est votre unique accès au suivi de votre demande.\n\nEn vous remerciant de votre confiance,\n{{signature}}"
-  },
-  depot_admin: {
-    objet: 'Nouvelle demande de vidéo {{type}} · {{ref}}',
-    corps: "Bonjour,\n\nUne nouvelle demande vient d'être déposée.\n\nRéférence : {{ref}}\nType : {{type}}\nDemandeur : {{demandeur}} ({{email}})\nTitre : {{titre}}\nDurée souhaitée : {{duree}}\n\nLa demande est disponible dans l'espace administrateur.\n{{lienAdmin}}"
-  },
   attestation: {
-    objet: 'Attestation de validation · {{ref}}',
-    corps: "Bonjour {{demandeur}},\n\nNous accusons réception de votre validation pour la vidéo « {{titre}} » ({{refVersion}}).\n\nVotre accord a été enregistré et horodaté. Vous trouverez ci-joint l'attestation correspondante, au format PDF, reproduisant les déclarations que vous avez acceptées. Elle reste également consultable à l'adresse suivante :\n{{lienAttestation}}\n\nNous vous invitons à en conserver un exemplaire.\n\nSi le contenu de votre vidéo doit évoluer plus tard, vous pourrez demander une nouvelle version depuis ce lien :\n{{lienMiseAJour}}\nLa version validée aujourd'hui restera en ligne jusqu'à la validation de la nouvelle.\n\nNous vous remercions pour votre collaboration,\n{{signature}}"
-  },
-  validee_admin: {
-    objet: '{{refVersion}} · vidéo validée par {{demandeur}}',
-    corps: "Bonjour,\n\n{{demandeur}} vient de valider la vidéo « {{titre}} » ({{refVersion}}).\n\n{{lienAdmin}}"
+    objet: "Attestation de validation · {{ref}}",
+    corps: "Bonjour {{demandeur}},\n\nNous accusons réception de votre validation pour la vidéo « {{titre}} », produite avec l'outil Synthesia dans le cadre du projet de création de vidéos de l'académie de Reims.\n\nVotre accord a été enregistré et horodaté. Vous trouverez ci-joint l'attestation correspondante, au format PDF, reproduisant les déclarations que vous avez acceptées. Elle reste également consultable et imprimable à l'adresse suivante :\n{{lienAttestation}}\n\nNous vous invitons à en conserver un exemplaire. Ce document atteste que vous avez visionné la vidéo dans son intégralité et autorisé sa diffusion en l'état au sein du réseau des GRETA de l'académie de Reims.\n\nSi le contenu de votre vidéo doit évoluer plus tard, vous pourrez demander une nouvelle version depuis ce lien :\n{{lienMiseAJour}}\nLa version validée aujourd'hui restera en ligne jusqu'à la validation de la nouvelle.\n\nNous vous remercions pour votre collaboration,\n{{signature}}"
   },
   modif_confirmation: {
-    objet: 'Votre demande de modification a bien été reçue · {{ref}}',
-    corps: "Bonjour {{demandeur}},\n\nNous vous confirmons la réception de votre demande de modification concernant la vidéo « {{titre}} » ({{refVersion}}).\n\nVoici ce que vous nous avez transmis :\n{{commentaire}}\n{{compteurApresModif}}\nNous allons produire une nouvelle version en tenant compte de ces éléments, et vous serez informé par courriel dès qu'elle sera prête à valider. Vous pouvez suivre l'avancement à tout moment :\n{{lienSuivi}}\n\nNous vous remercions pour votre vigilance,\n{{signature}}"
+    objet: "Votre demande de modification a bien été reçue · {{ref}}",
+    corps: "Bonjour {{demandeur}},\n\nNous vous confirmons la réception de votre demande de modification concernant la vidéo « {{titre}} », produite avec l'outil Synthesia dans le cadre du projet de création de vidéos de l'académie de Reims.\n\nVoici ce que vous nous avez transmis :\n{{commentaire}}\n{{compteurModifs}}\nNous allons produire une nouvelle version en tenant compte de ces éléments, et vous serez informé par courriel dès qu'elle sera prête à valider. Vous pouvez suivre l'avancement à tout moment :\n{{lienSuivi}}\n\nNous vous remercions pour votre vigilance,\n{{signature}}"
   },
-  modif_admin: {
-    objet: 'Modification demandée sur la vidéo {{refVersion}}',
-    corps: "Bonjour,\n\n{{demandeur}} souhaite une modification de la vidéo « {{titre}} » ({{refVersion}}).\n{{compteurAdmin}}\nRemarques transmises :\n{{commentaire}}\n\n{{lienAdmin}}"
+  depot_admin: {
+    objet: "Nouvelle demande de vidéo Synthesia · {{ref}}",
+    corps: "Bonjour,\n\nUne nouvelle demande vient d'être déposée dans le cadre du projet de création de vidéos Synthesia de l'académie de Reims.\n\nDemandeur : {{demandeur}} ({{email}})\nTitre : {{titre}}\nPublic visé : {{public}}\nDurée souhaitée : {{duree}}\nUrgence : {{urgence}}\nStoryboard : {{plans}}\n\nLe ticket {{ref}} est disponible dans l'espace administrateur, avec le script et les visuels transmis.\n\nBonne journée."
   },
-  maj_confirmation: {
-    objet: 'Votre demande de mise à jour a bien été reçue · {{ref}}',
-    corps: "Bonjour {{demandeur}},\n\nNous vous confirmons la réception de votre demande de mise à jour de la vidéo « {{titre}} ». Une nouvelle version est ouverte : {{refVersion}}.\n\nVoici ce que vous nous avez transmis :\n{{commentaire}}\n\nLa version validée précédemment reste en ligne jusqu'à la validation de la nouvelle. Vous serez informé par courriel dès que celle-ci sera prête à valider. Suivi :\n{{lienSuivi}}\n\nNous vous remercions,\n{{signature}}"
-  },
-  maj_admin: {
-    objet: 'Mise à jour demandée · {{refVersion}}',
-    corps: "Bonjour,\n\n{{demandeur}} demande une nouvelle version de la vidéo « {{titre}} » : {{refVersion}}.\n{{compteurAdmin}}\nDescription de la mise à jour :\n{{commentaire}}\n\n{{lienAdmin}}"
+  depot_confirmation: {
+    objet: "Votre demande de vidéo Synthesia a bien été reçue · {{ref}}",
+    corps: "Bonjour {{demandeur}},\n\nNous vous remercions pour votre demande de vidéo, déposée dans le cadre du projet de création de vidéos Synthesia de l'académie de Reims. Elle a bien été enregistrée sous la référence {{ref}}.\n\nVotre projet « {{titre}} » va être étudié dans les meilleurs délais. Vous serez informé par courriel dès que la production sera lancée, puis dès que la vidéo sera prête à être visionnée.\n\nVous pouvez suivre l'avancement de votre demande et, le moment venu, valider la vidéo depuis ce lien personnel :\n{{lienSuivi}}\n\nNous vous invitons à conserver ce courriel : ce lien est votre unique accès au suivi de votre demande.\n\nEn vous remerciant de votre confiance,\n{{signature}}"
   },
   prise_en_charge: {
-    objet: 'Votre vidéo {{ref}} est en cours de réalisation',
-    corps: "Bonjour {{demandeur}},\n\nNous avons le plaisir de vous informer que votre demande « {{titre}} » ({{refVersion}}) est désormais prise en charge : la production de votre vidéo est lancée.\n\nNous reviendrons vers vous dès que la vidéo sera disponible, afin que vous puissiez la visionner et nous faire part de votre avis.\n\nVous pouvez suivre l'avancement à tout moment depuis votre lien personnel :\n{{lienSuivi}}\n\nRestant à votre disposition,\n{{signature}}"
+    objet: "Votre vidéo Synthesia {{ref}} est en cours de réalisation",
+    corps: "Bonjour {{demandeur}},\n\nNous avons le plaisir de vous informer que votre demande « {{titre}} » ({{ref}}) est désormais prise en charge : la production de votre vidéo Synthesia est lancée.\n\nNous reviendrons vers vous dès que la première version sera disponible, afin que vous puissiez la visionner et nous faire part de votre avis.\n\nVous pouvez suivre l'avancement à tout moment depuis votre lien personnel :\n{{lienSuivi}}\n\nRestant à votre disposition,\n{{signature}}"
   },
   pret_a_valider: {
-    objet: 'Votre vidéo {{ref}} est prête à être validée',
-    corps: "Bonjour {{demandeur}},\n\nNous avons le plaisir de vous annoncer que la vidéo « {{titre}} » ({{refVersion}}) est terminée et disponible à cette adresse :\n{{lienVideo}}\n\nNous vous invitons à la visionner puis, si elle vous convient, à la valider en signant le formulaire prévu à cet effet :\n{{lienValidation}}\n{{blocModification}}\nEn vous remerciant par avance pour votre retour,\n{{signature}}"
+    objet: "Votre vidéo Synthesia {{ref}} est prête à être validée",
+    corps: "Bonjour {{demandeur}},\n\nNous avons le plaisir de vous annoncer que la vidéo « {{titre}} », réalisée avec Synthesia dans le cadre du projet académique, est terminée et disponible à cette adresse :\n{{lienVideo}}\n\nNous vous invitons à la visionner puis, si elle vous convient, à la valider en signant le formulaire prévu à cet effet :\n{{lienValidation}}\n\nSi vous souhaitez au contraire y apporter des modifications, ce formulaire est prérempli avec la référence de votre vidéo :\n{{lienModification}}\n{{compteurModifs}}\nVos remarques sont précieuses : n'hésitez pas à être précis (minutage, formulation, visuels), afin que la version suivante réponde pleinement à vos attentes.\n\nEn vous remerciant par avance pour votre retour,\n{{signature}}"
   },
   relance: {
-    objet: 'Rappel · votre vidéo {{ref}} attend votre validation',
-    corps: "Bonjour {{demandeur}},\n\nNous nous permettons de revenir vers vous au sujet de la vidéo « {{titre}} » ({{refVersion}}), actuellement en attente de votre validation.\n\nDès réception de votre retour, nous pourrons finaliser votre projet.\n\nValider la vidéo :\n{{lienValidation}}\n{{blocModification}}\nSi vous avez besoin d'un délai supplémentaire ou d'un échange préalable, n'hésitez pas à nous le faire savoir.\n\nAvec nos remerciements,\n{{signature}}"
+    objet: "Rappel · votre vidéo Synthesia {{ref}} attend votre validation",
+    corps: "Bonjour {{demandeur}},\n\nNous nous permettons de revenir vers vous au sujet de la vidéo « {{titre}} » ({{ref}}), réalisée avec Synthesia et actuellement en attente de votre validation.\n\nDès réception de votre retour, nous pourrons finaliser votre projet.\n\nValider la vidéo :\n{{lienValidation}}\n\nDemander une modification :\n{{lienModification}}\n{{compteurModifs}}\nSi vous avez besoin d'un délai supplémentaire ou d'un échange préalable, n'hésitez pas à nous le faire savoir.\n\nAvec nos remerciements,\n{{signature}}"
+  },
+  validee: {
+    objet: "{{ref}} · vidéo validée par {{demandeur}}",
+    corps: "Bonjour,\n\n{{demandeur}} vient de valider la vidéo « {{titre}} » ({{ref}}), réalisée avec Synthesia.\n\nLe projet est terminé : la vidéo peut être diffusée auprès du public visé ({{public}}).\n\nBonne journée."
+  },
+  maj_confirmation: {
+    objet: "Votre demande de mise à jour a bien été reçue · {{ref}}",
+    corps: "Bonjour {{demandeur}},\n\nNous vous confirmons la réception de votre demande de mise à jour de la vidéo « {{titre}} ». Une nouvelle version est ouverte : {{ref}}.\n\nVoici ce que vous nous avez transmis :\n{{commentaire}}\n\nLa version validée précédemment reste en ligne jusqu'à la validation de la nouvelle. Vous serez informé par courriel dès que celle-ci sera prête à valider. Vous pouvez suivre l'avancement à tout moment :\n{{lienSuivi}}\n\nNous vous remercions,\n{{signature}}"
+  },
+  maj_admin: {
+    objet: "Mise à jour demandée · {{ref}}",
+    corps: "Bonjour,\n\n{{demandeur}} demande une nouvelle version de la vidéo « {{titre}} » ({{ref}}).\n{{compteurModifs}}\nDescription de la mise à jour :\n{{commentaire}}\n\nLa demande est au statut « Mise à jour demandée » dans l'espace administrateur."
+  },
+  modif_demandee: {
+    objet: "Modification demandée sur la vidéo {{ref}}",
+    corps: "Bonjour,\n\n{{demandeur}} a visionné la vidéo « {{titre}} » ({{ref}}) et souhaite une modification avant validation.\n\nRemarques transmises :\n{{commentaire}}\n\nLa demande est repassée au statut « Modification demandée » dans l'espace administrateur, où figure l'historique complet.\n\nBonne journée."
   }
 };
 
 const MODELES_ADMIN = ['prise_en_charge', 'pret_a_valider', 'relance', 'libre'];
-const MODELES_FORMATEUR = { attestation: 'validee_admin', modif_confirmation: 'modif_admin', maj_confirmation: 'maj_admin' };
+const MODELES_FORMATEUR = { attestation: 'validee', modif_confirmation: 'modif_demandee', maj_confirmation: 'maj_admin' };
 
 /* ---------- point d'entrée ---------- */
 
@@ -135,8 +137,8 @@ function depot_(c) {
   if (rpc_('marquer_accuse', { p_token: c.token }) !== true) return { ok: false, erreur: 'accusé déjà envoyé ou délai dépassé' };
 
   const v = variables_(suivi, c.token, { demandeur: nom, email: email });
-  envoyer_(email, MODELES.depot_confirmation, v);
-  if (reglage_('ADRESSE_ADMIN')) envoyer_(reglage_('ADRESSE_ADMIN'), MODELES.depot_admin, v);
+  envoyer_(email, modele_('depot_confirmation'), v);
+  if (reglage_('ADRESSE_ADMIN')) envoyer_(reglage_('ADRESSE_ADMIN'), modele_('depot_admin'), v);
   return { ok: true };
 }
 
@@ -152,10 +154,12 @@ function formateur_(c) {
   const ev = { attestation: 'validation', modif_confirmation: 'modification', maj_confirmation: 'mise_a_jour' }[c.modele];
   const derniere = (suivi.historique || []).filter(function (h) { return h.acteur === 'formateur' && h.evenement === ev; }).pop();
   const v = variables_(suivi, c.token, { demandeur: nom, email: email, commentaire: derniere && derniere.texte || '' });
+  if (c.modele === 'modif_confirmation' && suivi.type === 'syren' && suivi.modifs_restantes === 0)
+    v.compteurModifs = "C'était votre dernière demande de modification pour cette vidéo.\n";
 
   const pj = c.modele === 'attestation' ? [attestationPdf_(suivi, v)] : [];
-  envoyer_(email, MODELES[c.modele], v, pj);
-  if (reglage_('ADRESSE_ADMIN')) envoyer_(reglage_('ADRESSE_ADMIN'), MODELES[MODELES_FORMATEUR[c.modele]], v);
+  envoyer_(email, modele_(c.modele), v, pj);
+  if (reglage_('ADRESSE_ADMIN')) envoyer_(reglage_('ADRESSE_ADMIN'), modele_(MODELES_FORMATEUR[c.modele]), v);
   return { ok: true };
 }
 
@@ -174,7 +178,7 @@ function admin_(c) {
   const v = variables_(suivi, d.token, { demandeur: nom, email: email });
 
   // Texte personnalisé possible pour l'administrateur (session vérifiée) ; sinon modèle par défaut
-  const modele = (c.objet && c.corps) ? { objet: texte_(c.objet, 300), corps: texte_(c.corps, 20000) } : MODELES[c.modele];
+  const modele = (c.objet && c.corps) ? { objet: texte_(c.objet, 300), corps: texte_(c.corps, 20000) } : modele_(c.modele);
   if (!modele) return { ok: false, erreur: 'modèle libre sans texte' };
   let resultat = 'envoyé';
   try { envoyer_(email, modele, v); } catch (err) { resultat = 'échec : ' + err.message; }
@@ -184,43 +188,50 @@ function admin_(c) {
 
 /* ---------- contenu des courriels ---------- */
 
+let personnalises_ = null;
+function modele_(id) {
+  if (personnalises_ === null) {
+    try { personnalises_ = rpc_('modeles_courriels', {}) || {}; } catch (e) { personnalises_ = {}; console.warn('modèles personnalisés indisponibles', e); }
+  }
+  const p = personnalises_[id] || {};
+  const d = MODELES[id] || {};
+  return { objet: p.objet || d.objet, corps: p.corps || d.corps };
+}
+
 function variables_(s, token, extra) {
   const site = String(reglage_('SITE_V2')).replace(/\/+$/, '');
   const suivi = site + '/suivi.html?';
   const c = s.contenu || {};
   const syren = s.type === 'syren';
   const reste = s.modifs_restantes;
-  const lienModif = suivi + 'modifier=' + token;
-  const pluriel = function (n) { return n + ' demande' + (n > 1 ? 's' : '') + ' de modification'; };
-
-  let blocModification = "\nSi vous souhaitez au contraire y apporter des modifications, ce formulaire est à votre disposition :\n" + lienModif +
-    "\n\nVos remarques sont précieuses : n'hésitez pas à être précis (minutage, formulation, visuels).\n";
-  if (syren && reste > 0) blocModification += 'Il vous reste ' + pluriel(reste) + ' pour cette vidéo.\n';
-  if (syren && reste === 0) blocModification = "\nVous avez utilisé les 2 demandes de modification prévues pour cette vidéo : elle peut être validée telle quelle. Pour toute situation particulière, répondez directement à ce courriel.\n";
-
+  const nbPlans = (c.storyboard || []).length;
+  let compteur = '';
+  if (syren && reste > 0) compteur = 'Il vous reste ' + reste + ' demande' + (reste > 1 ? 's' : '') + ' de modification pour cette vidéo.\n';
+  if (syren && reste === 0) compteur = 'Les 2 demandes de modification prévues pour cette vidéo ont été utilisées : elle peut être validée telle quelle. Pour toute situation particulière, répondez à ce courriel.\n';
   return Object.assign({
-    ref: s.ref,
+    ref: s.ref + (s.version > 1 ? ' v' + s.version : ''),
     refVersion: s.ref + (s.version > 1 ? ' v' + s.version : ''),
     type: syren ? 'Syren' : 'Classique',
     titre: texte_(c.titre || c.sujet || '(sans titre)', 300),
-    duree: texte_(c.duree || '—', 60),
+    duree: texte_(c.duree, 60), urgence: texte_(c.urgence, 40), public: texte_(c.publicVise, 300),
+    plans: nbPlans ? (nbPlans === 1 ? '1 plan' : nbPlans + ' plans') : 'aucun plan',
     lienVideo: s.lien || '',
     lienSuivi: suivi + 'suivi=' + token,
     lienValidation: suivi + 'valider=' + token,
-    lienModification: lienModif,
+    lienModification: suivi + 'modifier=' + token,
     lienMiseAJour: suivi + 'mise-a-jour=' + token,
     lienAttestation: suivi + 'attestation=' + token,
-    lienAdmin: site + '/admin.html',
-    blocModification: blocModification,
-    compteurApresModif: syren ? '\n' + (reste > 0 ? 'Il vous reste ' + pluriel(reste) + ' pour cette vidéo.' : "C'était votre dernière demande de modification pour cette vidéo.") + '\n' : '',
-    compteurAdmin: syren ? 'Demandes de modification restantes : ' + reste + ' sur 2.\n' : '',
+    lienAdmin: site + '/index.html?admin',
+    compteurModifs: compteur,
     commentaire: '',
     signature: reglage_('SIGNATURE')
   }, extra || {});
 }
 
 function remplir_(texte, v) {
-  return String(texte).replace(/\{\{(\w+)\}\}/g, function (m, k) { return v[k] === undefined || v[k] === null ? '' : String(v[k]); });
+  return String(texte).replace(/\{\{\s*(\w+)\s*\}\}/g, function (m, k) {
+    return v[k] === undefined || v[k] === null || v[k] === '' ? (k === 'compteurModifs' ? '' : '—') : String(v[k]);
+  });
 }
 
 function envoyer_(dest, modele, v, pieces) {

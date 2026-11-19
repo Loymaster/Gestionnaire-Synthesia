@@ -1,0 +1,19 @@
+# Garde le projet Supabase (offre gratuite) actif : il est mis en pause après 7 jours sans activité.
+# Un appel quotidien à une fonction publique suffit. La clé utilisée est la clé publique du site (aucun secret).
+name: Maintien Supabase
+on:
+  schedule:
+    - cron: "37 5 * * *"
+  workflow_dispatch:
+jobs:
+  appel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Appel du tableau public
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            "https://ybrivfxiepaabpjdnido.supabase.co/rest/v1/rpc/tableau_public" \
+            -H "apikey: sb_publishable_UIQicfFS1ZEczJy2K4rm5A_AuYoN-sP" \
+            -H "Content-Type: application/json" -d '{}')
+          echo "Réponse : $code"
+          test "$code" = "200"
