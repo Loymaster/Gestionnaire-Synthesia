@@ -31,7 +31,14 @@
   .sb input, .sb select { width: 100%; }
   .versions { display: flex; flex-direction: column; gap: 8px; }
   .versions .v { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 14.5px; }
+  .feuille { border: 1px solid var(--trait); border-radius: 4px; overflow: hidden; max-width: 100%; overflow-x: auto; }
   @media print {
+    .feuille { border: 0; }
+    .feuille, .feuille * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .feuille > div { padding: 0 !important; }
+    main { gap: 0 !important; }
+    .page { padding: 0 !important; }
+    @page { margin: 12mm; }
     .bandeau, .actions, .ne-pas-imprimer { display: none !important; }
     body { background: #fff; }
     .bloc { border: 0; padding: 0; }
@@ -53,6 +60,7 @@
 <script src="chiffrement.js"></script>
 <script src="api.js"></script>
 <script src="rgpd.js"></script>
+<script src="attestation.js"></script>
 <script>
 (function () {
   'use strict';
@@ -180,8 +188,9 @@
       '</div></div>' +
       '<div class="bloc"><div class="bloc-titre"><span class="num">3</span><h2>Signature</h2></div><div class="rangee">' +
       '<label class="champ"><span class="libelle">Prénom et nom</span><input type="text" id="nom" autocomplete="name"></label>' +
-      '<label class="champ"><span class="libelle">Adresse mail <span class="aide">pour recevoir l\'attestation</span></span><input type="email" id="email" autocomplete="email"></label>' +
-      '</div><p class="aide-bloc" style="font-size: 13.5px;">Votre nom est conservé chiffré avec l\'attestation. L\'adresse sert uniquement à vous envoyer l\'attestation : elle n\'est pas enregistrée.</p></div>' +
+      '<label class="champ"><span class="libelle">Fonction <span class="aide">facultatif</span></span><input type="text" id="fonction" placeholder="Ex. : formatrice, GRETA Marne"></label>' +
+      '</div><label class="champ"><span class="libelle">Adresse mail <span class="aide">pour recevoir l\'attestation</span></span><input type="email" id="email" autocomplete="email"></label>' +
+      '<p class="aide-bloc" style="font-size: 13.5px;">Votre nom et votre fonction figurent sur l\'attestation. L\'adresse sert uniquement à vous l\'envoyer : elle n\'est pas enregistrée.</p></div>' +
       '<div id="alerte" class="alerte" hidden></div>' +
       '<div class="envoi"><button class="bouton" id="signer">Signer et valider la vidéo</button><button class="bouton second" data-aller="suivi">Retour au suivi</button><span class="etat" id="etat"></span></div>';
     $("signer").addEventListener("click", signer);
@@ -198,8 +207,9 @@
     $("signer").disabled = true; $("alerte").hidden = true; $("etat").textContent = "Enregistrement de la validation…";
     try {
       var signeLe = new Date().toISOString();
-      var signature = await ApiV2.chiffrer({ nom: nom, signe_le: signeLe });
-      var r = await ApiV2.retour(token, "validation", { signature_chiffree: signature, declarations: declarations });
+      var fonction = $("fonction").value.trim();
+      var signature = await ApiV2.chiffrer({ nom: nom, fonction: fonction, signe_le: signeLe });
+      var r = await ApiV2.retour(token, "validation", { signature_chiffree: signature, declarations: declarations, nom: nom, fonction: fonction });
       if (!r || !r.ok) throw new Error((r && r.erreur) || "réponse inattendue");
       $("etat").textContent = "Envoi de l'attestation…";
       var c = await ApiV2.courriel({ action: "formateur", modele: "attestation", token: token, email: email, nom: nom });
@@ -346,23 +356,14 @@
 
   /* ---------- attestation ---------- */
   function vueAttestation() {
-    var num = parseInt(q.get("v") || new URLSearchParams(location.search).get("v"), 10);
+    var num = parseInt(new URLSearchParams(location.search).get("v"), 10);
     var validees = (s.versions || []).filter(function (v) { return v.valide_le; });
     var v = validees.filter(function (x) { return x.numero === num; })[0] || validees[validees.length - 1];
     if (!v) return message("Attestation indisponible", "Cette vidéo n'a pas encore été validée : aucune attestation ne peut être établie.");
-    var decl = (v.declarations && v.declarations.length ? v.declarations : declarations);
+    var a = attestationDonnees(s, v, Object.assign({ contactRgpd: window.CONFIG_V2.contactRgpd }, reglages), "logo-attestation.jpg");
     zone.innerHTML =
-      '<div class="bloc"><div class="surtitre">' + h(reglages.entite || "GIP FCIP de l'académie de Reims") + '</div>' +
-      '<h1 style="margin: 4px 0 0;">Attestation de validation</h1>' +
-      '<table class="sb" style="margin-top: 8px;">' +
-      '<tr><th style="width: 170px;">Référence</th><td>' + h(s.ref + (v.numero > 1 ? " v" + v.numero : "")) + '</td></tr>' +
-      '<tr><th>Vidéo</th><td>' + h(titre()) + '</td></tr>' +
-      '<tr><th>Lien</th><td>' + h(v.lien || s.lien || "") + '</td></tr>' +
-      '<tr><th>Validée le</th><td>' + date(v.valide_le, true) + '</td></tr>' +
-      '<tr><th>Validée par</th><td>Le demandeur de la vidéo. Son identité et sa signature sont conservées de façon chiffrée par le service.</td></tr></table>' +
-      '<div><strong>Le demandeur a déclaré :</strong><ul>' + decl.map(function (d) { return '<li style="margin-bottom: 6px;">' + h(d) + '</li>'; }).join("") + '</ul></div>' +
-      '<p class="aide-bloc" style="font-size: 13px;">' + h(reglages.mentionLegale || "Attestation établie par voie électronique. La signature du demandeur vaut acceptation des déclarations reproduites ci-dessus et engage sa responsabilité au titre du contenu de la vidéo.") + '</p>' +
-      '<div class="actions"><button class="bouton" id="imprimer">Imprimer ou enregistrer en PDF</button><button class="bouton second" data-aller="suivi">Suivi de la demande</button></div></div>';
+      '<div class="actions ne-pas-imprimer"><button class="bouton" id="imprimer">Imprimer ou enregistrer en PDF</button><button class="bouton second" data-aller="suivi">Suivi de la demande</button></div>' +
+      '<div class="feuille">' + attestationHtml(a) + '</div>';
     $("imprimer").addEventListener("click", function () { window.print(); });
   }
 
