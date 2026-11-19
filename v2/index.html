@@ -387,7 +387,7 @@
 
         <sc-if value="{{ loginEtapeEnrolement }}" hint-placeholder-val="{{ false }}">
           <p style="margin: 0 0 14px; font-size: 14px; line-height: 1.6; color: oklch(0.4 0 0);">Première connexion : activez la double authentification. Scannez ce code avec une application d'authentification (Google Authenticator, Microsoft Authenticator…), puis saisissez le code à 6 chiffres qu'elle affiche.</p>
-          <div style="width: 200px; height: 200px; margin: 0 auto 12px; background-image: {{ loginQrFond }}; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+          <div style="width: 200px; height: 200px; margin: 0 auto 12px; background: white;">{{ loginQrImage }}</div>
           <div style="font-size: 12px; color: oklch(0.5 0 0); text-align: center; margin-bottom: 16px; overflow-wrap: anywhere;">Saisie manuelle : <span style="font-family: 'JetBrains Mono', monospace;">{{ loginSecret }}</span></div>
         </sc-if>
 
@@ -2206,6 +2206,15 @@ function remarquesSyren(t) {
   return (e.evenement === "mise_a_jour" ? "Mise à jour demandée (version " + t.version + ") :\n" : "Modification demandée :\n") + e.texte + "\n\n" + MENTION_IA;
 }
 
+/* Code QR de double authentification : Supabase le fournit en SVG brut (« data:image/svg+xml;utf-8,<svg…> »),
+ * que le navigateur refuse tel quel dans une image de fond. Le SVG est réencodé. */
+function qrEncode(qr) {
+  const s = String(qr || "");
+  const i = s.indexOf("<svg");
+  if (i < 0) return s.replace(/"/g, "%22");
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(s.slice(i));
+}
+
 /* Compteur Syren : 2 demandes de modification pour toute la vie de la vidéo */
 function compteurModifs(t) {
   if (!t || t.type !== "syren" || t.modifsRestantes === null || t.modifsRestantes === undefined) return "";
@@ -3765,7 +3774,9 @@ class Component extends DCLogic {
 
       loginId: st.loginId, loginMdp: st.loginMdp, loginErreur: st.loginErreur,
       loginCode: st.loginCode, loginPhrase: st.loginPhrase, loginSecret: st.loginSecret,
-      loginQrFond: st.loginQr ? 'url("' + st.loginQr.replace(/"/g, '%22') + '")' : "none",
+      /* Image construite à valeur résolue (comme le lecteur vidéo) : le gabarit n'applique pas une image de fond calculée */
+      loginQrImage: st.loginQr ? React.createElement("img", { src: qrEncode(st.loginQr), alt: "Code QR de double authentification",
+        style: { display: "block", width: "200px", height: "200px", imageRendering: "pixelated" } }) : null,
       loginEtapeId: st.loginEtape === "identifiants", loginEtapeEnrolement: st.loginEtape === "enrolement",
       loginEtapeCode: st.loginEtape === "code" || st.loginEtape === "enrolement", loginEtapeCle: st.loginEtape === "cle",
       loginNumero: { identifiants: 1, enrolement: 2, code: 2, cle: 3 }[st.loginEtape] || 1,
