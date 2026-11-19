@@ -405,6 +405,19 @@
     $(id).addEventListener(id === "ton" || id === "langue" || id === "attestation" ? "change" : "input", rendre);
   });
   $("envoyer").addEventListener("click", envoyer);
+
+  /* Intégration dans Moodle (iframe) : la page transmet sa hauteur réelle à la page hôte, qui peut ajuster le cadre
+     (même message que le formulaire classique : { type: "synthesia-hauteur", hauteur }). */
+  if (window.parent !== window) {
+    var derniere = 0;
+    var signaler = function () {
+      /* Hauteur du contenu, et non de la fenêtre : sinon le cadre ne pourrait que grandir */
+      var hauteur = Math.ceil(document.querySelector('.page').getBoundingClientRect().height) + 48;
+      if (Math.abs(hauteur - derniere) > 4) { derniere = hauteur; try { parent.postMessage({ type: "synthesia-hauteur", hauteur: hauteur }, "*"); } catch (e) {} }
+    };
+    try { new ResizeObserver(signaler).observe(document.querySelector('.page')); } catch (e) { setInterval(signaler, 500); }
+    signaler();
+  }
   $("nouvelle").addEventListener("click", reinitialiser);
   rendre();
 })();
