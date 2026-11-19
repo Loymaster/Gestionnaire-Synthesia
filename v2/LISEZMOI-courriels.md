@@ -35,7 +35,8 @@ L'ancien script continue de fonctionner tant que la bascule n'est pas faite. Le 
 | `ADRESSE_ADMIN` | Destinataire des alertes (obligatoire) |
 | `EXPEDITEUR` | Nom affiché de l'expéditeur |
 | `SIGNATURE` | Signature des courriels |
-| `SITE_V2` | Adresse du site v2, pour les liens |
+| `SITE_V2` | Adresse du site v2, pour les liens et le logo de l'attestation |
+| `CONTACT_RGPD` | Contact pour l'exercice des droits, affiché sur l'attestation |
 | `LIMITE_HORAIRE` | Plafond d'envois publics par heure |
 | `EXIGER_DOUBLE_AUTH` | `oui` par défaut |
 | `SUPABASE_URL`, `SUPABASE_CLE` | Connexion à Supabase (clé publique) |
