@@ -101,4 +101,4 @@ textarea { resize: vertical; line-height: 1.5; }
 .rgpd strong { color: var(--encre); font-weight: 500; }
 .lien-suivi { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; width: 100%; }
 .lien-suivi input { flex: 1 1 260px; font-size: 13px; }
-.compteur { display: inline-block; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--attente-fond); color: var(--attente); }
+.compteur { display: inline-block; align-self: flex-start; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--attente-fond); color: var(--attente); }

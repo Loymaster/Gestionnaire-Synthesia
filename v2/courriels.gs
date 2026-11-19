@@ -27,7 +27,7 @@
 const REGLAGES_DEFAUT = {
   SUPABASE_URL: 'https://ybrivfxiepaabpjdnido.supabase.co',
   SUPABASE_CLE: 'sb_publishable_UIQicfFS1ZEczJy2K4rm5A_AuYoN-sP', // clé publique, sans valeur secrète
-  SITE: 'https://loymaster.github.io/Gestionnaire-Synthesia',
+  SITE_V2: 'https://loymaster.github.io/Gestionnaire-Synthesia/v2',
   ADRESSE_ADMIN: '',                                   // à renseigner : adresse qui reçoit les alertes
   EXPEDITEUR: 'CAFOC · GIP FCIP de Reims',
   SIGNATURE: "Le CAFOC\nGIP FCIP de l'académie de Reims",
@@ -162,7 +162,8 @@ function formateur_(c) {
 function admin_(c) {
   const utilisateur = verifierAdmin_(c.jwt);
   const email = adresse_(c.destinataire), nom = texte_(c.nom, 120);
-  if (!email || !c.id || MODELES_ADMIN.indexOf(c.modele) < 0) return { ok: false, erreur: 'paramètres manquants' };
+  const libre = !!(c.objet && c.corps);
+  if (!email || !c.id || (!libre && MODELES_ADMIN.indexOf(c.modele) < 0)) return { ok: false, erreur: 'paramètres manquants' };
 
   const lignes = rest_('GET', 'demandes?select=id,ref,type,statut,version,lien,contenu,token,modifs_utilisees&id=eq.' + encodeURIComponent(c.id), null, c.jwt);
   if (!lignes || !lignes.length) return { ok: false, erreur: 'demande introuvable' };
@@ -176,18 +177,19 @@ function admin_(c) {
   if (!modele) return { ok: false, erreur: 'modèle libre sans texte' };
   let resultat = 'envoyé';
   try { envoyer_(email, modele, v); } catch (err) { resultat = 'échec : ' + err.message; }
-  rest_('POST', 'courriels', { demande_id: d.id, modele: c.modele, resultat: resultat }, c.jwt);
+  rest_('POST', 'courriels', { demande_id: d.id, modele: texte_(c.modele || 'libre', 40), resultat: resultat }, c.jwt);
   return resultat === 'envoyé' ? { ok: true } : { ok: false, erreur: resultat };
 }
 
 /* ---------- contenu des courriels ---------- */
 
 function variables_(s, token, extra) {
-  const site = String(reglage_('SITE')).replace(/\/+$/, '');
+  const site = String(reglage_('SITE_V2')).replace(/\/+$/, '');
+  const suivi = site + '/suivi.html?';
   const c = s.contenu || {};
   const syren = s.type === 'syren';
   const reste = s.modifs_restantes;
-  const lienModif = site + '/?modifier=' + token;
+  const lienModif = suivi + 'modifier=' + token;
   const pluriel = function (n) { return n + ' demande' + (n > 1 ? 's' : '') + ' de modification'; };
 
   let blocModification = "\nSi vous souhaitez au contraire y apporter des modifications, ce formulaire est à votre disposition :\n" + lienModif +
@@ -202,12 +204,12 @@ function variables_(s, token, extra) {
     titre: texte_(c.titre || c.sujet || '(sans titre)', 300),
     duree: texte_(c.duree || '—', 60),
     lienVideo: s.lien || '',
-    lienSuivi: site + '/?suivi=' + token,
-    lienValidation: site + '/?valider=' + token,
+    lienSuivi: suivi + 'suivi=' + token,
+    lienValidation: suivi + 'valider=' + token,
     lienModification: lienModif,
-    lienMiseAJour: site + '/?mise-a-jour=' + token,
-    lienAttestation: site + '/?attestation=' + token,
-    lienAdmin: site + '/?admin',
+    lienMiseAJour: suivi + 'mise-a-jour=' + token,
+    lienAttestation: suivi + 'attestation=' + token,
+    lienAdmin: site + '/admin.html',
     blocModification: blocModification,
     compteurApresModif: syren ? '\n' + (reste > 0 ? 'Il vous reste ' + pluriel(reste) + ' pour cette vidéo.' : "C'était votre dernière demande de modification pour cette vidéo.") + '\n' : '',
     compteurAdmin: syren ? 'Demandes de modification restantes : ' + reste + ' sur 2.\n' : '',
