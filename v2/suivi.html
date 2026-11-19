@@ -23,6 +23,8 @@
   a.bouton { display: inline-flex; align-items: center; text-decoration: none; }
   .declarations { display: flex; flex-direction: column; gap: 10px; }
   .video { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 14px 16px; border-radius: 8px; background: var(--zone); border: 1px solid var(--trait); }
+  .lecteur { position: relative; width: 100%; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 8px; overflow: hidden; background: #0b1a33; }
+  .lecteur iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   .video a { color: var(--bleu); font-weight: 500; overflow-wrap: anywhere; }
   .sb { width: 100%; border-collapse: collapse; font-size: 14px; }
   .sb td, .sb th { padding: 6px; border-bottom: 1px solid var(--trait); text-align: left; vertical-align: top; }
@@ -116,7 +118,15 @@
   function blocVideo() {
     if (!s.lien) return "";
     var libelle = s.statut === "maj" || s.statut === "production" && s.version > 1 ? "Version actuellement en ligne :" : "Vidéo :";
-    return '<div class="video"><span>' + libelle + '</span><a href="' + h(s.lien) + '" target="_blank" rel="noopener">' + h(s.lien) + '</a></div>';
+    var src = integration(s.lien);
+    return (src ? '<div class="lecteur"><iframe src="' + h(src) + '" title="' + h(titre()) + '" loading="lazy" allowfullscreen allow="encrypted-media; fullscreen"></iframe></div>' : "") +
+      '<div class="video"><span>' + libelle + '</span><a href="' + h(s.lien) + '" target="_blank" rel="noopener">' + h(s.lien) + '</a></div>';
+  }
+
+  /* Lien de partage Synthesia → adresse du lecteur intégrable (même règle que l'outil actuel) */
+  function integration(lien) {
+    var m = String(lien || "").match(/share\.synthesia\.io\/(?:embeds\/videos\/)?([0-9a-f-]{20,})/i);
+    return m ? "https://share.synthesia.io/embeds/videos/" + m[1] : "";
   }
 
   /* ---------- vue suivi ---------- */
