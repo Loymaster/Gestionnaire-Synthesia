@@ -501,7 +501,7 @@ function installerEnvoisQuotidiens() {
 /** Vérifie la clé du script sans rien envoyer : cohérence de la clé, jeton, et liste de ce qui partirait aujourd'hui. */
 function testerEnvoisAutomatiques() {
   const cle = cleRobot_();
-  const m = 123456789n, e = 65537n;
+  const m = BigInt(123456789), e = BigInt(65537);
   const ok = modPow_(modPow_(m, e, cle.n), cle.d, cle.n) === m;
   Logger.log('Clé du script : ' + (ok ? 'valide' : 'INVALIDE') + ' (' + cle.k * 8 + ' bits).');
   const r = rpc_('robot_jalons', { p_jeton: reglage_('JETON_SCRIPT') });
@@ -532,8 +532,9 @@ function dechiffrerContact_(texte) {
 }
 
 function modPow_(b, e, m) {
-  let r = 1n; b = b % m;
-  while (e > 0n) { if (e & 1n) r = (r * b) % m; e >>= 1n; b = (b * b) % m; }
+  const UN = BigInt(1), ZERO = BigInt(0);
+  let r = UN; b = b % m;
+  while (e > ZERO) { if ((e & UN) !== ZERO) r = (r * b) % m; e >>= UN; b = (b * b) % m; }
   return r;
 }
 function octetsVersBig_(o) {
