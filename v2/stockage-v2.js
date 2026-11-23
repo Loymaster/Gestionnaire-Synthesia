@@ -207,7 +207,7 @@
       var courriels = crs.map(function (c) {
         var t = tickets[c.demande_id] || {};
         return { id: 'c' + c.id, canal: 'E-mail envoyé', dest: c.modele === 'depot_admin' ? 'Administrateur' : (t.email || ''), objet: libelleModele(c.modele) + (t.ref ? ' · ' + t.ref : ''),
-                 corps: c.resultat && c.resultat !== 'envoyé' ? 'Résultat : ' + c.resultat : '', ref: t.ref || '', envoye: c.envoye_le, expediteur: 'Script d\'envoi (compte GIP)' };
+                 corps: c.resultat && c.resultat !== 'envoyé' ? 'Résultat : ' + c.resultat : '', ref: t.ref || '', envoye: c.envoye_le, expediteur: 'Script d\'envoi (compte GIP)', modele: c.modele, resultat: c.resultat || '' };
       });
       synchroniserContacts(lignes, idents);
       return { demandes: liste, courriels: courriels, modeles: reglage('modeles') || {}, source: 'api', automatisation: etatAuto };
@@ -219,7 +219,9 @@
 
   function libelleModele(m) {
     return ({ depot_confirmation: 'Accusé de réception', attestation: 'Attestation de validation', modif_confirmation: 'Confirmation de modification',
-      maj_confirmation: 'Confirmation de mise à jour', prise_en_charge: 'Prise en charge', pret_a_valider: 'Vidéo prête à valider', relance: 'Relance', libre: 'Message' })[m] || m;
+      maj_confirmation: 'Confirmation de mise à jour', prise_en_charge: 'Prise en charge', pret_a_valider: 'Vidéo prête à valider', relance: 'Relance', libre: 'Message', avert_suppression: 'Avertissement avant suppression', video_supprimee: 'Vidéo supprimée',
+      suppression_concepteur: 'Vidéo à supprimer (concepteur)', lien_remplace: 'Nouvelle version', jalon_relance: 'Relance (jalon)', jalon_avert_mois: 'Avertissement à un mois (jalon)',
+      jalon_avert_semaine: 'Avertissement à une semaine (jalon)', jalon_suppression: 'Suppression (jalon)' })[m] || m;
   }
 
   /* ------------------------------------------------------------------ écriture (administrateur) */
