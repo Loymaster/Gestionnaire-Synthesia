@@ -325,6 +325,7 @@
 
       $("etat").textContent = "Envoi de l'accusé de réception…";
       var c = etat.depot.deja ? { ok: true } : await ApiV2.courriel({ action: "depot", token: etat.depot.token, email: email, nom: nom });
+      if (!etat.depot.deja) await ApiV2.contactRobot(etat.depot.token, email, nom);
       confirmer(c, email);
     } catch (e) {
       $("alerte").textContent = "L'envoi a échoué (" + e.message + "). Vos réponses sont conservées : réessayez dans un instant. Aucun doublon ne sera créé.";

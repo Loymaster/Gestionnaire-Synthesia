@@ -34,6 +34,9 @@ const REGLAGES_DEFAUT = {
   ENTITE: "GIP FCIP de l'académie de Reims",
   ORGANISME: "Réseau des GRETA de l'académie de Reims",
   CONTACT_RGPD: 'lois.kerrouche@gipfcip-reims.fr',       // contact affiché sur l'attestation
+  CLE_ROBOT: '',                                       // envois automatiques : clé du script (créée dans l'outil, Configuration)
+  JETON_SCRIPT: '',                                    // envois automatiques : jeton du script (créé avec la clé)
+  HEURE_ENVOIS: '8',                                   // heure des envois automatiques quotidiens
   LIMITE_HORAIRE: '40',                                // courriels publics (1 et 2) par heure, au total
   EXIGER_DOUBLE_AUTH: 'oui'                            // la session administrateur doit être en double authentification
 };
@@ -89,6 +92,18 @@ const MODELES = {
   validee: {
     objet: "{{ref}} · vidéo validée par {{demandeur}}",
     corps: "Bonjour,\n\n{{demandeur}} vient de valider la vidéo « {{titre}} » ({{ref}}), réalisée avec Synthesia.\n\nLe projet est terminé : la vidéo peut être diffusée auprès du public visé ({{public}}).\n\nBonne journée."
+  },
+  avert_suppression: {
+    objet: "Votre vidéo {{ref}} sera supprimée le {{dateSuppression}} sans nouvelle de votre part",
+    corps: "Bonjour {{demandeur}},\n\nLa vidéo « {{titre}} » ({{ref}}) vous a été envoyée pour validation, et nous n'avons pas encore reçu votre réponse.\n\nSans nouvelle de votre part, votre vidéo sera supprimée {{delaiSuppression}}, le {{dateSuppression}}.\n\nPour la conserver, il vous suffit de la valider ou de demander une modification :\nValider la vidéo : {{lienValidation}}\nDemander une modification : {{lienModification}}\n{{compteurModifs}}\nSi vous avez besoin d'un délai supplémentaire, répondez simplement à ce courriel.\n\nAvec nos remerciements,\n{{signature}}"
+  },
+  video_supprimee: {
+    objet: "Votre vidéo {{ref}} a été supprimée",
+    corps: "Bonjour {{demandeur}},\n\nSans réponse de votre part 3 mois après son envoi, la vidéo « {{titre}} » ({{ref}}) a été supprimée, ainsi que votre demande et les documents transmis.\n\nSi vous avez toujours besoin de cette vidéo, vous pouvez déposer une nouvelle demande.\n\nNous vous remercions de votre compréhension,\n{{signature}}"
+  },
+  suppression_concepteur: {
+    objet: "À supprimer dans Synthesia · {{ref}}",
+    corps: "Bonjour,\n\nLa demande {{ref}} « {{titre}} » est restée sans réponse 3 mois après l'envoi de la vidéo : elle vient d'être supprimée de l'outil (il n'en reste qu'une trace anonyme).\n\nMerci de supprimer la vidéo dans Synthesia :\n{{lienVideo}}\n\nLe demandeur a été prévenu."
   },
   maj_confirmation: {
     objet: "Votre demande de mise à jour a bien été reçue · {{ref}}",
@@ -415,6 +430,144 @@ function html_(x) {
 
 function sortie_(o) {
   return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
+}
+
+
+/* =====================================================================================================
+ * ENVOIS AUTOMATIQUES (jalons après l'envoi d'une vidéo au demandeur)
+ *   - relance 15 jours sans réponse ;
+ *   - avertissements un mois puis une semaine avant la suppression ;
+ *   - suppression au bout de 3 mois : courriel au demandeur, courriel à l'administrateur (vidéo à supprimer dans Synthesia).
+ * Supabase calcule les jalons dus ; le script déchiffre l'adresse (clé CLE_ROBOT), envoie, puis fait noter le jalon.
+ * Installation : exécuter une fois installerEnvoisQuotidiens().
+ * ===================================================================================================== */
+
+/** Tâche quotidienne (déclencheur). */
+function envoisDuJour() {
+  const verrou = LockService.getScriptLock();
+  if (!verrou.tryLock(30000)) return;
+  try {
+    const jeton = reglage_('JETON_SCRIPT');
+    if (!jeton || !reglage_('CLE_ROBOT')) { console.warn('Envois automatiques : CLE_ROBOT ou JETON_SCRIPT manquant.'); return; }
+    const r = rpc_('robot_jalons', { p_jeton: jeton });
+    if (!r || !r.actif) { console.log('Envois automatiques désactivés dans l\'outil.'); return; }
+    const bilan = [], echecs = [];
+    (r.jalons || []).forEach(function (j) {
+      try { bilan.push(traiterJalon_(j, jeton)); }
+      catch (e) { echecs.push(j.ref + ' (' + j.jalon + ') : ' + e.message); console.error(j.ref, e); }
+    });
+    console.log('Envois automatiques : ' + bilan.length + ' jalon(s) traité(s), ' + echecs.length + ' échec(s).');
+    if (echecs.length && reglage_('ADRESSE_ADMIN')) {
+      MailApp.sendEmail({ to: reglage_('ADRESSE_ADMIN'), name: reglage_('EXPEDITEUR'), subject: 'Envois automatiques : ' + echecs.length + ' échec(s)',
+        body: "Bonjour,\n\nCes jalons n'ont pas pu être traités ce matin. Ils seront retentés demain ; vous pouvez aussi les envoyer depuis la fiche de chaque demande.\n\n" + echecs.join('\n') });
+    }
+  } finally { verrou.releaseLock(); }
+}
+
+function traiterJalon_(j, jeton) {
+  const s = { ref: j.ref, type: j.type, version: j.version, lien: j.lien, modifs_restantes: j.modifs_restantes,
+              contenu: { titre: j.titre, duree: j.duree, publicVise: j.public_vise } };
+  const echeance = new Date(j.echeance_suppression);
+  const extra = { dateSuppression: Utilities.formatDate(echeance, 'Europe/Paris', 'dd/MM/yyyy'),
+                  delaiSuppression: j.jalon === 'avert_mois' ? 'dans un mois' : j.jalon === 'avert_semaine' ? 'dans une semaine' : '' };
+  let contact = null;
+  try { contact = dechiffrerContact_(j.contact_robot); } catch (e) { contact = null; }
+
+  if (j.jalon === 'suppression') {
+    // Le courriel à l'administrateur part dans tous les cas ; celui au demandeur si son adresse est lisible
+    const v = variables_(s, j.token, Object.assign({ demandeur: contact ? contact.nom : '', email: contact ? contact.email : '' }, extra));
+    let resultat = 'envoyé';
+    if (contact && adresse_(contact.email)) envoyer_(contact.email, modele_('video_supprimee'), v);
+    else resultat = 'adresse du demandeur indisponible : courriel au demandeur non envoyé';
+    if (reglage_('ADRESSE_ADMIN')) envoyer_(reglage_('ADRESSE_ADMIN'), modele_('suppression_concepteur'), v);
+    rpc_('robot_jalon_fait', { p_jeton: jeton, p_id: j.id, p_jalon: 'suppression', p_resultat: resultat });
+    return j.ref + ' supprimée';
+  }
+
+  if (!contact || !adresse_(contact.email)) throw new Error("adresse du demandeur indisponible (ouvrez l'outil pour la préparer)");
+  const v = variables_(s, j.token, Object.assign({ demandeur: contact.nom, email: contact.email }, extra));
+  envoyer_(contact.email, modele_(j.jalon === 'relance' ? 'relance' : 'avert_suppression'), v);
+  rpc_('robot_jalon_fait', { p_jeton: jeton, p_id: j.id, p_jalon: j.jalon, p_resultat: 'envoyé' });
+  return j.ref + ' ' + j.jalon;
+}
+
+/** À exécuter une fois : crée le déclencheur quotidien (et supprime un éventuel doublon). */
+function installerEnvoisQuotidiens() {
+  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'envoisDuJour') ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('envoisDuJour').timeBased().everyDays(1).atHour(Number(reglage_('HEURE_ENVOIS')) || 8).inTimezone('Europe/Paris').create();
+  Logger.log('Déclencheur créé : envoisDuJour chaque jour vers ' + (reglage_('HEURE_ENVOIS') || 8) + ' h (heure de Paris).');
+}
+
+/** Vérifie la clé du script sans rien envoyer : cohérence de la clé, jeton, et liste de ce qui partirait aujourd'hui. */
+function testerEnvoisAutomatiques() {
+  const cle = cleRobot_();
+  const m = 123456789n, e = 65537n;
+  const ok = modPow_(modPow_(m, e, cle.n), cle.d, cle.n) === m;
+  Logger.log('Clé du script : ' + (ok ? 'valide' : 'INVALIDE') + ' (' + cle.k * 8 + ' bits).');
+  const r = rpc_('robot_jalons', { p_jeton: reglage_('JETON_SCRIPT') });
+  Logger.log('Jeton : accepté. Envois automatiques ' + (r.actif ? 'ACTIFS' : 'désactivés dans l\'outil') + '.');
+  (r.jalons || []).forEach(function (j) {
+    let qui = '?';
+    try { qui = dechiffrerContact_(j.contact_robot).email; } catch (err) { qui = 'adresse indisponible'; }
+    Logger.log(j.ref + ' → ' + j.jalon + ' → ' + qui);
+  });
+  if (!(r.jalons || []).length) Logger.log("Aucun jalon dû aujourd'hui" + (r.actif ? '.' : ' (la liste n\'est calculée que si les envois sont actifs).'));
+}
+
+/* ---------- déchiffrement RSA-OAEP (SHA-256) de l'adresse, sans bibliothèque ---------- */
+
+function cleRobot_() {
+  const c = JSON.parse(reglage_('CLE_ROBOT'));
+  return { n: BigInt('0x' + c.n), d: BigInt('0x' + c.d), k: c.n.length / 2 };
+}
+
+function dechiffrerContact_(texte) {
+  if (!texte) throw new Error('adresse non préparée');
+  const env = JSON.parse(Utilities.newBlob(Utilities.base64Decode(texte)).getDataAsString('UTF-8'));
+  const cle = cleRobot_();
+  const c = octetsVersBig_(Utilities.base64Decode(env.c));
+  const em = bigVersOctets_(modPow_(c, cle.d, cle.n), cle.k);
+  const message = oaepDecoder_(em, cle.k);
+  return JSON.parse(Utilities.newBlob(message.map(signe_)).getDataAsString('UTF-8'));
+}
+
+function modPow_(b, e, m) {
+  let r = 1n; b = b % m;
+  while (e > 0n) { if (e & 1n) r = (r * b) % m; e >>= 1n; b = (b * b) % m; }
+  return r;
+}
+function octetsVersBig_(o) {
+  let h = '0x0';
+  for (let i = 0; i < o.length; i++) h += ((o[i] & 255) + 256).toString(16).slice(1);
+  return BigInt(h);
+}
+function bigVersOctets_(x, k) {
+  let h = x.toString(16); while (h.length < k * 2) h = '0' + h;
+  const o = []; for (let i = 0; i < h.length; i += 2) o.push(parseInt(h.substr(i, 2), 16));
+  return o;
+}
+function signe_(x) { return x > 127 ? x - 256 : x; }
+function sha256Octets_(o) {
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, o.map(signe_)).map(function (x) { return x & 255; });
+}
+function mgf1_(graine, longueur) {
+  let sortie = [];
+  for (let c = 0; sortie.length < longueur; c++) sortie = sortie.concat(sha256Octets_(graine.concat([(c >>> 24) & 255, (c >>> 16) & 255, (c >>> 8) & 255, c & 255])));
+  return sortie.slice(0, longueur);
+}
+function oaepDecoder_(em, k) {
+  const h = 32;
+  if (em[0] !== 0) throw new Error('déchiffrement invalide (clé du script incorrecte ?)');
+  const grainemasquee = em.slice(1, 1 + h), dbmasque = em.slice(1 + h);
+  const masqueGraine = mgf1_(dbmasque, h);
+  const graine = grainemasquee.map(function (x, i) { return x ^ masqueGraine[i]; });
+  const masque = mgf1_(graine, k - h - 1);
+  const db = dbmasque.map(function (x, i) { return x ^ masque[i]; });
+  const lHash = sha256Octets_([]);
+  for (let i = 0; i < h; i++) if (db[i] !== lHash[i]) throw new Error('déchiffrement invalide (clé du script incorrecte ?)');
+  let i = h; while (i < db.length && db[i] === 0) i++;
+  if (db[i] !== 1) throw new Error('déchiffrement invalide');
+  return db.slice(i + 1);
 }
 
 /* ---------- test depuis l'éditeur ---------- */
