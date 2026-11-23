@@ -100,5 +100,33 @@
     return JSON.parse(dec.decode(await sub.decrypt({ name: 'AES-GCM', iv: deb64(p.iv) }, aes, deb64(p.c))));
   }
 
-  global.Chiffrement = { genererPaire, protegerClePrivee, ouvrirClePrivee, chiffrer, dechiffrer, empreinte };
+  /* ---- clé du script d'envoi des courriels (envois automatiques) ----
+   * Chiffrement RSA-OAEP direct, sans AES, pour que le script Google puisse déchiffrer avec un code simple.
+   * La clé privée est remise au script sous la forme { n, d } en hexadécimal (propriété CLE_ROBOT). */
+  async function genererCleRobot() {
+    verifierSupport();
+    const paire = await sub.generateKey({ ...RSA, modulusLength: 3072, publicExponent: new Uint8Array([1, 0, 1]) }, true, ['encrypt', 'decrypt']);
+    const publique = b64(await sub.exportKey('spki', paire.publicKey));
+    const jwk = await sub.exportKey('jwk', paire.privateKey);
+    const hex = (b64url) => Array.from(Uint8Array.from(atob(b64url.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((b64url.length + 3) % 4)), (c) => c.charCodeAt(0)), (x) => x.toString(16).padStart(2, '0')).join('');
+    return { publique, empreinte: await empreinte(publique), privee: JSON.stringify({ n: hex(jwk.n), d: hex(jwk.d) }) };
+  }
+
+  /* { email, nom } → texte chiffré pour le script ; le nom est raccourci si le tout dépasse la capacité de la clé */
+  async function chiffrerRobot(contact, publiqueB64) {
+    verifierSupport();
+    const cle = await importerPublique(publiqueB64);
+    let nom = String(contact.nom || '');
+    let octets;
+    do {
+      octets = enc.encode(JSON.stringify({ email: contact.email, nom }));
+      if (octets.length <= 300) break;
+      nom = nom.slice(0, Math.max(0, nom.length - 20));
+    } while (nom.length);
+    if (octets.length > 318) throw new Error('adresse trop longue pour le chiffrement du script');
+    const c = await sub.encrypt(RSA, cle, octets);
+    return btoa(JSON.stringify({ v: 1, e: await empreinte(publiqueB64), c: b64(c) }));
+  }
+
+  global.Chiffrement = { genererPaire, protegerClePrivee, ouvrirClePrivee, chiffrer, dechiffrer, empreinte, genererCleRobot, chiffrerRobot };
 })(typeof window !== 'undefined' ? window : globalThis);

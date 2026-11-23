@@ -142,6 +142,9 @@
       identiteIllisible: !!(ident && ident.illisible),
       depose: d.depose_le, derniereValidation: d.derniere_validation_le,
       lienValide: vval ? (vval.lien || d.lien || '') : '',
+      livreeLe: d.livree_le, echeance: d.echeance_suppression, relanceAutoLe: d.relance_auto_le,
+      avertMoisLe: d.avert_mois_le, avertSemaineLe: d.avert_semaine_le, supprimeeLe: d.supprimee_le,
+      contactRobot: !!d.contact_robot,
       piecesPurgees: d.pieces_purgees_le, anonymise: d.anonymise_le,
       accuse: d.accuse_envoye_le,
       versions: vs.map(function (v) { return { numero: v.numero, statut: v.statut, lien: v.lien, validee: v.valide_le, nom: v.validation && v.validation.nom, fonction: v.validation && v.validation.fonction }; }),
@@ -177,9 +180,11 @@
         client().from('historique').select('*').order('quand'),
         client().from('pieces').select('*').order('ajoute_le'),
         client().from('courriels').select('*').order('envoye_le', { ascending: false }).limit(500),
-        client().from('reglages').select('*').eq('cle', 'modeles')
+        client().from('reglages').select('*')
       ]);
       var lignes = verifier(res[0], 'demandes'), vers = verifier(res[1]), hist = verifier(res[2]), pcs = verifier(res[3]), crs = verifier(res[4]), regl = verifier(res[5]);
+      var reglage = function (cle) { var x = regl.filter(function (r) { return r.cle === cle; })[0]; return x ? x.valeur : null; };
+      etatAuto = { actif: !!((reglage('automatisation') || {}).actif), cle: reglage('cle_robot') };
 
       var chemins = pcs.filter(function (p) { return !p.supprime_le; }).map(function (p) { return p.chemin; });
       var urls = {};
@@ -204,7 +209,8 @@
         return { id: 'c' + c.id, canal: 'E-mail envoyé', dest: c.modele === 'depot_admin' ? 'Administrateur' : (t.email || ''), objet: libelleModele(c.modele) + (t.ref ? ' · ' + t.ref : ''),
                  corps: c.resultat && c.resultat !== 'envoyé' ? 'Résultat : ' + c.resultat : '', ref: t.ref || '', envoye: c.envoye_le, expediteur: 'Script d\'envoi (compte GIP)' };
       });
-      return { demandes: liste, courriels: courriels, modeles: (regl[0] && regl[0].valeur) || {}, source: 'api' };
+      synchroniserContacts(lignes, idents);
+      return { demandes: liste, courriels: courriels, modeles: reglage('modeles') || {}, source: 'api', automatisation: etatAuto };
     } catch (e) {
       signaler('Lecture impossible : ' + e.message);
       return { demandes: [], courriels: [], modeles: {}, source: 'erreur', erreur: e.message };
@@ -218,11 +224,12 @@
 
   /* ------------------------------------------------------------------ écriture (administrateur) */
 
-  var COLONNES = ['statut', 'lien', 'archive', 'catalogue'];
-  var IGNORES = ['id', 'ref', 'token', 'type', 'historique', 'pieces', 'validation', 'versions', 'depose', 'demandeur', 'email', '_identite',
+  var COLONNES = ['statut', 'lien', 'archive', 'catalogue', 'relance_auto_le'];
+  var IGNORES = ['_evenement', 'id', 'ref', 'token', 'type', 'historique', 'pieces', 'validation', 'versions', 'depose', 'demandeur', 'email', '_identite',
     'modifsUtilisees', 'modifsRestantes', 'derniereValidation', 'piecesPurgees', 'anonymise', 'accuse', 'identiteIllisible', 'version'];
 
   function evenementPour(patch, avant) {
+    if (patch._evenement) return patch._evenement;
     if (patch.statut && patch.statut !== avant.statut) {
       if (patch.statut === 'production' && ['nouvelle', 'modif', 'maj'].indexOf(avant.statut) >= 0) return 'production';
       if (patch.statut === 'validation' && ['production', 'modif', 'maj', 'nouvelle'].indexOf(avant.statut) >= 0) return 'livraison';
@@ -339,6 +346,7 @@
     if (!r.deja && (courriels || []).length) {
       accuse = await window.ApiV2.courriel({ action: 'depot', token: r.token, email: demande.email, nom: demande.demandeur });
     }
+    if (!r.deja) await window.ApiV2.contactRobot(r.token, demande.email, demande.demandeur);
     return { ok: true, ref: r.ref, token: r.token, deja: r.deja, echecs: echecs, accuse: accuse && accuse.ok };
   }
 
@@ -366,6 +374,60 @@
     } catch (e) { return { ok: false, message: 'Échec : ' + e.message }; }
   }
 
+  /* ------------------------------------------------------------------ envois automatiques */
+
+  var etatAuto = { actif: false, cle: null };
+  var STATUTS_ACTIFS = ['nouvelle', 'production', 'validation', 'modif', 'maj'];
+
+  function empreinteContact(texte) {
+    try { return JSON.parse(atob(texte)).e; } catch (e) { return null; }
+  }
+
+  /* L'adresse chiffrée pour le script est (re)créée ici, dans le navigateur de l'administrateur qui l'a déchiffrée :
+     demandes reprises de l'ancien outil, demandes déposées avant la clé du script, ou clé du script remplacée. */
+  async function synchroniserContacts(lignes, idents) {
+    var cle = etatAuto.cle;
+    if (!cle || !cle.publique) return 0;
+    var n = 0;
+    for (var i = 0; i < lignes.length; i++) {
+      var d = lignes[i], ident = idents[i];
+      if (STATUTS_ACTIFS.indexOf(d.statut) < 0 || !ident || ident.illisible || !ident.email) continue;
+      if (d.contact_robot && empreinteContact(d.contact_robot) === cle.empreinte) continue;
+      try {
+        var c = await window.Chiffrement.chiffrerRobot({ email: ident.email, nom: ident.demandeur || '' }, cle.publique);
+        var r = await client().from('demandes').update({ contact_robot: c }).eq('id', d.id);
+        if (!r.error) { n++; d.contact_robot = c; if (tickets[d.id]) tickets[d.id].contactRobot = true; }
+      } catch (e) {}
+    }
+    if (n && Stockage.onContacts) Stockage.onContacts(n);
+    return n;
+  }
+
+  /* Nouvelle clé du script + nouveau jeton. La clé privée et le jeton ne sont montrés qu'une fois, pour le script. */
+  async function creerCleScript() {
+    var cle = await window.Chiffrement.genererCleRobot();
+    var a = new Uint8Array(32); window.crypto.getRandomValues(a);
+    var jeton = Array.from(a, function (x) { return x.toString(16).padStart(2, '0'); }).join('');
+    verifier(await client().rpc('admin_definir_jeton_script', { p_jeton: jeton }), 'jeton du script');
+    verifier(await client().from('reglages').upsert({ cle: 'cle_robot', valeur: { publique: cle.publique, empreinte: cle.empreinte, creee_le: new Date().toISOString() }, maj_le: new Date().toISOString() }), 'clé du script');
+    etatAuto.cle = { publique: cle.publique, empreinte: cle.empreinte };
+    return { empreinte: cle.empreinte, privee: cle.privee, jeton: jeton };
+  }
+
+  async function definirAutomatisation(actif) {
+    verifier(await client().from('reglages').upsert({ cle: 'automatisation', valeur: { actif: !!actif, maj_le: new Date().toISOString() }, maj_le: new Date().toISOString() }), 'automatisation');
+    etatAuto.actif = !!actif;
+    return etatAuto.actif;
+  }
+
+  async function prolonger(id, dateIso) {
+    return verifier(await client().rpc('admin_prolonger', { p_id: id, p_echeance: dateIso }), 'prolongation');
+  }
+
+  async function jalonFait(id, jalon) {
+    return verifier(await client().rpc('admin_jalon_fait', { p_id: id, p_jalon: jalon }), 'jalon');
+  }
+
   var Stockage = {
     onErreur: null,
     apiConfiguree: function () { return true; },
@@ -375,7 +437,9 @@
     seConnecter: seConnecter, reprendreSession: reprendreSession, enrolerDoubleAuth: enrolerDoubleAuth,
     verifierCode: verifierCode, ouvrirCle: ouvrirCle, deconnexion: deconnexion, cleOuverte: function () { return !!clePrivee; },
     /* administrateur */
-    charger: charger, majDemande: majDemande, supprimerDemande: supprimerDemande, purgerPieces: purgerPieces,
+    charger: charger, majDemande: majDemande,
+    creerCleScript: creerCleScript, definirAutomatisation: definirAutomatisation, prolonger: prolonger, jalonFait: jalonFait,
+    automatisation: function () { return etatAuto; }, supprimerDemande: supprimerDemande, purgerPieces: purgerPieces,
     pousser: pousser, expedier: expedier, tester: tester, importerDemande: importerDemande,
     remplacerDemandes: async function () { throw new Error("Le remplacement global de la base n'existe plus en v2 : utilisez la reprise des demandes."); },
     client: client,

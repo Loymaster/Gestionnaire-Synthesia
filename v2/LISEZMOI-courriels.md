@@ -40,3 +40,30 @@ L'ancien script continue de fonctionner tant que la bascule n'est pas faite. Le 
 | `LIMITE_HORAIRE` | Plafond d'envois publics par heure |
 | `EXIGER_DOUBLE_AUTH` | `oui` par défaut |
 | `SUPABASE_URL`, `SUPABASE_CLE` | Connexion à Supabase (clé publique) |
+| `CLE_ROBOT` | Clé privée du script, créée dans l'outil (Configuration → Envois automatiques). Elle n'est jamais conservée ailleurs. |
+| `JETON_SCRIPT` | Jeton du script, créé en même temps que la clé. Supabase n'en garde que l'empreinte. |
+| `HEURE_ENVOIS` | Heure du passage quotidien (`8` par défaut, heure de Paris) |
+
+## Envois automatiques (relances, avertissements, suppression)
+
+Après l'envoi de la vidéo (statut « En attente de validation »), le calendrier est fixé par la base :
+
+| Jalon | Date | Courriel |
+|---|---|---|
+| Relance | 15 jours après l'envoi, si aucune relance n'a déjà été faite et si l'on n'est pas déjà à moins de 5 semaines de la suppression | `relance` au demandeur |
+| Avertissement | 1 mois avant la suppression | `avert_suppression` au demandeur |
+| Avertissement | 1 semaine avant la suppression | `avert_suppression` au demandeur |
+| Suppression | 3 mois après l'envoi (ou date prolongée) | `video_supprimee` au demandeur, `suppression_concepteur` à `ADRESSE_ADMIN` |
+
+- **À la suppression.** La demande devient une trace anonyme (titre, sujet, durée, public). Les noms, l'adresse, le lien de la vidéo et les textes du formateur sont effacés, et les pièces jointes sont purgées.
+- **Dans l'outil.** On peut envoyer un jalon en avance sans changer l'échéance, ou prolonger l'échéance.
+
+### Mise en route
+
+1. Dans l'outil : **Configuration → Envois automatiques → Créer la clé et le jeton du script**. Copiez les deux valeurs affichées (une seule fois) dans les propriétés `CLE_ROBOT` et `JETON_SCRIPT`.
+2. Dans l'éditeur Apps Script, exécutez `testerEnvoisAutomatiques` : c'est un essai à blanc qui vérifie la clé et liste les jalons dus.
+3. Exécutez `installerEnvoisQuotidiens` (une seule fois) pour créer le déclencheur quotidien.
+4. Ouvrez l'outil une fois, pour que les adresses des demandes en attente soient préparées pour le script.
+5. Activez les envois automatiques dans l'outil.
+
+Tant que les envois ne sont pas activés dans l'outil, le passage quotidien ne fait rien.

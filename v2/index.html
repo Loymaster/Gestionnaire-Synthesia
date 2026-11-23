@@ -831,6 +831,35 @@
         </div>
 
         <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
+          <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Envois automatiques</h2>
+          <p style="margin: 0 0 16px; font-size: 13.5px; color: oklch(0.5 0 0); line-height: 1.55; text-wrap: pretty;">Après l'envoi d'une vidéo au demandeur : relance au bout de 15 jours sans réponse, avertissements un mois puis une semaine avant la suppression, suppression de la demande au bout de 3 mois (courriel au demandeur, et à vous pour supprimer la vidéo dans Synthesia). Le script Google les envoie chaque matin ; chaque fiche montre ses jalons, permet d'envoyer plus tôt et de prolonger.</p>
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px;">
+            <span style="padding: 5px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: {{ autoBg }}; color: {{ autoFg }};">{{ autoEtat }}</span>
+            <button onClick="{{ basculerAuto }}" style="cursor: pointer; padding: 10px 16px; border-radius: 7px; font-size: 13.5px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194;">{{ autoBouton }}</button>
+          </div>
+          <div style="font-size: 13.5px; line-height: 1.6; color: oklch(0.35 0 0); margin-bottom: 14px;">{{ autoCle }}<br>{{ autoContacts }}</div>
+          <button onClick="{{ creerCleScript }}" style="cursor: pointer; padding: 10px 16px; border-radius: 7px; font-size: 13.5px; font-weight: 500; border: 0; background: #154194; color: white;">{{ autoCreerLabel }}</button>
+          <sc-if value="{{ autoProprietes }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: 16px; padding: 14px 16px; border-radius: 8px; background: #fff7e8; border: 1px solid #f3d29a;">
+              <p style="margin: 0 0 10px; font-size: 13.5px; line-height: 1.55;"><strong>À copier maintenant dans le script Google</strong> (Paramètres du projet → Propriétés du script). Ces valeurs ne seront plus jamais affichées ; ne les envoyez à personne.</p>
+              <div style="font-size: 12px; color: oklch(0.45 0 0); margin-bottom: 4px;">Propriété CLE_ROBOT</div>
+              <textarea readonly="readonly" value="{{ autoClePrivee }}" style="width: 100%; height: 90px; font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 8px; border: 1px solid #c8d2e4; border-radius: 6px;"></textarea>
+              <div style="font-size: 12px; color: oklch(0.45 0 0); margin: 10px 0 4px;">Propriété JETON_SCRIPT</div>
+              <input readonly="readonly" value="{{ autoJeton }}" style="width: 100%; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 8px; border: 1px solid #c8d2e4; border-radius: 6px;" />
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px;">
+                <button onClick="{{ copierClePrivee }}" style="cursor: pointer; padding: 10px 16px; border-radius: 7px; font-size: 13.5px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194;">Copier CLE_ROBOT</button>
+                <button onClick="{{ copierJeton }}" style="cursor: pointer; padding: 10px 16px; border-radius: 7px; font-size: 13.5px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194;">Copier JETON_SCRIPT</button>
+                <button onClick="{{ masquerProprietes }}" style="cursor: pointer; padding: 10px 16px; border-radius: 7px; font-size: 13.5px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194;">C'est fait, masquer</button>
+              </div>
+              <div style="font-size: 12.5px; color: #1f5f43; margin-top: 8px;">{{ autoMsg }}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ autoErreur }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size: 13px; color: oklch(0.5 0.14 25); margin-top: 10px;">{{ autoErreur }}</div>
+          </sc-if>
+        </div>
+
+        <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 24px;">
           <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
             <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600;">Déclarations du formulaire de validation</h2>
             <span style="flex: 1;"></span>
@@ -1263,6 +1292,33 @@
             </sc-if>
           </div>
 
+          <sc-if value="{{ d.montrerJalons }}" hint-placeholder-val="{{ false }}">
+            <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 22px;">
+              <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 6px;">Jalons et relances</div>
+              <p style="margin: 0 0 12px; font-size: 12.5px; color: oklch(0.53 0 0); line-height: 1.5;">{{ d.jalonsIntro }}</p>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <sc-for list="{{ d.jalons }}" as="j" hint-placeholder-count="4">
+                  <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding-bottom: 10px; border-bottom: 1px solid oklch(0.95 0 0);">
+                    <span style="flex-shrink: 0; width: 9px; height: 9px; border-radius: 999px; background: {{ j.point }};"></span>
+                    <span style="flex: 1; min-width: 140px; font-size: 13.5px; line-height: 1.4;"><span style="font-weight: 500;">{{ j.label }}</span><br><span style="color: oklch(0.5 0 0); font-size: 12.5px;">{{ j.etat }}</span></span>
+                    <sc-if value="{{ j.anticipable }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ j.envoyer }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194; white-space: nowrap;">{{ j.boutonLabel }}</button>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size: 12.5px; color: oklch(0.45 0 0); margin: 12px 0 6px;">{{ d.derniereRelance }}</div>
+              <sc-if value="{{ d.peutProlonger }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px;">
+                  <button onClick="{{ d.prolongerUnMois }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194; white-space: nowrap;">Prolonger d'un mois</button>
+                  <input type="date" value="{{ dateProlongation }}" onChange="{{ majDateProlongation }}" style="padding: 7px 9px; border: 1px solid #c8d2e4; border-radius: 6px; font-size: 13px;" />
+                  <button onClick="{{ d.prolongerDate }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194; white-space: nowrap;">Reporter à cette date</button>
+                </div>
+              </sc-if>
+              <div style="font-size: 12.5px; color: #1f5f43; margin-top: 8px; min-height: 16px;">{{ jalonMsg }}</div>
+            </div>
+          </sc-if>
+
           <div style="background: white; border: 1px solid #dfe5f0; border-radius: 12px; padding: 22px;">
             <div style="font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: oklch(0.58 0 0); margin-bottom: 14px;">Outils</div>
             <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -1271,6 +1327,7 @@
               </sc-if>
               <button onClick="{{ ouvrirValidationAdmin }}" style="cursor: pointer; padding: 10px; border-radius: 7px; font-size: 13.5px; background: oklch(0.97 0 0); color: oklch(0.35 0 0); border: 1px solid #cfd8e8;" style-hover="background: oklch(0.94 0 0);">Formulaire de validation</button>
               <button onClick="{{ ouvrirModificationAdmin }}" style="cursor: pointer; padding: 10px; border-radius: 7px; font-size: 13.5px; background: oklch(0.97 0 0); color: oklch(0.35 0 0); border: 1px solid #cfd8e8;" style-hover="background: oklch(0.94 0 0);">Formulaire de modification</button>
+              <button onClick="{{ ouvrirMiseAJourAdmin }}" style="cursor: pointer; padding: 10px; border-radius: 7px; font-size: 13.5px; background: oklch(0.97 0 0); color: oklch(0.35 0 0); border: 1px solid #cfd8e8;" style-hover="background: oklch(0.94 0 0);">Formulaire de mise à jour</button>
               <button onClick="{{ basculerArchive }}" style="cursor: pointer; padding: 10px; border-radius: 7px; font-size: 13.5px; background: oklch(0.97 0 0); color: oklch(0.35 0 0); border: 1px solid #cfd8e8;" style-hover="background: oklch(0.94 0 0);">{{ d.labelArchive }}</button>
             </div>
           </div>
@@ -1877,9 +1934,10 @@ const S = {
   validation: { label: "À valider",        bg: "oklch(0.95 0.055 80)",  fg: "oklch(0.44 0.11 70)" },
   modif:      { label: "Modification demandée", bg: "oklch(0.95 0.04 25)", fg: "oklch(0.47 0.14 25)" },
   validee:    { label: "Validée",          bg: "oklch(0.94 0.04 155)",  fg: "oklch(0.4 0.1 155)" },
-  maj:        { label: "Mise à jour demandée", bg: "#fff1dc", fg: "#9a5a00" }
+  maj:        { label: "Mise à jour demandée", bg: "#fff1dc", fg: "#9a5a00" },
+  supprimee:  { label: "Supprimée",        bg: "#ececec", fg: "#5a5e67" }
 };
-const ORDRE = ["nouvelle", "production", "validation", "modif", "validee", "maj"];
+const ORDRE = ["nouvelle", "production", "validation", "modif", "validee", "maj", "supprimee"];
 /* Les deux dernières phases sont internes à l'administration : aucun courriel,
  * et le demandeur n'y voit qu'une vidéo validée. */
 const ORDRE_PUBLIC = ["nouvelle", "production", "validation", "modif", "validee"];
@@ -1888,7 +1946,7 @@ const estValidee = s => VALIDES.indexOf(s) >= 0;
 const statutPublic = s => estValidee(s) ? "validee" : s;
 const pub = t => t ? { ...t, statut: statutPublic(t.statut) } : t;
 const PRIORITE = { Urgent: "priorité urgente", Normal: "priorité normale", Faible: "priorité faible" };
-const PT = { nouvelle: "oklch(0.42 0.01 250)", production: "#154194", validation: "oklch(0.44 0.11 70)", modif: "oklch(0.47 0.14 25)", validee: "oklch(0.4 0.1 155)", maj: "#9a5a00" };
+const PT = { nouvelle: "oklch(0.42 0.01 250)", production: "#154194", validation: "oklch(0.44 0.11 70)", modif: "oklch(0.47 0.14 25)", validee: "oklch(0.4 0.1 155)", maj: "#9a5a00", supprimee: "#5a5e67" };
 
 const ACTIONS = {
   nouvelle: {
@@ -1914,6 +1972,10 @@ const ACTIONS = {
   validee: {
     titre: "Vidéo validée", label: "", suivant: null, besoinLien: false,
     texte: "La vidéo est validée et signée. Le demandeur peut demander une mise à jour depuis son lien de suivi : une nouvelle version s'ouvrira alors, et celle-ci restera en ligne jusqu'à la validation de la nouvelle."
+  },
+  supprimee: {
+    titre: "Demande supprimée", label: "", suivant: null, besoinLien: false,
+    texte: "Aucune réponse 3 mois après l'envoi de la vidéo : la demande a été supprimée. Il n'en reste qu'une trace anonyme (référence, titre, dates). Le demandeur a été prévenu, et un courriel vous a demandé de supprimer la vidéo dans Synthesia."
   },
   maj: {
     titre: "Produire la nouvelle version", label: "Marquer « en production »", suivant: "production", besoinLien: false,
@@ -2123,6 +2185,24 @@ const MODELES = [
     corps: "Bonjour,\n\n{{demandeur}} vient de valider la vidéo « {{titre}} » ({{ref}}), réalisée avec Synthesia.\n\nLe projet est terminé : la vidéo peut être diffusée auprès du public visé ({{public}}).\n\nBonne journée."
   },
   {
+    id: "avert_suppression", nom: "Avertissement avant suppression", dest: "Le demandeur",
+    quand: "Envoyé automatiquement un mois, puis une semaine avant la suppression d'une vidéo restée sans réponse (ou plus tôt depuis la fiche).",
+    objet: "Votre vidéo {{ref}} sera supprimée le {{dateSuppression}} sans nouvelle de votre part",
+    corps: "Bonjour {{demandeur}},\n\nLa vidéo « {{titre}} » ({{ref}}) vous a été envoyée pour validation, et nous n'avons pas encore reçu votre réponse.\n\nSans nouvelle de votre part, votre vidéo sera supprimée {{delaiSuppression}}, le {{dateSuppression}}.\n\nPour la conserver, il vous suffit de la valider ou de demander une modification :\nValider la vidéo : {{lienValidation}}\nDemander une modification : {{lienModification}}\n{{compteurModifs}}\nSi vous avez besoin d'un délai supplémentaire, répondez simplement à ce courriel.\n\nAvec nos remerciements,\n{{signature}}"
+  },
+  {
+    id: "video_supprimee", nom: "Vidéo supprimée", dest: "Le demandeur",
+    quand: "Envoyé automatiquement à la suppression d'une vidéo restée sans réponse 3 mois après son envoi.",
+    objet: "Votre vidéo {{ref}} a été supprimée",
+    corps: "Bonjour {{demandeur}},\n\nSans réponse de votre part 3 mois après son envoi, la vidéo « {{titre}} » ({{ref}}) a été supprimée, ainsi que votre demande et les documents transmis.\n\nSi vous avez toujours besoin de cette vidéo, vous pouvez déposer une nouvelle demande.\n\nNous vous remercions de votre compréhension,\n{{signature}}"
+  },
+  {
+    id: "suppression_concepteur", nom: "Vidéo à supprimer dans Synthesia", dest: "Vous (administrateur)",
+    quand: "Envoyé automatiquement quand une demande est supprimée après 3 mois sans réponse.",
+    objet: "À supprimer dans Synthesia · {{ref}}",
+    corps: "Bonjour,\n\nLa demande {{ref}} « {{titre}} » est restée sans réponse 3 mois après l'envoi de la vidéo : elle vient d'être supprimée de l'outil (il n'en reste qu'une trace anonyme).\n\nMerci de supprimer la vidéo dans Synthesia :\n{{lienVideo}}\n\nLe demandeur a été prévenu."
+  },
+  {
     id: "maj_confirmation", nom: "Accusé de demande de mise à jour", dest: "Le demandeur",
     quand: "Dès qu'un demandeur demande une nouvelle version d'une vidéo validée.",
     objet: "Votre demande de mise à jour a bien été reçue · {{ref}}",
@@ -2163,7 +2243,7 @@ const DECLARATIONS_DEFAUT = [
   "Je valide l'utilisation de cette vidéo et j'autorise sa mutualisation, sa diffusion et sa réutilisation à des fins de formation, sans limitation de durée, au sein du réseau des GRETA de l'académie de Reims et des services académiques, à l'exclusion de tout usage commercial."
 ];
 
-const VARIABLES = ["ref", "titre", "demandeur", "email", "duree", "urgence", "public", "plans", "lienVideo", "lienSuivi", "lienValidation", "lienModification", "lienMiseAJour", "lienAttestation", "compteurModifs", "commentaire", "signature"];
+const VARIABLES = ["ref", "titre", "demandeur", "email", "duree", "urgence", "public", "plans", "lienVideo", "lienSuivi", "lienValidation", "lienModification", "lienMiseAJour", "lienAttestation", "compteurModifs", "dateSuppression", "delaiSuppression", "commentaire", "signature"];
 
 function chargerModeles() {
   try {
@@ -2213,6 +2293,15 @@ function qrEncode(qr) {
   const i = s.indexOf("<svg");
   if (i < 0) return s.replace(/"/g, "%22");
   return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(s.slice(i));
+}
+
+/* « dans un mois », « dans une semaine », « dans 12 jours » : délai jusqu'à la suppression */
+function delaiAvant(iso) {
+  const j = Math.round((new Date(iso).getTime() - Date.now()) / 86400000);
+  if (j <= 1) return "demain";
+  if (j >= 28 && j <= 31) return "dans un mois";
+  if (j === 7) return "dans une semaine";
+  return "dans " + j + " jours";
 }
 
 /* Compteur Syren : 2 demandes de modification pour toute la vie de la vidéo */
@@ -2860,6 +2949,8 @@ class Component extends DCLogic {
       lienMiseAJour: base + "/suivi.html?mise-a-jour=" + t.token,
       lienAttestation: base + "/suivi.html?attestation=" + t.token,
       compteurModifs: compteurModifs(t),
+      dateSuppression: t.echeance ? new Date(t.echeance).toLocaleDateString("fr-FR") : "",
+      delaiSuppression: t.echeance ? delaiAvant(t.echeance) : "",
       signature: this.reglages().signature,
       commentaire: "", ...(extra || {})
     };
@@ -2943,7 +3034,9 @@ class Component extends DCLogic {
       : sel.derniereValidation ? "Suppression automatique prévue le " + new Date(new Date(sel.derniereValidation).getTime() + 30 * 86400000).toLocaleDateString("fr-FR") + " (30 jours après la validation)."
       : "Suppression automatique 30 jours après la validation.";
     const copier = (texte, cle) => () => copierTexte(texte).then(ok => this.setState({ briefMsg: ok ? (cle === "brief" ? "Brief copié : collez-le dans Syren." : "Remarques copiées.") : "Copie refusée par le navigateur : sélectionnez le texte à la main." }));
+    const jal = this.jalonsFiche(sel);
     return {
+      ...jal,
       syren,
       typeLabel: syren ? "Syren" : "Classique",
       typeBg: syren ? "#e9f7fb" : "#eef1f8", typeFg: syren ? "#0b6e88" : "#154194",
@@ -2968,6 +3061,102 @@ class Component extends DCLogic {
           .catch(e => this.setState(s => ({ base: { ...s.base, erreur: "Suppression impossible : " + e.message } })));
       }
     };
+  }
+
+  /* ---- v2 : carte « Envois automatiques » de la Configuration ---- */
+  carteAutomatisation() {
+    const st = this.state;
+    const auto = (window.Stockage && window.Stockage.automatisation && window.Stockage.automatisation()) || {};
+    const attente = (st.tickets || []).filter(t => t.statut === "validation");
+    const prets = attente.filter(t => t.contactRobot).length;
+    const copier = (v, n) => () => copierTexte(v).then(ok => this.setState({ autoMsg: ok ? n + " copié." : "Copie refusée : sélectionnez le texte à la main." }));
+    return {
+      autoEtat: auto.actif ? "Actifs" : "Désactivés",
+      autoBg: auto.actif ? "#dcefe6" : "#ececec", autoFg: auto.actif ? "#1f5f43" : "#5a5e67",
+      autoBouton: auto.actif ? "Désactiver" : "Activer les envois automatiques",
+      basculerAuto: () => {
+        if (!auto.actif && !auto.cle) { this.setState({ autoErreur: "Créez d'abord la clé et le jeton du script, et copiez-les dans le script Google." }); return; }
+        window.Stockage.definirAutomatisation(!auto.actif)
+          .then(() => this.setState({ autoErreur: "", autoMaj: Date.now() }))
+          .catch(e => this.setState({ autoErreur: "Changement impossible : " + e.message }));
+      },
+      autoCle: auto.cle && auto.cle.empreinte ? "Clé du script : empreinte " + auto.cle.empreinte + "." : "Clé du script : pas encore créée.",
+      autoContacts: attente.length ? "Adresses prêtes pour le script : " + prets + " sur " + attente.length + " vidéo(s) en attente de validation." : "Aucune vidéo en attente de validation.",
+      autoCreerLabel: auto.cle ? "Remplacer la clé et le jeton du script" : "Créer la clé et le jeton du script",
+      creerCleScript: () => {
+        if (auto.cle && st.confirmeCleScript !== true) { this.setState({ confirmeCleScript: true, autoErreur: "Remplacer la clé oblige à recopier les deux propriétés dans le script. Cliquez une seconde fois pour confirmer." }); return; }
+        this.setState({ autoErreur: "", confirmeCleScript: false, autoMsg: "Création…" });
+        window.Stockage.creerCleScript()
+          .then(r => { this.setState({ autoProprietes: true, autoClePrivee: r.privee, autoJeton: r.jeton, autoMsg: "Clé créée (empreinte " + r.empreinte + "). Les adresses vont être préparées." }); this.rafraichir(); })
+          .catch(e => this.setState({ autoErreur: "Création impossible : " + e.message, autoMsg: "" }));
+      },
+      autoProprietes: !!st.autoProprietes, autoClePrivee: st.autoClePrivee || "", autoJeton: st.autoJeton || "",
+      copierClePrivee: copier(st.autoClePrivee || "", "CLE_ROBOT"), copierJeton: copier(st.autoJeton || "", "JETON_SCRIPT"),
+      masquerProprietes: () => this.setState({ autoProprietes: false, autoClePrivee: "", autoJeton: "", autoMsg: "" }),
+      autoMsg: st.autoMsg || "", autoErreur: st.autoErreur || ""
+    };
+  }
+
+  /* ---- v2 : jalons après l'envoi de la vidéo (relance J+15, avertissements, suppression à 3 mois) ---- */
+  jalonsFiche(sel) {
+    if (!sel.livreeLe || !sel.echeance || ["validation", "supprimee"].indexOf(sel.statut) < 0) {
+      return { montrerJalons: false, jalons: [], jalonsIntro: "", derniereRelance: "", peutProlonger: false };
+    }
+    const j = 86400000, livree = new Date(sel.livreeLe), echeance = new Date(sel.echeance);
+    const moisAvant = new Date(echeance); moisAvant.setMonth(moisAvant.getMonth() - 1);
+    const fr = d => new Date(d).toLocaleDateString("fr-FR");
+    const auto = (window.Stockage.automatisation && window.Stockage.automatisation()) || {};
+    const attente = sel.statut === "validation";
+    const VERT = "oklch(0.5 0.12 155)", GRIS = "oklch(0.75 0 0)", ORANGE = "#d48a00";
+    const ligne = (cle, label, prevue, faite, modele) => {
+      const due = !faite && Date.now() >= prevue.getTime();
+      return {
+        label,
+        etat: faite ? "Envoyé le " + fr(faite) : (due ? "Dû depuis le " + fr(prevue) + (auto.actif ? " · part au prochain passage du script" : " · envois automatiques désactivés") : "Prévu le " + fr(prevue)),
+        point: faite ? VERT : (due ? ORANGE : GRIS),
+        anticipable: attente && !faite && !!modele && !!sel.email,
+        boutonLabel: due ? "Envoyer" : "Envoyer maintenant",
+        envoyer: () => this.envoyerJalon(sel, cle, modele)
+      };
+    };
+    const jalons = [
+      { label: "Vidéo envoyée au demandeur", etat: "Le " + fr(livree), point: VERT, anticipable: false },
+      (!sel.relanceAutoLe && (sel.avertMoisLe || sel.avertSemaineLe || Math.max(livree.getTime() + 15 * j, Date.now()) >= moisAvant.getTime() - 7 * j)
+        ? { label: "Relance (15 jours sans réponse)", etat: "Sans objet : les avertissements de suppression prennent le relais", point: GRIS, anticipable: attente && !!sel.email, boutonLabel: "Envoyer maintenant", envoyer: () => this.envoyerJalon(sel, "relance", "relance") }
+        : ligne("relance", "Relance (15 jours sans réponse)", new Date(livree.getTime() + 15 * j), sel.relanceAutoLe, "relance")),
+      ligne("avert_mois", "Avertissement un mois avant", moisAvant, sel.avertMoisLe, "avert_suppression"),
+      ligne("avert_semaine", "Avertissement une semaine avant", new Date(echeance.getTime() - 7 * j), sel.avertSemaineLe, "avert_suppression"),
+      sel.statut === "supprimee"
+        ? { label: "Suppression", etat: "Faite le " + fr(sel.supprimeeLe || echeance), point: VERT, anticipable: false }
+        : { label: "Suppression de la demande", etat: "Prévue le " + fr(echeance) + " · courriel au demandeur et à vous (vidéo à supprimer dans Synthesia)", point: GRIS, anticipable: false }
+    ];
+    const relances = [sel.relanceAutoLe].concat((sel.historique || []).filter(h => h.evenement === "relance").map(h => h.iso)).filter(Boolean).map(x => new Date(x).getTime());
+    return {
+      montrerJalons: true, jalons,
+      jalonsIntro: attente
+        ? (auto.actif ? "Envois automatiques actifs : chaque jalon part seul à sa date. « Envoyer maintenant » l'envoie plus tôt sans changer l'échéance."
+                      : "Envois automatiques désactivés (Configuration) : les jalons sont calculés mais ne partent pas seuls. « Envoyer maintenant » l'envoie depuis cette fiche.")
+          + (sel.email && !sel.contactRobot && auto.cle ? " L'adresse du demandeur sera préparée pour le script au prochain chargement." : "")
+        : "Demande supprimée après 3 mois sans réponse.",
+      derniereRelance: relances.length ? "Dernière relance : le " + fr(Math.max.apply(null, relances)) : "Aucune relance envoyée pour le moment.",
+      peutProlonger: attente,
+      prolongerUnMois: () => { const d = new Date(Math.max(echeance.getTime(), Date.now())); d.setMonth(d.getMonth() + 1); this.prolongerEcheance(sel, d); },
+      prolongerDate: () => { if (!this.state.dateProlongation) { this.setState({ jalonMsg: "Choisissez d'abord une date." }); return; } this.prolongerEcheance(sel, new Date(this.state.dateProlongation + "T12:00:00")); }
+    };
+  }
+
+  envoyerJalon(sel, cle, modele) {
+    if (!sel.email) { this.setState({ jalonMsg: "Adresse du demandeur illisible : envoi impossible." }); return; }
+    this.envoyer(modele, sel.email, this.variables(sel), sel.ref);
+    window.Stockage.jalonFait(sel.id, cle)
+      .then(() => { this.setState({ jalonMsg: "Courriel envoyé ; jalon mis à jour (l'échéance ne change pas)." }); this.rafraichir(); })
+      .catch(e => this.setState({ jalonMsg: "Jalon non enregistré : " + e.message }));
+  }
+
+  prolongerEcheance(sel, date) {
+    window.Stockage.prolonger(sel.id, date.toISOString())
+      .then(() => { this.setState({ jalonMsg: "Échéance reportée au " + date.toLocaleDateString("fr-FR") + "." }); this.rafraichir(); })
+      .catch(e => this.setState({ jalonMsg: "Report impossible : " + e.message }));
   }
 
   /* Changement de phase à la main, dans les deux sens. L'administrateur reste
@@ -3306,7 +3495,8 @@ class Component extends DCLogic {
         return;
       }
       if (!a.suivant) {
-        this.majTicket(sel.id, {}, { qui: "Administrateur", quand: this.horodatage(), texte: a.note, point: PT.validation });
+        /* v2 : une relance manuelle tient lieu de la relance automatique de J+15 */
+        this.majTicket(sel.id, { _evenement: "relance", ...(sel.relanceAutoLe ? {} : { relance_auto_le: new Date().toISOString() }) }, { qui: "Administrateur", quand: this.horodatage(), texte: a.note, point: PT.validation });
         this.envoyer("relance", sel.email, this.variables(sel), sel.ref);
         return;
       }
@@ -3836,9 +4026,14 @@ class Component extends DCLogic {
       majDestManuel: e => this.setState({ destManuel: e.target.value }),
       lancerEnvoiManuel: () => this.envoiManuel(),
       envoiManuelPret: !!st.envoiManuel,
-      ouvrirAttestationTicket: () => { if (sel) this.ouvrirAttestation(sel.ref); },
-      ouvrirValidationAdmin: () => { if (sel) this.ouvrirSignature(sel.token); },
-      ouvrirModificationAdmin: () => { if (sel) this.ouvrirModification(sel.token); },
+      /* v2 : ouvrent dans un nouvel onglet les pages du formateur (suivi.html), avec son lien personnel */
+      ouvrirAttestationTicket: () => { if (sel) window.open(this.variables(sel).lienAttestation, "_blank", "noopener"); },
+      ouvrirValidationAdmin: () => { if (sel) window.open(this.variables(sel).lienValidation, "_blank", "noopener"); },
+      ouvrirModificationAdmin: () => { if (sel) window.open(this.variables(sel).lienModification, "_blank", "noopener"); },
+      ouvrirMiseAJourAdmin: () => { if (sel) window.open(this.variables(sel).lienMiseAJour, "_blank", "noopener"); },
+      dateProlongation: st.dateProlongation || "",
+      majDateProlongation: e => this.setState({ dateProlongation: e.target.value }),
+      jalonMsg: st.jalonMsg || "",
       voirArchives: st.voirArchives,
       basculerArchives: () => this.setState({ voirArchives: !st.voirArchives, selected: null }),
       labelArchives: st.voirArchives ? "Revenir aux demandes actives" : "Voir les archives",
@@ -3872,7 +4067,7 @@ class Component extends DCLogic {
         this.majTicket(sel.id, { lien: st.lienInput.trim() }, { qui: "Administrateur", quand: this.horodatage(), texte: "Lien de la vidéo remplacé.", point: PT.validation });
         this.envoyer("lien_remplace", sel.email, this.variables(sel, { lienVideo: st.lienInput.trim() }), sel.ref);
       },
-      ouvrirValidation: () => { if (sel) this.setState({ route: "valider", tokenActif: sel.token }); },
+      ouvrirValidation: () => { if (sel) window.open(this.variables(sel).lienValidation, "_blank", "noopener"); },
       supprimerTicket: () => {
         if (!sel) return;
         this.setState({ tickets: st.tickets.filter(t => t.id !== sel.id), route: "admin", selected: null });
@@ -3986,6 +4181,7 @@ class Component extends DCLogic {
       derniereRef: st.derniereRef,
       derniereAdresse: st.derniereAdresse,
       mentionRgpd: String(window.mentionRgpd ? window.mentionRgpd() : "").replace(/<[^>]+>/g, ""),
+      ...this.carteAutomatisation(),
       ouvrirDerniereValidation: () => { window.open("suivi.html?suivi=" + encodeURIComponent(st.dernierToken), "_blank", "noopener"); },
 
       soumettre: () => {

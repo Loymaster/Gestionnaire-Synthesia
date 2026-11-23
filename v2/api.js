@@ -119,5 +119,18 @@
   const estJeton = (t) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(t || ''));
   const adresseValide = (a) => /^[^\s@<>,;"]+@[^\s@<>,;"]+\.[a-z]{2,}$/i.test(String(a || '').trim());
 
-  global.ApiV2 = { rpc, deposer, envoyerFichier, courriel, lireSuivi, retour, tableau, reglagesPublics, chiffrer, verifierCle, nouvelleCle, estJeton, adresseValide };
+  /* Copie de l'adresse chiffrée pour le script d'envoi (relances et avertissements automatiques).
+     Sans clé du script configurée, rien n'est envoyé : le dépôt n'en dépend pas. */
+  async function contactRobot(token, email, nom) {
+    try {
+      const r = await reglagesPublics();
+      const cle = r && r.cleRobot;
+      if (!cle || !cle.publique) return false;
+      if (await global.Chiffrement.empreinte(cle.publique) !== cle.empreinte) return false;
+      const c = await global.Chiffrement.chiffrerRobot({ email, nom }, cle.publique);
+      return await rpc('deposer_contact_robot', { p_token: token, p_contact: c });
+    } catch (e) { return false; }
+  }
+
+  global.ApiV2 = { contactRobot, rpc, deposer, envoyerFichier, courriel, lireSuivi, retour, tableau, reglagesPublics, chiffrer, verifierCle, nouvelleCle, estJeton, adresseValide };
 })(window);
