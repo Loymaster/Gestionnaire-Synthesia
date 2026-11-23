@@ -1048,6 +1048,126 @@
     </div>
   </sc-if>
 
+  <sc-if value="{{ routeRelances }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <header style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; padding: 36px 0 24px;">
+        <div style="flex: 1; min-width: 240px;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #f39200; margin-bottom: 8px;">Espace administrateur</div>
+          <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">Relances et jalons</h1>
+          <p style="margin: 8px 0 0; font-size: 15px; color: oklch(0.5 0 0); max-width: 64ch; text-wrap: pretty;">Les demandes vues sous l'angle des courriels : jalons, derniers envois, relances. Cochez des demandes pour agir sur plusieurs à la fois. Un envoi anticipé ne change jamais la date de suppression.</p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <span style="font-size: 13px; color: #154194;">{{ etatRafraichi }}</span>
+          <button onClick="{{ rafraichir }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: #154194; color: white; border: 0;" style-hover="background: #0f3070;">Actualiser</button>
+          <button onClick="{{ seDeconnecter }}" style="cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: white; border: 1px solid #cfd8e8;" style-hover="background: oklch(0.96 0 0);">Se déconnecter</button>
+        </div>
+      </header>
+
+      <div style="display: flex; gap: 4px; flex-wrap: wrap; padding: 4px; background: oklch(0.945 0 0); border-radius: 9px; margin-bottom: 24px; width: fit-content;">
+        <sc-for list="{{ onglets }}" as="o" hint-placeholder-count="2">
+          <button onClick="{{ o.onClick }}" style="cursor: pointer; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: {{ o.poids }}; background: {{ o.bg }}; color: {{ o.fg }}; border: 1px solid {{ o.bd }};">{{ o.label }}</button>
+        </sc-for>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px;">
+        <sc-for list="{{ rel.compteurs }}" as="c" hint-placeholder-count="4">
+          <div style="background: white; border: 1px solid #dfe5f0; border-radius: 10px; padding: 16px 18px;">
+            <div style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1; color: {{ c.couleur }};">{{ c.n }}</div>
+            <div style="font-size: 13px; color: oklch(0.5 0 0); margin-top: 6px;">{{ c.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="font-size: 13px; color: oklch(0.45 0 0); margin-bottom: 12px;">{{ rel.etatAuto }}</div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+        <sc-for list="{{ rel.filtres }}" as="fl" hint-placeholder-count="6">
+          <button onClick="{{ fl.onClick }}" style="cursor: pointer; padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; background: {{ fl.bg }}; color: {{ fl.fg }}; border: 1px solid {{ fl.bd }};">{{ fl.label }}</button>
+        </sc-for>
+      </div>
+
+      <div style="position: sticky; top: 0; z-index: 5; background: #f6f8fc; border: 1px solid #dfe5f0; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          <span style="font-size: 13.5px; font-weight: 600; margin-right: 6px;">{{ rel.nbSel }}</span>
+          <span style="font-size: 12.5px; color: oklch(0.5 0 0);">Cocher :</span>
+          <sc-for list="{{ rel.selections }}" as="sx" hint-placeholder-count="4">
+            <button onClick="{{ sx.onClick }}" style="cursor: pointer; padding: 4px 10px; border-radius: 999px; font-size: 12px; background: white; color: oklch(0.3 0 0); border: 1px solid #cfd8e8;">{{ sx.label }}</button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ rel.actionsVisibles }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 12.5px; color: oklch(0.5 0 0);">Pour la sélection :</span>
+            <button onClick="{{ rel.lotJalon }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; background: #154194; color: white; border: 1px solid #154194; white-space: nowrap;">Envoyer le jalon dû</button>
+            <button onClick="{{ rel.lotRelance }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194; white-space: nowrap;">Relancer</button>
+            <button onClick="{{ rel.lotAvert }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194; white-space: nowrap;">Avertir de la suppression</button>
+            <button onClick="{{ rel.lotProlonger }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194; white-space: nowrap;">Prolonger d'un mois</button>
+            <button onClick="{{ rel.basculerModeles }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194; white-space: nowrap;">{{ rel.labelModeles }}</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ rel.modelesOuverts }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 12.5px; color: oklch(0.5 0 0);">Modèle à envoyer :</span>
+            <sc-for list="{{ rel.modeles }}" as="mo" hint-placeholder-count="5">
+              <button onClick="{{ mo.onClick }}" style="cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 12px; background: white; color: #154194; border: 1px solid #cfd8e8;">{{ mo.nom }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ rel.confirmer }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; background: #fff4e0; border: 1px solid #f3c77a; border-radius: 8px; padding: 10px 12px;">
+            <span style="flex: 1; min-width: 220px; font-size: 13.5px; line-height: 1.45;">{{ rel.texteConfirmation }}</span>
+            <button onClick="{{ rel.valider }}" style="cursor: pointer; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; background: #154194; color: white; border: 0;">Confirmer</button>
+            <button onClick="{{ rel.annuler }}" style="cursor: pointer; padding: 7px 14px; border-radius: 6px; font-size: 13px; background: white; border: 1px solid #cfd8e8;">Annuler</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ rel.montrerMsg }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size: 13px; color: #154194; white-space: pre-wrap; line-height: 1.5;">{{ rel.msg }}</div>
+        </sc-if>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <sc-for list="{{ rel.lignes }}" as="l" hint-placeholder-count="5">
+          <div style="display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; background: {{ l.fond }}; border: 1px solid #dfe5f0; border-left: 3px solid {{ l.fg }}; border-radius: 10px; padding: 14px 16px;">
+            <input type="checkbox" checked="{{ l.coche }}" onChange="{{ l.basculer }}" aria-label="Sélectionner {{ l.ref }}" style="width: 17px; height: 17px; margin-top: 3px; flex-shrink: 0; accent-color: #154194; cursor: pointer;" />
+            <div style="flex: 1 1 260px; min-width: 0;">
+              <div style="display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap;">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: oklch(0.5 0 0);">{{ l.ref }}</span>
+                <span style="padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 500; white-space: nowrap; background: {{ l.bg }}; color: {{ l.fg }};">{{ l.statut }}</span>
+                <sc-if value="{{ l.du }}" hint-placeholder-val="{{ false }}">
+                  <span style="padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; background: #fff1d6; color: #9a5b00;">{{ l.duLabel }}</span>
+                </sc-if>
+              </div>
+              <div style="font-size: 14.5px; font-weight: 500; line-height: 1.35; margin-top: 4px;">{{ l.titre }}</div>
+              <div style="font-size: 12.5px; color: oklch(0.5 0 0); margin-top: 2px; overflow-wrap: anywhere;">{{ l.contact }}</div>
+              <sc-if value="{{ l.montrerJalons }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+                  <sc-for list="{{ l.jalons }}" as="j" hint-placeholder-count="5">
+                    <span title="{{ j.titre }}" style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 6px; font-size: 11.5px; background: {{ j.fond }}; color: oklch(0.3 0 0); border: 1px solid {{ j.bord }};"><span style="width: 7px; height: 7px; border-radius: 999px; background: {{ j.point }};"></span>{{ j.court }} · {{ j.date }}</span>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <div style="font-size: 12px; color: oklch(0.45 0 0); margin-top: 8px; line-height: 1.5;">{{ l.resume }}</div>
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; align-items: center; max-width: 100%;">
+              <sc-if value="{{ l.duEnvoyable }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ l.envoyerDu }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; background: #154194; color: white; border: 1px solid #154194; white-space: nowrap;">Envoyer le jalon dû</button>
+              </sc-if>
+              <sc-if value="{{ l.actions }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ l.relancer }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194; white-space: nowrap;">Relancer</button>
+                <button onClick="{{ l.avertir }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194; white-space: nowrap;">Avertir</button>
+                <button onClick="{{ l.prolonger }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: white; color: #154194; border: 1px solid #154194; white-space: nowrap;">+1 mois</button>
+              </sc-if>
+              <button onClick="{{ l.ouvrir }}" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: white; color: oklch(0.3 0 0); border: 1px solid #cfd8e8; white-space: nowrap;">Fiche</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ rel.vide }}" hint-placeholder-val="{{ false }}">
+        <div style="background: white; border: 1px dashed oklch(0.86 0 0); border-radius: 10px; padding: 48px; text-align: center; color: oklch(0.55 0 0); font-size: 15px;">Aucune demande dans ce filtre.</div>
+      </sc-if>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ routeTicket }}" hint-placeholder-val="{{ false }}">
     <div style="padding-top: 32px; animation: fadein 0.2s ease-out;">
       <button onClick="{{ retourListe }}" style="border: 0; background: none; cursor: pointer; padding: 0; margin-bottom: 18px; font-size: 14px; color: oklch(0.5 0 0);" style-hover="color: oklch(0.22 0 0);">← Retour à la liste</button>
@@ -3145,6 +3265,210 @@ class Component extends DCLogic {
     };
   }
 
+  /* ---- Onglet « Relances et jalons » : les demandes vues sous l'angle des courriels ---- */
+
+  /* Jalons d'une vidéo en attente de validation, mêmes règles que la base (robot_jalons). */
+  etatJalons(t) {
+    if (t.statut !== "validation" || !t.livreeLe || !t.echeance) return null;
+    const j = 86400000, now = Date.now();
+    const livree = new Date(t.livreeLe).getTime(), echeance = new Date(t.echeance).getTime();
+    const m = new Date(echeance); m.setMonth(m.getMonth() - 1); const moisAvant = m.getTime();
+    const semaineAvant = echeance - 7 * j, relancePrevue = livree + 15 * j;
+    const relanceSansObjet = !t.relanceAutoLe && (t.avertMoisLe || t.avertSemaineLe || Math.max(relancePrevue, now) >= moisAvant - 7 * j);
+    const etape = (cle, court, nom, prevue, faite, sansObjet) => ({
+      cle, court, nom, prevue, faite: faite ? new Date(faite).getTime() : null, sansObjet: !!sansObjet,
+      du: !faite && !sansObjet && now >= prevue
+    });
+    const etapes = [
+      etape("livraison", "Vidéo", "Vidéo envoyée", livree, t.livreeLe),
+      etape("relance", "Relance", "Relance à 15 jours", relancePrevue, t.relanceAutoLe, relanceSansObjet),
+      etape("avert_mois", "J-30", "Avertissement un mois avant", moisAvant, t.avertMoisLe),
+      etape("avert_semaine", "J-7", "Avertissement une semaine avant", semaineAvant, t.avertSemaineLe),
+      etape("suppression", "Suppr.", "Suppression", echeance, null)
+    ];
+    /* Seul le jalon le plus avancé part (comme le script) : relance < J-30 < J-7 < suppression. */
+    const dus = etapes.filter(e => e.du);
+    return { etapes, du: dus.length ? dus[dus.length - 1] : null, echeance, joursRestants: Math.ceil((echeance - now) / j) };
+  }
+
+  vueRelances() {
+    const st = this.state;
+    const fr = x => new Date(x).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "2-digit" });
+    const sel = st.relSel || {};
+    const filtre = st.relFiltre || "attente";
+    const auto = (window.Stockage.automatisation && window.Stockage.automatisation()) || {};
+    const nomModele = id => { const m = MODELES.find(x => x.id === id); if (m) return m.nom; const lib = { jalon_relance: "Relance (jalon)", jalon_avert_mois: "Avertissement J-30 (jalon)", jalon_avert_semaine: "Avertissement J-7 (jalon)", jalon_suppression: "Suppression (jalon)", libre: "Message libre" }; return lib[id] || id || "Courriel"; };
+    /* Courriels par demande (journal de la base + envois de cette session) */
+    const parRef = {};
+    (st.mails || []).forEach(m => { if (!m.ref || /^marqueur/.test(m.resultat || "")) return; (parRef[m.ref] = parRef[m.ref] || []).push(m); });
+    const actives = st.tickets.filter(t => !t.archive && t.statut !== "supprimee");
+    const infos = actives.map(t => {
+      const jal = this.etatJalons(t);
+      const mails = (parRef[t.ref] || []).slice().sort((a, b) => new Date(b.envoye) - new Date(a.envoye));
+      const relances = [t.relanceAutoLe].concat((t.historique || []).filter(h => h.evenement === "relance").map(h => h.iso)).filter(Boolean).map(x => new Date(x).getTime());
+      return { t, jal, mails, derniereRelance: relances.length ? Math.max.apply(null, relances) : null };
+    });
+    const FILTRES = [
+      { k: "dus", label: "Jalon dû", f: i => !!(i.jal && i.jal.du) },
+      { k: "attente", label: "En attente de validation", f: i => i.t.statut === "validation" },
+      { k: "proches", label: "Suppression sous 30 jours", f: i => !!(i.jal && i.jal.joursRestants <= 30) },
+      { k: "jamais", label: "Jamais relancées", f: i => i.t.statut === "validation" && !i.derniereRelance },
+      { k: "encours", label: "Autres demandes en cours", f: i => i.t.statut !== "validation" && !estValidee(i.t.statut) },
+      { k: "toutes", label: "Toutes", f: () => true }
+    ];
+    const F = FILTRES.find(x => x.k === filtre) || FILTRES[1];
+    const visibles = infos.filter(F.f).sort((a, b) => {
+      if (a.jal && b.jal) return a.jal.echeance - b.jal.echeance;
+      if (a.jal || b.jal) return a.jal ? -1 : 1;
+      return new Date(b.t.depose) - new Date(a.t.depose);
+    });
+    const idsSel = visibles.filter(i => sel[i.t.id]).map(i => i.t.id);
+    const cocher = ids => this.setState({ relSel: ids.reduce((o, id) => (o[id] = true, o), {}), relConfirm: null });
+    const demander = (action, ids, modele) => {
+      if (!ids.length) { this.setState({ relMsg: "Cochez d'abord au moins une demande." }); return; }
+      this.setState({ relConfirm: { action, ids, modele: modele || null }, relMsg: "" });
+    };
+    const attente = infos.filter(i => i.t.statut === "validation");
+    const VERT = "oklch(0.5 0.12 155)", GRIS = "oklch(0.75 0 0)", ORANGE = "#d48a00";
+    const conf = st.relConfirm;
+    const libAction = c => c.action === "jalon" ? "envoyer le jalon dû (relance ou avertissement, selon la demande)" : c.action === "relance" ? "envoyer la relance" : c.action === "avert" ? "envoyer l'avertissement de suppression" : c.action === "prolonger" ? "reporter d'un mois la date de suppression" : "envoyer « " + nomModele(c.modele) + " »";
+    return {
+      compteurs: [
+        { n: attente.length, label: "En attente de validation", couleur: "oklch(0.22 0 0)" },
+        { n: infos.filter(i => i.jal && i.jal.du).length, label: "Jalon dû", couleur: ORANGE },
+        { n: attente.filter(i => !i.derniereRelance).length, label: "Jamais relancées", couleur: "oklch(0.22 0 0)" },
+        { n: infos.filter(i => i.jal && i.jal.joursRestants <= 30).length, label: "Suppression sous 30 jours", couleur: "oklch(0.5 0.16 25)" }
+      ],
+      etatAuto: auto.actif ? "Envois automatiques actifs : le script envoie chaque matin les jalons dus." : "Envois automatiques désactivés (Configuration) : les jalons dus ne partent qu'à la main.",
+      filtres: FILTRES.map(x => ({
+        label: x.label + " · " + infos.filter(x.f).length,
+        onClick: () => this.setState({ relFiltre: x.k, relConfirm: null }),
+        bg: x.k === F.k ? "#154194" : "white", fg: x.k === F.k ? "white" : "oklch(0.35 0 0)", bd: x.k === F.k ? "#154194" : "#cfd8e8"
+      })),
+      nbSel: idsSel.length ? idsSel.length + " sélectionnée" + (idsSel.length > 1 ? "s" : "") : "Aucune sélection",
+      selections: [
+        { label: "Toutes celles affichées", onClick: () => cocher(visibles.map(i => i.t.id)) },
+        { label: "Jalon dû", onClick: () => cocher(visibles.filter(i => i.jal && i.jal.du).map(i => i.t.id)) },
+        { label: "Jamais relancées", onClick: () => cocher(visibles.filter(i => i.t.statut === "validation" && !i.derniereRelance).map(i => i.t.id)) },
+        { label: "Suppression sous 30 jours", onClick: () => cocher(visibles.filter(i => i.jal && i.jal.joursRestants <= 30).map(i => i.t.id)) },
+        { label: "Aucune", onClick: () => cocher([]) }
+      ],
+      actionsVisibles: idsSel.length > 0 && !st.relEnCours,
+      lotJalon: () => demander("jalon", idsSel),
+      lotRelance: () => demander("relance", idsSel),
+      lotAvert: () => demander("avert", idsSel),
+      lotProlonger: () => demander("prolonger", idsSel),
+      basculerModeles: () => this.setState({ relModelesOuverts: !st.relModelesOuverts }),
+      labelModeles: st.relModelesOuverts ? "Fermer les modèles" : "Autre modèle…",
+      modelesOuverts: !!st.relModelesOuverts && idsSel.length > 0 && !st.relEnCours,
+      modeles: MODELES.filter(m => m.dest === "Le demandeur").map(m => ({ nom: m.nom, onClick: () => demander("modele", idsSel, m.id) })),
+      confirmer: !!conf && !st.relEnCours,
+      texteConfirmation: conf ? (() => {
+        const lot = conf.ids.map(id => infos.find(i => i.t.id === id)).filter(Boolean);
+        const ok = lot.filter(i => this.lotEligible(conf.action, i.t) === true).length;
+        return "Confirmez-vous : " + libAction(conf) + " pour " + ok + " demande" + (ok > 1 ? "s" : "") + " ?"
+          + (ok < lot.length ? " (" + (lot.length - ok) + " ignorée" + (lot.length - ok > 1 ? "s" : "") + " : adresse illisible ou vidéo pas en attente de validation)" : "");
+      })() : "",
+      valider: () => this.executerLot(conf),
+      annuler: () => this.setState({ relConfirm: null }),
+      montrerMsg: !!st.relMsg, msg: st.relMsg || "",
+      lignes: visibles.map(i => {
+        const t = i.t, s = S[t.statut] || S.nouvelle, jal = i.jal, enAttente = t.statut === "validation";
+        const dernier = i.mails[0];
+        const resume = [
+          dernier ? "Dernier courriel : " + nomModele(dernier.modele) + " le " + fr(dernier.envoye) + (dernier.resultat && !/^envoy/.test(dernier.resultat) ? " (" + dernier.resultat + ")" : "") : "Aucun courriel journalisé",
+          i.mails.length > 1 ? i.mails.length + " courriels au total" : "",
+          enAttente ? (i.derniereRelance ? "dernière relance le " + fr(i.derniereRelance) : "jamais relancée") : "",
+          jal ? (jal.joursRestants >= 0 ? "suppression dans " + jal.joursRestants + " j" : "suppression échue") : ""
+        ].filter(Boolean).join(" · ");
+        return {
+          ref: t.ref, titre: t.titre, statut: s.label, bg: s.bg, fg: s.fg,
+          fond: sel[t.id] ? "#f3f7ff" : "white",
+          contact: t.identiteIllisible ? "Adresse illisible (clé privée ?)" : (t.demandeur || "—") + (t.email ? " · " + t.email : " · adresse inconnue"),
+          coche: !!sel[t.id],
+          basculer: () => this.setState(x => { const n = { ...(x.relSel || {}) }; if (n[t.id]) delete n[t.id]; else n[t.id] = true; return { relSel: n, relConfirm: null }; }),
+          du: !!(jal && jal.du), duLabel: jal && jal.du ? "Dû : " + jal.du.nom.toLowerCase() : "",
+          montrerJalons: !!jal,
+          jalons: jal ? jal.etapes.map(e => ({
+            court: e.court,
+            date: e.faite ? fr(e.faite) : e.sansObjet ? "—" : fr(e.prevue),
+            titre: e.nom + " : " + (e.faite ? "fait le " + fr(e.faite) : e.sansObjet ? "sans objet (avertissements)" : e.du ? "dû depuis le " + fr(e.prevue) : "prévu le " + fr(e.prevue)),
+            point: e.faite ? VERT : e.du ? ORANGE : GRIS,
+            fond: e.du ? "#fff6e6" : "white", bord: e.du ? "#f3c77a" : "#e3e8f1"
+          })) : [],
+          resume,
+          actions: enAttente && !!t.email,
+          envoyerDu: () => this.setState({ relSel: { [t.id]: true }, relConfirm: { action: "jalon", ids: [t.id] }, relMsg: "" }),
+          duEnvoyable: !!(jal && jal.du && jal.du.cle !== "suppression" && t.email),
+          relancer: () => this.setState({ relSel: { [t.id]: true }, relConfirm: { action: "relance", ids: [t.id] }, relMsg: "" }),
+          avertir: () => this.setState({ relSel: { [t.id]: true }, relConfirm: { action: "avert", ids: [t.id] }, relMsg: "" }),
+          prolonger: () => this.setState({ relSel: { [t.id]: true }, relConfirm: { action: "prolonger", ids: [t.id] }, relMsg: "" }),
+          ouvrir: () => this.setState({ selected: t.id, route: "ticket", lienInput: t.lien || "", emailEdite: null })
+        };
+      }),
+      vide: visibles.length === 0
+    };
+  }
+
+  /* true si l'action peut s'appliquer à cette demande, sinon la raison */
+  lotEligible(action, t) {
+    if (action === "prolonger") return t.statut === "validation" && !!t.echeance ? true : "pas en attente de validation";
+    if (!t.email) return "adresse illisible";
+    if ((action === "relance" || action === "avert" || action === "jalon") && t.statut !== "validation") return "pas en attente de validation";
+    if (action === "jalon") {
+      const jal = this.etatJalons(t);
+      if (!jal || !jal.du) return "aucun jalon dû";
+      if (jal.du.cle === "suppression") return "échéance atteinte : la suppression est faite par le script, ou prolongez";
+    }
+    return true;
+  }
+
+  /* Exécution d'une action groupée, demande par demande, avec bilan */
+  async executerLot(conf) {
+    if (!conf || this.state.relEnCours) return;
+    const lot = conf.ids.map(id => this.state.tickets.find(t => t.id === id)).filter(Boolean);
+    const ok = [], ko = [];
+    this.setState({ relEnCours: true, relConfirm: null, relMsg: "Traitement 0 / " + lot.length + "…" });
+    for (let n = 0; n < lot.length; n++) {
+      const t = lot[n];
+      this.setState({ relMsg: "Traitement " + (n + 1) + " / " + lot.length + " : " + t.ref + "…" });
+      const elig = this.lotEligible(conf.action, t);
+      if (elig !== true) { ko.push(t.ref + " : ignorée (" + elig + ")"); continue; }
+      try {
+        if (conf.action === "prolonger") {
+          const d = new Date(Math.max(new Date(t.echeance).getTime(), Date.now())); d.setMonth(d.getMonth() + 1);
+          await window.Stockage.prolonger(t.id, d.toISOString());
+          ok.push(t.ref + " → suppression le " + d.toLocaleDateString("fr-FR"));
+          continue;
+        }
+        const du = conf.action === "jalon" ? this.etatJalons(t).du.cle : null;
+        const modele = conf.action === "relance" || du === "relance" ? "relance" : conf.action === "avert" || du ? "avert_suppression" : conf.modele;
+        const m = this.modele(modele), vars = this.variables(t);
+        const mail = {
+          id: "m" + Date.now() + Math.random().toString(36).slice(2, 5), modele, canal: this.canalActuel(), dest: t.email,
+          objet: remplir(m.objet, vars), corps: remplir(m.corps, vars), ref: t.ref, envoye: new Date().toISOString(),
+          expediteur: this.reglages().nomExpediteur + " <" + this.reglages().adresseExpediteur + ">"
+        };
+        const r = await window.Stockage.expedier(mail);
+        if (!r || !r.ok) throw new Error((r && r.erreur) || "envoi refusé");
+        this.setState(s => ({ mails: [mail, ...s.mails] }));
+        /* Le jalon correspondant est noté (historique, date de dernière relance) ; l'échéance ne change pas. */
+        let jalon = du;
+        if (!jalon && modele === "relance" && t.statut === "validation") jalon = "relance";
+        if (!jalon && modele === "avert_suppression" && t.statut === "validation") jalon = t.avertMoisLe ? "avert_semaine" : "avert_mois";
+        if (jalon) await window.Stockage.jalonFait(t.id, jalon);
+        ok.push(t.ref + " → " + t.email);
+      } catch (e) { ko.push(t.ref + " : " + e.message); }
+      await new Promise(r => setTimeout(r, 250));
+    }
+    this.setState({
+      relEnCours: false, relSel: {},
+      relMsg: "Terminé : " + ok.length + " réussie" + (ok.length > 1 ? "s" : "") + (ko.length ? ", " + ko.length + " non traitée" + (ko.length > 1 ? "s" : "") : "") + "."
+        + (ko.length ? "\n" + ko.join("\n") : "")
+    });
+    this.rafraichir();
+  }
+
   envoyerJalon(sel, cle, modele) {
     if (!sel.email) { this.setState({ jalonMsg: "Adresse du demandeur illisible : envoi impossible." }); return; }
     this.envoyer(modele, sel.email, this.variables(sel), sel.ref);
@@ -3532,6 +3856,8 @@ class Component extends DCLogic {
       routeLogin: st.route === "login",
       routeAdmin: st.route === "admin" && st.authed,
       routeMails: st.route === "mails" && st.authed,
+      routeRelances: st.route === "relances" && st.authed,
+      rel: st.route === "relances" && st.authed ? this.vueRelances() : { compteurs: [], filtres: [], selections: [], modeles: [], lignes: [] },
       routeConfig: st.route === "config" && st.authed,
       baseSource: st.base.source === "api" ? "Base connectée"
         : st.base.source === "hors-ligne" ? "Hors ligne" : "Mode local (démonstration)",
@@ -3616,6 +3942,7 @@ class Component extends DCLogic {
       onglets: [
         { label: "Demandes", actif: st.route === "admin" || st.route === "ticket", onClick: () => this.setState({ route: "admin", selected: null }) },
         { label: st.mails.length ? "Courriels envoyés · " + st.mails.length : "Courriels envoyés", actif: st.route === "mails", onClick: () => this.setState({ route: "mails" }) },
+        { label: "Relances et jalons", actif: st.route === "relances", onClick: () => this.setState({ route: "relances" }) },
         { label: "Avancement", actif: st.route === "tableau", onClick: () => this.setState({ route: "tableau" }) },
         { label: "Catalogue", actif: st.route === "catalogue", onClick: () => this.setState({ route: "catalogue" }) },
         { label: "Attestations", actif: st.route === "attestations", onClick: () => this.setState({ route: "attestations" }) },
